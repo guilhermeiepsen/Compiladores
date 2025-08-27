@@ -1,0 +1,59 @@
+Análise lexica
+
+é o que faz o fopen e le caracter porcaracter
+busca encontrar lexemas e gerar tokens a artir deles.
+
+qual a coisa do makefile?
+
+a tabela de simbolos guarda os simbolos específicos do arrquivo que esta sendo compilado, palavras reservadas, simbolos e pontuações não entram.
+Análise lexica guarda os tokens de simbolos e/ou literais na tabela de simbolos
+
+
+********* AULA DE LABORATÓRIO ***********
+
+precisamos desenvolver um makefile pra o trabalho, para isso, precisamos ver o vídeo indicado pelo professor, mas essa série de comandos já é um código inicial para este makefile:
+
+flex scanner.l ; gcc lex.yy.c -c ; gcc main.c -c ; gcc main.o lex.yy.o -o e1; cat teste_1.txt | ./e1
+
+flex é o parser e tokenizador, lex.yy.c é o código gerado pelo scanner automaticamente pelo primeiro comando.
+
+Precisamos compilar individualmente cada um dos arquivos, de maneira a não termos que recompilar todos os arquivos sempre que mudarmos algo no projeto.
+
+então -c gera o .o a partir do arquivo c. e depois podemos a partir do .o de cada um dos arquivos gerar o executavel e1
+
+além disso, cat teste_1.txt | ./e1 printa o conteudo de teste_1.txt como entrada para o executável ./e1 . Assim, conseguimos colocar o arquivo de parseamento teste como entrada para nosso analisador lexico(?) da etapa 1.
+
+strace ./e1 mostra o trace de todas as chamadas de sistema pelo programa
+
+
+AUTOMATOS
+existe um mecanismo automatico que transforma ers em automatos, onde esse automato teria como arestas os digitos possiveis aceitaveis da expressão regular. Não precisamos saber como essa tradução acontece, visto que ela é automatica.
+
+A contrsução de thompsom torna esse mecanismo que é arbitrário quando traduzimos de maneira manual, em algo automático, thompsom é gangster.
+
+Um automato finito parece bastante uma maquina de estados como a de turing.
+
+para montar um automato a partir da expressão regular, podemos montar caixinhas de reconhecimento de +, | , * e simplesmente usar essas caixinhas em expressões mais complexas.
+
+Um AFND pode ter possibilidades infinitas de percorrer o automato até reconhecer qualquer padrão, isso acontece pela existencia de transições vazias, mas a ideia é que existe uma maneira de transformar esse automato não deterministico, que tem infinitas respostas para percorrer o automato, em um automato deterministico, onde sabemos quais as possibilidades finitas para o programa percorrer o automato.
+
+Algorítmo de subconjuntos é este algoritmo que transforma um afnd em um afd, deterministico, então thompsom funciona somente por causa dessa prova vista em linguagens formais e automatos
+
+Fechamento vazio:
+quais estados são alcançados somente a partir de transições vazias. Transições vasias são estados livres, basicamente até onde podemos ir no automato sem consumir a entrada, quais são os estados iniciais de processamento do automato?
+
+basicamente o fechamento vazio diz que os estados que estão dentro do fechamento vazio daquele estado seria como se em qualque rum dos estados do fechamento vazio de a, seria como se estivessemos em a, ou estando em a seria como se estivessemos em qualquer um dos estados pertencentes ao fechamento vazio de a. Esse subconjunto do fechamento vazio do estado a é uma coisa só.
+
+fechamento do Movimento: 
+movimento é quais estados conseguimos alcançar usando um simbolo específico. Transição imediata, não podemos usar transições vazias para chegar onde um estado transitaria com o simbolo.
+
+Sempre depois do movimento aplicamos o fechamento vazio. pois sempre depois de um movimento, aplicamos o fechamento vazio, para descobrir quais estados são alcançados apos o movimento com simbolo a. 
+
+Estes dois conceitos são fundamentais para transformar um AFND em AFD.
+
+calculando sempre o fechamento vazio, temos o conjunto de estados do AFND que são um estado do AFD.
+
+sempre aplico o fechamento vazio que é resultado do movimento do estado A com o simbolo a.
+
+
+
