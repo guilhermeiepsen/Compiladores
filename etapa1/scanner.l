@@ -24,8 +24,8 @@ retorna { return TK_RETORNA; }
 enquanto { return TK_ENQUANTO; }
 com { return TK_COM; }
 [!*/%+\-<>\[\]()=,;&|] { return (int) yytext[0]; }
-[a-z][a-zA-Z0-9_]* { return TK_ID; }
-[0-9]* { return TK_LI_INTEIRO; }
+[a-z_][a-z0-9_]* { return TK_ID; }
+[0-9]+ { return TK_LI_INTEIRO; }
 [0-9]*\.[0-9]+ { return TK_LI_DECIMAL; }
 "==" { return TK_OC_EQ; }
 "<=" { return TK_OC_LE; }
