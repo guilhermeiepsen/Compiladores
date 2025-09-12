@@ -1,0 +1,10 @@
+bison -d parser.y;
+gcc -c parser.tab.c;
+gcc -c lex.yy.c;
+gcc main.o parser.tab.o lex.yy.o -o etapa2;
+./etapa2 < entrada2.txt;
+echo $?
+
+
+flex scanner.l -> generates lex.yy.c
+bison parser.y -> generates parser.tab

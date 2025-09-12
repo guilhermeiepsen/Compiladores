@@ -7,14 +7,13 @@ LDIR = .
 
 LIBS = -lm
 
-_DEPS = tokens.h
+_DEPS = tokens.h parser.tab.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o lex.yy.o 
+_OBJ = main.o lex.yy.o parser.tab.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-all: etapa1
-
+all: etapa2
 
 $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -23,10 +22,14 @@ $(ODIR)/%.o: %.c $(DEPS)
 $(ODIR)/lex.yy.c : scanner.l
 	flex -o $@ $<
 
-etapa1: $(OBJ)
+# --- Special rule: generate parser.tab.c and parser.tab.h from parser.y ---
+$(ODIR)/parser.tab.c $(ODIR)/parser.tab.h: parser.y
+	bison -d --report=all --report-file=$(ODIR)/parser.output -o $(ODIR)/parser.tab.c $<
+
+etapa2: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean
 
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ 
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h
