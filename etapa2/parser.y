@@ -43,7 +43,8 @@ header: "identifier" "->" integer_or_decimal optional_parameter_list ":=";
 integer_or_decimal: "decimal"
                   | "integer";
 
-optional_parameter_list: ',' parameter_list
+optional_parameter_list: parameter_list
+                       | ',' parameter_list
                        | %empty;
 
 parameter_list: parameter
@@ -53,11 +54,11 @@ parameter: "identifier" ":=" integer_or_decimal;
 
 body: command_block;
 
-command_block: '[' command_sequence ']';
+command_block: '[' command_sequence ']'
+             | '[' ']';
 
-command_sequence: %empty
-                | simple_command ';'
-                | command_sequence ';' simple_command ';';
+command_sequence: simple_command
+                | command_sequence simple_command;
 
 simple_command: variable_declaration_with_instantiation
               | function_call
@@ -101,11 +102,47 @@ mandatory_block: mandatory_block simple_command
 
 iterative_struct: "while" '(' expression ')' command_block;
 
+expression: logical_or_expression;
 
-expression: "decimal"
+logical_or_expression: logical_and_expression
+                     | logical_or_expression '|' logical_and_expression;
+
+logical_and_expression: equality_expression
+                      | logical_and_expression '&' equality_expression;
+
+equality_expression: relational_expression
+                    | equality_expression "==" relational_expression
+                    | equality_expression "!=" relational_expression;
+
+relational_expression: additive_expression
+                     | relational_expression '<' additive_expression
+                     | relational_expression '>' additive_expression
+                     | relational_expression "<=" additive_expression
+                     | relational_expression ">=" additive_expression;
+
+additive_expression: multiplicative_expression
+                   | additive_expression '+' multiplicative_expression
+                   | additive_expression '-' multiplicative_expression;
+
+multiplicative_expression: unary_expression
+                         | multiplicative_expression '*' unary_expression
+                         | multiplicative_expression '/' unary_expression
+                         | multiplicative_expression '%' unary_expression;
+
+unary_expression: primary_expression
+                | '+' unary_expression
+                | '-' unary_expression
+                | '!' unary_expression;
+
+primary_expression: "identifier"
+                  | "integer literal"
+                  | "decimal literal"
+                  | '(' expression ')';
+
 
 %%
 
 void yyerror (char const *mensagem) {
-  printf("ERROR FOUND:: [%s]\n", mensagem);
+  extern int yylineno; // Declare yylineno to access the current line number
+  printf("ERROR FOUND at line %d: [%s]\n", yylineno, mensagem);
 }

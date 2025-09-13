@@ -1,0 +1,6 @@
+int max(int a, int b) := integer {
+    if (a > b) [
+        return a := integer;
+    ] else [
+        return b := integer;
+}

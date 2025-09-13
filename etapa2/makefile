@@ -29,6 +29,18 @@ $(ODIR)/parser.tab.c $(ODIR)/parser.tab.h: parser.y
 etapa2: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
+# Create test directories
+.PHONY: create-test-dirs
+create-test-dirs:
+	@mkdir -p tests/valid
+	@mkdir -p tests/invalid
+
+# Run tests
+.PHONY: test
+
+test: create-test-dirs
+	bash test_syntax.sh
+
 .PHONY: clean
 
 clean:
