@@ -70,7 +70,7 @@ extern int yydebug;
     TK_OC_EQ = 271,                /* "=="  */
     TK_OC_NE = 272,                /* "!="  */
     TK_ID = 273,                   /* "identifier"  */
-    TK_LI_INTEIRO = 274,           /* "integer literal "  */
+    TK_LI_INTEIRO = 274,           /* "integer literal"  */
     TK_LI_DECIMAL = 275,           /* "decimal literal"  */
     TK_ER = 276                    /* "error"  */
   };
