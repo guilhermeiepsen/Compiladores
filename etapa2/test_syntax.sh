@@ -17,11 +17,28 @@ fi
 run_tests() {
     local test_type=$1
     local dir=$2
+    local correct_count=0
+    local total_count=0
     echo "Running $test_type tests..."
     for test_file in $dir/*.txt; do
         echo "Testing $test_file..."
-        ./etapa2 < "$test_file" 2>&1 | tee /dev/tty
+        if ./etapa2 < "$test_file" 2>&1 | grep -q "syntax error"; then
+            if [ "$test_type" == "invalid" ]; then
+                correct_count=$((correct_count + 1))
+            fi
+        else
+            if [ "$test_type" == "valid" ]; then
+                correct_count=$((correct_count + 1))
+            fi
+        fi
+        total_count=$((total_count + 1))
     done
+    echo -e "\033[1;34m$test_type tests: $correct_count out of $total_count correct\033[0m"
+    if [ "$correct_count" -eq "$total_count" ]; then
+        echo -e "\033[0;32mSuccess: All $test_type tests passed!\033[0m"
+    else
+        echo -e "\033[0;33mAlert: Some $test_type tests failed!\033[0m"
+    fi
 }
 
 # Run valid and invalid tests
