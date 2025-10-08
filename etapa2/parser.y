@@ -15,7 +15,7 @@ void yyerror (char const *mensagem);
 %token TK_RETORNA "return"
 %token TK_SETA "->"
 %token TK_ENQUANTO "while"
-%token TK_COM ","
+%token TK_COM "with"
 %token TK_OC_LE "<="
 %token TK_OC_GE ">="
 %token TK_OC_EQ "=="
@@ -38,19 +38,16 @@ element: function_definition
 
 function_definition: header body;
 
-header: "identifier" "->" integer_or_decimal optional_parameter_list ":=";
-
-integer_or_decimal: "decimal"
-                  | "integer";
+header: "identifier" "->" var_type optional_parameter_list ":=";
 
 optional_parameter_list: parameter_list
-                       | ',' parameter_list
+                       | "with" parameter_list
                        | %empty;
 
 parameter_list: parameter
               | parameter_list ',' parameter;
 
-parameter: "identifier" ":=" integer_or_decimal;
+parameter: "identifier" ":=" var_type;
 
 body: command_block;
 
@@ -73,7 +70,7 @@ variable_declaration_with_instantiation: "variable" "identifier" ":=" var_type o
 var_type: "decimal"
          | "integer";
 
-optional_instantiation: ',' literal
+optional_instantiation: "with" literal
                        | %empty;
 
 literal: "integer literal"
@@ -140,7 +137,8 @@ unary_expression: primary_expression
 primary_expression: "identifier"
                   | "integer literal"
                   | "decimal literal"
-                  | '(' expression ')';
+                  | '(' expression ')'
+                  | function_call;
 
 
 %%

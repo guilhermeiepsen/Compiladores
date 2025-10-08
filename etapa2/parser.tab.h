@@ -64,7 +64,7 @@ extern int yydebug;
     TK_RETORNA = 265,              /* "return"  */
     TK_SETA = 266,                 /* "->"  */
     TK_ENQUANTO = 267,             /* "while"  */
-    TK_COM = 268,                  /* ","  */
+    TK_COM = 268,                  /* "with"  */
     TK_OC_LE = 269,                /* "<="  */
     TK_OC_GE = 270,                /* ">="  */
     TK_OC_EQ = 271,                /* "=="  */

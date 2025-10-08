@@ -1,2 +1,0 @@
-function -> decimal :=, identifier -> inteiro , param := decimal, param2 := decimal := ,
-identifier -> decimal :=, identifier -> inteiro , param := decimal, param2 := decimal :=;
