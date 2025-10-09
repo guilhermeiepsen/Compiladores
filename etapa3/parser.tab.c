@@ -564,16 +564,16 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_int16 yyrline[] =
 {
-       0,    50,    50,    51,    53,    54,    56,    57,    59,    61,
-      63,    64,    65,    67,    68,    70,    72,    74,    75,    77,
-      78,    80,    81,    82,    83,    84,    86,    88,    90,    91,
-      93,    94,    96,    97,    99,   101,   103,   104,   105,   107,
-     109,   110,   112,   114,   115,   117,   118,   120,   122,   124,
-     125,   127,   128,   130,   131,   132,   134,   135,   136,   137,
-     138,   140,   141,   142,   144,   145,   146,   147,   149,   150,
-     151,   152,   154,   155,   156,   157,   158
+       0,    53,    53,    54,    56,    57,    59,    60,    62,    64,
+      66,    67,    68,    70,    71,    73,    75,    77,    78,    80,
+      81,    83,    84,    85,    86,    87,    89,    91,    93,    94,
+      96,    97,    99,   100,   102,   104,   106,   107,   108,   110,
+     112,   113,   115,   117,   118,   120,   121,   123,   125,   130,
+     134,   141,   145,   152,   156,   162,   169,   173,   179,   185,
+     191,   198,   202,   207,   213,   217,   222,   227,   233,   237,
+     241,   245,   250,   253,   256,   259,   263
 };
 #endif
 
@@ -1495,8 +1495,287 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
+  case 48: /* expression: logical_or_expression  */
+#line 125 "parser.y"
+                                  {
+  (yyval.node) = asd_new((yyvsp[0].node)->label);
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1505 "parser.tab.c"
+    break;
 
-#line 1500 "parser.tab.c"
+  case 49: /* logical_or_expression: logical_and_expression  */
+#line 130 "parser.y"
+                                              {
+  (yyval.node) = asd_new((yyvsp[0].node)->label);
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1514 "parser.tab.c"
+    break;
+
+  case 50: /* logical_or_expression: logical_or_expression '|' logical_and_expression  */
+#line 134 "parser.y"
+                                                   {
+  printf("YYTEXT ON LOGICAL OR EXPRESSION | %s\n", yytext);
+  (yyval.node) = asd_new(yytext);
+  asd_add_child((yyval.node), (yyvsp[-2].node));
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1525 "parser.tab.c"
+    break;
+
+  case 51: /* logical_and_expression: equality_expression  */
+#line 141 "parser.y"
+                                            {
+  (yyval.node) = asd_new((yyvsp[0].node)->label);
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1534 "parser.tab.c"
+    break;
+
+  case 52: /* logical_and_expression: logical_and_expression '&' equality_expression  */
+#line 145 "parser.y"
+                                                 {
+  printf("YYTEXT ON LOGICAL AND EXPRESSION & %s\n", yytext);
+  (yyval.node) = asd_new(yytext);
+  asd_add_child((yyval.node), (yyvsp[-2].node));
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1545 "parser.tab.c"
+    break;
+
+  case 53: /* equality_expression: relational_expression  */
+#line 152 "parser.y"
+                                           {
+  (yyval.node) = asd_new((yyvsp[0].node)->label);
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1554 "parser.tab.c"
+    break;
+
+  case 54: /* equality_expression: equality_expression "==" relational_expression  */
+#line 156 "parser.y"
+                                                 {
+  printf("YYTEXT ON EQUALITY EXPRESSION == %s\n", yytext);
+  (yyval.node) = asd_new(yytext);
+  asd_add_child((yyval.node), (yyvsp[-2].node));
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1565 "parser.tab.c"
+    break;
+
+  case 55: /* equality_expression: equality_expression "!=" relational_expression  */
+#line 162 "parser.y"
+                                                 {
+  printf("YYTEXT ON EQUALITY EXPRESSION != %s\n", yytext);
+  (yyval.node) = asd_new(yytext);
+  asd_add_child((yyval.node), (yyvsp[-2].node));
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1576 "parser.tab.c"
+    break;
+
+  case 56: /* relational_expression: additive_expression  */
+#line 169 "parser.y"
+                                           {
+  (yyval.node) = asd_new((yyvsp[0].node)->label);
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1585 "parser.tab.c"
+    break;
+
+  case 57: /* relational_expression: relational_expression '<' additive_expression  */
+#line 173 "parser.y"
+                                                {
+  printf("YYTEXT ON RELATIONAL EXPRESSION < %s\n", yytext);
+  (yyval.node) = asd_new(yytext);
+  asd_add_child((yyval.node), (yyvsp[-2].node));
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1596 "parser.tab.c"
+    break;
+
+  case 58: /* relational_expression: relational_expression '>' additive_expression  */
+#line 179 "parser.y"
+                                                {
+  printf("YYTEXT ON RELATIONAL EXPRESSION > %s\n", yytext);
+  (yyval.node) = asd_new(yytext);
+  asd_add_child((yyval.node), (yyvsp[-2].node));
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1607 "parser.tab.c"
+    break;
+
+  case 59: /* relational_expression: relational_expression "<=" additive_expression  */
+#line 185 "parser.y"
+                                                 {
+  printf("YYTEXT ON RELATIONAL EXPRESSION <= %s\n", yytext);
+  (yyval.node) = asd_new(yytext);
+  asd_add_child((yyval.node), (yyvsp[-2].node));
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1618 "parser.tab.c"
+    break;
+
+  case 60: /* relational_expression: relational_expression ">=" additive_expression  */
+#line 191 "parser.y"
+                                                 {
+  printf("YYTEXT ON RELATIONAL EXPRESSION >= %s\n", yytext);
+  (yyval.node) = asd_new(yytext);
+  asd_add_child((yyval.node), (yyvsp[-2].node));
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1629 "parser.tab.c"
+    break;
+
+  case 61: /* additive_expression: multiplicative_expression  */
+#line 198 "parser.y"
+                                               {
+  (yyval.node) = asd_new((yyvsp[0].node)->label);
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1638 "parser.tab.c"
+    break;
+
+  case 62: /* additive_expression: additive_expression '+' multiplicative_expression  */
+#line 202 "parser.y"
+                                                    {
+  (yyval.node) = asd_new("+");
+  asd_add_child((yyval.node), (yyvsp[-2].node));
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1648 "parser.tab.c"
+    break;
+
+  case 63: /* additive_expression: additive_expression '-' multiplicative_expression  */
+#line 207 "parser.y"
+                                                    {
+  (yyval.node) = asd_new("-");
+  asd_add_child((yyval.node), (yyvsp[-2].node));
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1658 "parser.tab.c"
+    break;
+
+  case 64: /* multiplicative_expression: unary_expression  */
+#line 213 "parser.y"
+                                            { 
+  (yyval.node) = asd_new((yyvsp[0].node)->label);
+  asd_add_child((yyval.node), (yyvsp[0].node)); 
+}
+#line 1667 "parser.tab.c"
+    break;
+
+  case 65: /* multiplicative_expression: multiplicative_expression '*' unary_expression  */
+#line 217 "parser.y"
+                                                 {
+  (yyval.node) = asd_new("*");
+  asd_add_child((yyval.node), (yyvsp[-2].node));
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1677 "parser.tab.c"
+    break;
+
+  case 66: /* multiplicative_expression: multiplicative_expression '/' unary_expression  */
+#line 222 "parser.y"
+                                                 {
+  (yyval.node) = asd_new("/");
+  asd_add_child((yyval.node), (yyvsp[-2].node));
+  asd_add_child((yyval.node), (yyvsp[0].node)); 
+}
+#line 1687 "parser.tab.c"
+    break;
+
+  case 67: /* multiplicative_expression: multiplicative_expression '%' unary_expression  */
+#line 227 "parser.y"
+                                                 {
+  (yyval.node) = asd_new("%");
+  asd_add_child((yyval.node), (yyvsp[-2].node));
+  asd_add_child((yyval.node), (yyvsp[0].node));
+}
+#line 1697 "parser.tab.c"
+    break;
+
+  case 68: /* unary_expression: primary_expression  */
+#line 233 "parser.y"
+                                     { 
+    (yyval.node) = asd_new((yyvsp[0].node)->label); 
+    asd_add_child((yyval.node), (yyvsp[0].node)); 
+}
+#line 1706 "parser.tab.c"
+    break;
+
+  case 69: /* unary_expression: '+' unary_expression  */
+#line 237 "parser.y"
+                       { 
+    (yyval.node) = asd_new("+"); 
+    asd_add_child((yyval.node), (yyvsp[0].node)); 
+}
+#line 1715 "parser.tab.c"
+    break;
+
+  case 70: /* unary_expression: '-' unary_expression  */
+#line 241 "parser.y"
+                       { 
+    (yyval.node) = asd_new("-"); 
+    asd_add_child((yyval.node), (yyvsp[0].node)); 
+}
+#line 1724 "parser.tab.c"
+    break;
+
+  case 71: /* unary_expression: '!' unary_expression  */
+#line 245 "parser.y"
+                       { 
+    (yyval.node) = asd_new("!"); 
+    asd_add_child((yyval.node), (yyvsp[0].node)); 
+}
+#line 1733 "parser.tab.c"
+    break;
+
+  case 72: /* primary_expression: "identifier"  */
+#line 250 "parser.y"
+                                 { 
+    (yyval.node) = asd_new((yyvsp[0].lexical_value).value); 
+}
+#line 1741 "parser.tab.c"
+    break;
+
+  case 73: /* primary_expression: "integer literal"  */
+#line 253 "parser.y"
+                    { 
+    (yyval.node) = asd_new((yyvsp[0].lexical_value).value); 
+}
+#line 1749 "parser.tab.c"
+    break;
+
+  case 74: /* primary_expression: "decimal literal"  */
+#line 256 "parser.y"
+                    { 
+    (yyval.node) = asd_new((yyvsp[0].lexical_value).value); 
+}
+#line 1757 "parser.tab.c"
+    break;
+
+  case 75: /* primary_expression: '(' expression ')'  */
+#line 259 "parser.y"
+                     { 
+    (yyval.node) = asd_new((yyvsp[-1].node)->label); 
+    asd_add_child((yyval.node), (yyvsp[-1].node)); 
+}
+#line 1766 "parser.tab.c"
+    break;
+
+  case 76: /* primary_expression: function_call  */
+#line 263 "parser.y"
+                { 
+    (yyval.node) = asd_new((yyvsp[0].node)->label); 
+    asd_add_child((yyval.node), (yyvsp[0].node)); 
+}
+#line 1775 "parser.tab.c"
+    break;
+
+
+#line 1779 "parser.tab.c"
 
       default: break;
     }
@@ -1720,7 +1999,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 161 "parser.y"
+#line 267 "parser.y"
 
 
 void yyerror (char const *mensagem) {

@@ -26,6 +26,8 @@ extern char *yytext;
   lexical_value_t lexical_value;
 }
 
+%type <node> program list element function_definition header optional_parameter_list parameter_list parameter body command_block command_sequence simple_command variable_declaration variable_declaration_with_instantiation var_type optional_instantiation literal attribution_command function_call args return_command flow_control_command conditional_struct else_block mandatory_block iterative_struct expression logical_or_expression logical_and_expression equality_expression relational_expression additive_expression multiplicative_expression unary_expression primary_expression
+
 %token TK_TIPO "type"
 %token TK_VAR "variable"
 %token TK_SENAO "else"
@@ -118,47 +120,156 @@ else_block: %empty
 mandatory_block: mandatory_block simple_command
                | simple_command;
 
-iterative_struct: "while" '(' expression ')' command_block;
+iterative_struct: "while" '(' expression ')' command_block {
+  // maybe the label here should be just 'enquanto'
+  $$ = asd_new("while" + "(" + $2->label + ")");
+  // two children, the expression and the command block
+  asd_add_child($$, $2);
+  asd_add_child($$, $3);
+};
 
-expression: logical_or_expression;
+expression: logical_or_expression {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+};
 
-logical_or_expression: logical_and_expression
-                     | logical_or_expression '|' logical_and_expression;
+logical_or_expression: logical_and_expression {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+}
+| logical_or_expression '|' logical_and_expression {
+  printf("YYTEXT ON LOGICAL OR EXPRESSION | %s\n", yytext);
+  $$ = asd_new(yytext);
+  asd_add_child($$, $1);
+  asd_add_child($$, $3);
+};
 
-logical_and_expression: equality_expression
-                      | logical_and_expression '&' equality_expression;
+logical_and_expression: equality_expression {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+}
+| logical_and_expression '&' equality_expression {
+  printf("YYTEXT ON LOGICAL AND EXPRESSION & %s\n", yytext);
+  $$ = asd_new(yytext);
+  asd_add_child($$, $1);
+  asd_add_child($$, $3);
+};
 
-equality_expression: relational_expression
-                    | equality_expression "==" relational_expression
-                    | equality_expression "!=" relational_expression;
+equality_expression: relational_expression {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+}
+| equality_expression "==" relational_expression {
+  printf("YYTEXT ON EQUALITY EXPRESSION == %s\n", yytext);
+  $$ = asd_new(yytext);
+  asd_add_child($$, $1);
+  asd_add_child($$, $3);
+}
+| equality_expression "!=" relational_expression {
+  printf("YYTEXT ON EQUALITY EXPRESSION != %s\n", yytext);
+  $$ = asd_new(yytext);
+  asd_add_child($$, $1);
+  asd_add_child($$, $3);
+};
 
-relational_expression: additive_expression
-                     | relational_expression '<' additive_expression
-                     | relational_expression '>' additive_expression
-                     | relational_expression "<=" additive_expression
-                     | relational_expression ">=" additive_expression;
+relational_expression: additive_expression {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+}
+| relational_expression '<' additive_expression {
+  printf("YYTEXT ON RELATIONAL EXPRESSION < %s\n", yytext);
+  $$ = asd_new(yytext);
+  asd_add_child($$, $1);
+  asd_add_child($$, $3);
+}
+| relational_expression '>' additive_expression {
+  printf("YYTEXT ON RELATIONAL EXPRESSION > %s\n", yytext);
+  $$ = asd_new(yytext);
+  asd_add_child($$, $1);
+  asd_add_child($$, $3);
+}
+| relational_expression "<=" additive_expression {
+  printf("YYTEXT ON RELATIONAL EXPRESSION <= %s\n", yytext);
+  $$ = asd_new(yytext);
+  asd_add_child($$, $1);
+  asd_add_child($$, $3);
+}
+| relational_expression ">=" additive_expression {
+  printf("YYTEXT ON RELATIONAL EXPRESSION >= %s\n", yytext);
+  $$ = asd_new(yytext);
+  asd_add_child($$, $1);
+  asd_add_child($$, $3);
+};
 
-additive_expression: multiplicative_expression
-                   | additive_expression '+' multiplicative_expression
-                   | additive_expression '-' multiplicative_expression;
+additive_expression: multiplicative_expression {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+}
+| additive_expression '+' multiplicative_expression {
+  $$ = asd_new("+");
+  asd_add_child($$, $1);
+  asd_add_child($$, $3);
+}
+| additive_expression '-' multiplicative_expression {
+  $$ = asd_new("-");
+  asd_add_child($$, $1);
+  asd_add_child($$, $3);
+};
 
-multiplicative_expression: unary_expression
-                         | multiplicative_expression '*' unary_expression
-                         | multiplicative_expression '/' unary_expression
-                         | multiplicative_expression '%' unary_expression;
+multiplicative_expression: unary_expression { 
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1); 
+}
+| multiplicative_expression '*' unary_expression {
+  $$ = asd_new("*");
+  asd_add_child($$, $1);
+  asd_add_child($$, $3);
+}
+| multiplicative_expression '/' unary_expression {
+  $$ = asd_new("/");
+  asd_add_child($$, $1);
+  asd_add_child($$, $3); 
+}
+| multiplicative_expression '%' unary_expression {
+  $$ = asd_new("%");
+  asd_add_child($$, $1);
+  asd_add_child($$, $3);
+};
 
-unary_expression: primary_expression
-                | '+' unary_expression
-                | '-' unary_expression
-                | '!' unary_expression;
+unary_expression: primary_expression { 
+    $$ = asd_new($1->label); 
+    asd_add_child($$, $1); 
+}
+| '+' unary_expression { 
+    $$ = asd_new("+"); 
+    asd_add_child($$, $2); 
+}
+| '-' unary_expression { 
+    $$ = asd_new("-"); 
+    asd_add_child($$, $2); 
+}
+| '!' unary_expression { 
+    $$ = asd_new("!"); 
+    asd_add_child($$, $2); 
+};
 
-primary_expression: "identifier"
-                  | "integer literal"
-                  | "decimal literal"
-                  | '(' expression ')'
-                  | function_call;
-
-
+primary_expression: "identifier" { 
+    $$ = asd_new($1.value); 
+}
+| "integer literal" { 
+    $$ = asd_new($1.value); 
+}
+| "decimal literal" { 
+    $$ = asd_new($1.value); 
+}
+| '(' expression ')' { 
+    $$ = asd_new($2->label); 
+    asd_add_child($$, $2); 
+}
+| function_call { 
+    $$ = asd_new($1->label); 
+    asd_add_child($$, $1); 
+};
 %%
 
 void yyerror (char const *mensagem) {
