@@ -89,16 +89,10 @@ return_command: "return" expression ":=" var_type;
 flow_control_command: conditional_struct
                      | iterative_struct;
 
-conditional_struct: "if" '(' expression ')' '[' not_mandatory_block ']' else_block;
+conditional_struct: "if" '(' expression ')' command_block else_block;
 
 else_block: %empty
           | "else" command_block;
-
-mandatory_block: mandatory_block simple_command
-               | simple_command;
-
-not_mandatory_block: mandatory_block
-                  | %empty;
 
 iterative_struct: "while" '(' expression ')' command_block;
 

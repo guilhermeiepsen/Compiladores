@@ -1,0 +1,14 @@
+main -> inteiro com args := inteiro, argsb := decimal := [
+    var a := inteiro com 7
+    enquanto (  (x <= 5 & 3 != a) | 1 ) [
+        a := (a + 1)/12
+    ]
+    retorna a := inteiro
+],
+main -> inteiro args := inteiro, argsb := decimal := [
+    var a := inteiro com 7
+    enquanto (  (x <= 5 & 3 != a) | 1 ) [
+        a := (a + 1)/12
+    ]
+    retorna a := inteiro
+];

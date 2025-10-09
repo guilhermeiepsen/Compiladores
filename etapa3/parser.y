@@ -2,10 +2,11 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#include "asd.h"
 int yylex(void);
 void yyerror (char const *mensagem);
 extern char *yytext;
-// Define the struct for lexical values
+extern asd_tree_t *arvore;
 %}
 
 %code requires {
@@ -26,7 +27,7 @@ extern char *yytext;
   lexical_value_t lexical_value;
 }
 
-%type <node> program list element function_definition header optional_parameter_list parameter_list parameter body command_block command_sequence simple_command variable_declaration variable_declaration_with_instantiation var_type optional_instantiation literal attribution_command function_call args return_command flow_control_command conditional_struct else_block mandatory_block iterative_struct expression logical_or_expression logical_and_expression equality_expression relational_expression additive_expression multiplicative_expression unary_expression primary_expression
+%type <node> program list element function_definition header optional_parameter_list parameter_list parameter body command_block command_sequence simple_command variable_declaration variable_declaration_with_instantiation var_type optional_instantiation literal attribution_command function_call args return_command flow_control_command conditional_struct else_block iterative_struct expression logical_or_expression logical_and_expression equality_expression relational_expression additive_expression multiplicative_expression unary_expression primary_expression
 
 %token TK_TIPO "type"
 %token TK_VAR "variable"
@@ -50,82 +51,220 @@ extern char *yytext;
 
 %%
 
-program: list ';'
-       | %empty;
+program: list ';' {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
 
-list: element
-    | list ',' element;
+  // Set arvore to point to the root of the tree
+  arvore = $$;
+}
+| %empty {
+  $$ = asd_new("empty program");
+  arvore = $$;
+};
 
-element: function_definition
-       | variable_declaration;
+list: element {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+}
+| list ',' element {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+  asd_add_child($$, $3);
+};
 
-function_definition: header body;
+element: function_definition {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+}
+| variable_declaration {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+};
 
-header: "identifier" "->" var_type optional_parameter_list ":=";
+function_definition: header body {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+  asd_add_child($$, $2);
+};
 
-optional_parameter_list: parameter_list
-                       | "with" parameter_list
-                       | %empty;
+header: "identifier" "->" var_type optional_parameter_list ":=" {
+  $$ = asd_new("header");
+  asd_add_child($$, $3);
+};
 
-parameter_list: parameter
-              | parameter_list ',' parameter;
+optional_parameter_list: parameter_list {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+}
+| "with" parameter_list {
+  $$ = asd_new($2->label);
+  asd_add_child($$, $2);
+}
+| %empty {
+  $$ = asd_new("empty param list");
+};
 
-parameter: "identifier" ":=" var_type;
+parameter_list: parameter {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+}
+| parameter_list ',' parameter {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+  asd_add_child($$, $3);
+};
 
-body: command_block;
+parameter: "identifier" ":=" var_type {
+  $$ = asd_new("parameter");
+  asd_add_child($$, $3);
+};
 
-command_block: '[' command_sequence ']'
-             | '[' ']';
+body: command_block {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+};
 
-command_sequence: simple_command
-                | command_sequence simple_command;
+command_block: '[' command_sequence ']' {
+  $$ = asd_new($2->label);
+  asd_add_child($$, $2);
+}
+| '[' ']' {
+$$ = asd_new("empty command block");
+};
 
-simple_command: variable_declaration_with_instantiation
-              | function_call
-              | attribution_command
-              | return_command
-              | flow_control_command;
+command_sequence: simple_command {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+}
+| command_sequence simple_command {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+  asd_add_child($$, $2);
+};
 
-variable_declaration: "variable" "identifier" ":=" var_type;
+simple_command: variable_declaration_with_instantiation {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+}
+| function_call {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+}
+| attribution_command {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+}
+| return_command {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+}
+| flow_control_command {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+};
 
-variable_declaration_with_instantiation: "variable" "identifier" ":=" var_type optional_instantiation;
+variable_declaration: "variable" "identifier" ":=" var_type {
+  // this labels are just to see the tree in the output. Probably are wrong
+  $$ = asd_new("declare");
+  asd_add_child($$, $4);
+};
 
-var_type: "decimal"
-         | "integer";
+variable_declaration_with_instantiation: "variable" "identifier" ":=" var_type optional_instantiation {
+    $$ = asd_new("declare with");
+    asd_add_child($$, $4);
+    asd_add_child($$, $5);
+};
 
-optional_instantiation: "with" literal
-                       | %empty;
+var_type: "decimal" {
+  $$ = asd_new("decimal");
+}
+         | "integer" {
+  $$ = asd_new("integer");
+};
 
-literal: "integer literal"
-        | "decimal literal";
+optional_instantiation: "with" literal {
+  $$ = asd_new("with");
+  asd_add_child($$, $2);
+}
+| %empty {
+  $$ = asd_new("empty with");
+};
 
-attribution_command: "identifier" ":=" expression;
+literal: "integer literal" {
+  $$ = asd_new($1.value);
+}
+| "decimal literal" {
+  $$ = asd_new($1.value);
+};
 
-function_call: "identifier" '(' args ')';
+attribution_command: "identifier" ":=" expression {
+  char buffer[256]; // Adjust size as needed
+  sprintf(buffer, "%s := %s", $1.value, $3->label);
+  $$ = asd_new(buffer);
+  // two children, the identifier and the expression.
+  asd_add_child($$, $3);
+};
 
-args: %empty;
-args: args ',' expression
-    | expression;
+function_call: "identifier" '(' args ')' {
+  // Only used to concatenate function name with 'call' 
+  char buffer[256]; // Adjust size as needed
+  sprintf(buffer, "call %s", $1.value);
+  $$ = asd_new(buffer);
+  asd_add_child($$, $3);
+};
 
-return_command: "return" expression ":=" var_type;
+args: %empty {
+  // for now creating node for args and leaving it without children as the else block.
+  $$ = asd_new("empty args");
+}
+| args ',' expression {
+  $$ = asd_new("args");
+  asd_add_child($$, $1);
+  asd_add_child($$, $3);
+}
+| expression {
+  $$ = asd_new("args");
+  asd_add_child($$, $1);
+};
 
-flow_control_command: conditional_struct
-                     | iterative_struct;
+return_command: "return" expression ":=" var_type {
+  $$ = asd_new("return");
+  // return has only one child that is the expression.
+  asd_add_child($$, $2);
+};
 
-conditional_struct: "if" '(' expression ')' '[' mandatory_block ']' else_block;
+flow_control_command: conditional_struct {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+}
+| iterative_struct {
+  $$ = asd_new($1->label);
+  asd_add_child($$, $1);
+};
 
-else_block: %empty
-          | "else" command_block;
+conditional_struct: "if" '(' expression ')' command_block else_block {
+  $$ = asd_new("if");
+  asd_add_child($$, $3);
+  asd_add_child($$, $5);
+  asd_add_child($$, $6);
+};
 
-mandatory_block: mandatory_block simple_command
-               | simple_command;
+else_block: %empty {
+  // maybe this should be empty, for now just putting the else node with zero or one children. and son of if node.
+  $$ = asd_new("empty else");
+}
+| "else" command_block {
+  $$ = asd_new("else");
+  asd_add_child($$, $2);
+};
 
 iterative_struct: "while" '(' expression ')' command_block {
   // maybe the label here should be just 'enquanto'
-  $$ = asd_new("while" + "(" + $2->label + ")");
+  $$ = asd_new("while");
   // two children, the expression and the command block
-  asd_add_child($$, $2);
   asd_add_child($$, $3);
+  asd_add_child($$, $5);
 };
 
 expression: logical_or_expression {
@@ -138,7 +277,6 @@ logical_or_expression: logical_and_expression {
   asd_add_child($$, $1);
 }
 | logical_or_expression '|' logical_and_expression {
-  printf("YYTEXT ON LOGICAL OR EXPRESSION | %s\n", yytext);
   $$ = asd_new(yytext);
   asd_add_child($$, $1);
   asd_add_child($$, $3);
@@ -149,7 +287,6 @@ logical_and_expression: equality_expression {
   asd_add_child($$, $1);
 }
 | logical_and_expression '&' equality_expression {
-  printf("YYTEXT ON LOGICAL AND EXPRESSION & %s\n", yytext);
   $$ = asd_new(yytext);
   asd_add_child($$, $1);
   asd_add_child($$, $3);
@@ -160,13 +297,11 @@ equality_expression: relational_expression {
   asd_add_child($$, $1);
 }
 | equality_expression "==" relational_expression {
-  printf("YYTEXT ON EQUALITY EXPRESSION == %s\n", yytext);
   $$ = asd_new(yytext);
   asd_add_child($$, $1);
   asd_add_child($$, $3);
 }
 | equality_expression "!=" relational_expression {
-  printf("YYTEXT ON EQUALITY EXPRESSION != %s\n", yytext);
   $$ = asd_new(yytext);
   asd_add_child($$, $1);
   asd_add_child($$, $3);
@@ -177,25 +312,21 @@ relational_expression: additive_expression {
   asd_add_child($$, $1);
 }
 | relational_expression '<' additive_expression {
-  printf("YYTEXT ON RELATIONAL EXPRESSION < %s\n", yytext);
   $$ = asd_new(yytext);
   asd_add_child($$, $1);
   asd_add_child($$, $3);
 }
 | relational_expression '>' additive_expression {
-  printf("YYTEXT ON RELATIONAL EXPRESSION > %s\n", yytext);
   $$ = asd_new(yytext);
   asd_add_child($$, $1);
   asd_add_child($$, $3);
 }
 | relational_expression "<=" additive_expression {
-  printf("YYTEXT ON RELATIONAL EXPRESSION <= %s\n", yytext);
   $$ = asd_new(yytext);
   asd_add_child($$, $1);
   asd_add_child($$, $3);
 }
 | relational_expression ">=" additive_expression {
-  printf("YYTEXT ON RELATIONAL EXPRESSION >= %s\n", yytext);
   $$ = asd_new(yytext);
   asd_add_child($$, $1);
   asd_add_child($$, $3);

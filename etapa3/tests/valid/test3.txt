@@ -1,0 +1,12 @@
+factorial -> inteiro n := inteiro := [
+    se (n <= 1) [
+        retorna 1 := inteiro
+    ] senao [
+        retorna n * factorial(n - 1) := inteiro
+    ]
+],
+main -> inteiro args := inteiro := [
+    var a := inteiro com 7
+    factorial(a)
+    retorna a := inteiro
+];
