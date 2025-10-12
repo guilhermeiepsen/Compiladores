@@ -47,15 +47,15 @@ extern int yydebug;
 /* "%code requires" blocks.  */
 #line 12 "parser.y"
 
-  #include "asd.h"
-  #include "parser.tab.h"
+ #include "asd.h"
+ #include "parser.tab.h"
 
-  // Declaring lexical_value in here makes it accessible in .h
-  typedef struct {
-    int line_number;
-    char *token_type;
-    char *value;
-  } lexical_value_t;
+ // Declaring lexical_value in here makes it accessible in .h
+ typedef struct {
+  int line_number;
+  char *token_type;
+  char *value;
+ } lexical_value_t;
 
 #line 61 "parser.tab.h"
 
@@ -97,8 +97,8 @@ union YYSTYPE
 {
 #line 25 "parser.y"
 
-  asd_tree_t *node;
-  lexical_value_t lexical_value;
+ asd_tree_t *node;
+ lexical_value_t lexical_value;
 
 #line 104 "parser.tab.h"
 

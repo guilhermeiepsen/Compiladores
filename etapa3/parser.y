@@ -10,24 +10,57 @@ extern asd_tree_t *arvore;
 %}
 
 %code requires {
-  #include "asd.h"
-  #include "parser.tab.h"
+ #include "asd.h"
+ #include "parser.tab.h"
 
-  // Declaring lexical_value in here makes it accessible in .h
-  typedef struct {
-    int line_number;
-    char *token_type;
-    char *value;
-  } lexical_value_t;
+ // Declaring lexical_value in here makes it accessible in .h
+ typedef struct {
+  int line_number;
+  char *token_type;
+  char *value;
+ } lexical_value_t;
 }
 %define parse.error verbose
 
 %union {
-  asd_tree_t *node;
-  lexical_value_t lexical_value;
+ asd_tree_t *node;
+ lexical_value_t lexical_value;
 }
 
-%type <node> program list element function_definition header optional_parameter_list parameter_list parameter body command_block command_sequence simple_command variable_declaration variable_declaration_with_instantiation var_type optional_instantiation literal attribution_command function_call args return_command flow_control_command conditional_struct else_block iterative_struct expression logical_or_expression logical_and_expression equality_expression relational_expression additive_expression multiplicative_expression unary_expression primary_expression
+%type <node> program
+%type <node> list
+%type <node> element
+%type <node> function_definition
+%type <node> header
+%type <node> optional_parameter_list
+%type <node> parameter_list
+%type <node> parameter
+%type <node> body command_block
+%type <node> command_sequence
+%type <node> simple_command
+%type <node> variable_declaration
+%type <node> variable_declaration_with_instantiation
+%type <node> var_type
+%type <node> optional_instantiation
+%type <node> literal
+%type <node> attribution_command
+%type <node> function_call
+%type <node> args
+%type <node> return_command
+%type <node> flow_control_command
+%type <node> conditional_struct
+%type <node> else_block
+%type <node> iterative_struct
+%type <node> expression
+%type <node> logical_or_expression
+%type <node> logical_and_expression
+%type <node> equality_expression
+%type <node> relational_expression
+%type <node> additive_expression
+%type <node> multiplicative_expression
+%type <node> unary_expression
+%type <node> primary_expression
+
 
 %token TK_TIPO "type"
 %token TK_VAR "variable"
@@ -51,291 +84,235 @@ extern asd_tree_t *arvore;
 
 %%
 
-program: list ';' {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
+program:
+  list ';'
+  {
+    $$ = asd_new("program");
+    asd_add_child($$, $1);
+    arvore = $1;
+  }
+;
 
-  // Set arvore to point to the root of the tree
-  arvore = $$;
-}
-| %empty {
-  $$ = asd_new("empty program");
-  arvore = $$;
-};
 
-list: element {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-}
-| list ',' element {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-  asd_add_child($$, $3);
-};
+/* Regra 'list' com recursão à direita (para encadeamento A -> B -> C) */
+list:
+    element
+    {
+        $$ = $1;
+    }
+|   element ',' list
+    {
+        /* Anexa o resto da lista ($3) como filho do elemento atual ($1) */
+        if ($1 != NULL) {
+            if ($3 != NULL) asd_add_child($1, $3);
+            $$ = $1;
+        } else {
+            /* Se o elemento atual for nulo (uma declaração global), a lista começa do próximo */
+            $$ = $3;
+        }
+    }
+;
 
-element: function_definition {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-}
-| variable_declaration {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-};
+
+
+element: function_definition { $$ = $1; }
+| variable_declaration { $$ = $1; };
 
 function_definition: header body {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-  asd_add_child($$, $2);
+    $$ = $1;
+    if ($2) asd_add_child($$, $2); // Adiciona o corpo diretamente
 };
 
-header: "identifier" "->" var_type optional_parameter_list ":=" {
-  $$ = asd_new("header");
-  asd_add_child($$, $3);
+/* ALTERADO: Header simplificado para remover tipo de retorno e sempre desempacotar parâmetros */
+header: TK_ID TK_SETA var_type optional_parameter_list TK_ATRIB {
+  $$ = asd_new($1.value);       /* nome da função */
+  /* asd_add_child($$, $3); */  /* Linha removida para omitir o tipo de retorno */
+
+  /* $4 é a lista de parâmetros. Vamos sempre desempacotar os filhos. */
+  if ($4) {
+    for (int i = 0; i < $4->number_of_children; i++) {
+      asd_add_child($$, $4->children[i]);
+    }
+  }
 };
 
-optional_parameter_list: parameter_list {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-}
-| "with" parameter_list {
-  $$ = asd_new($2->label);
-  asd_add_child($$, $2);
-}
-| %empty {
-  $$ = asd_new("empty param list");
-};
+/* ALTERADO: Regra simplificada para sempre passar a lista para o header desempacotar */
+optional_parameter_list:
+  %empty { $$ = NULL; }
+| TK_COM parameter_list { $$ = $2; }
+| parameter_list { $$ = $1; }
+;
 
-parameter_list: parameter {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-}
+parameter_list:
+  parameter {
+    $$ = asd_new("temp_param_list");
+    asd_add_child($$, $1);
+  }
 | parameter_list ',' parameter {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-  asd_add_child($$, $3);
-};
+    asd_add_child($1, $3);
+    $$ = $1;
+  }
+;
 
-parameter: "identifier" ":=" var_type {
-  $$ = asd_new("parameter");
-  asd_add_child($$, $3);
-};
-
-body: command_block {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-};
-
-command_block: '[' command_sequence ']' {
-  $$ = asd_new($2->label);
-  asd_add_child($$, $2);
-}
-| '[' ']' {
-$$ = asd_new("empty command block");
-};
-
-command_sequence: simple_command {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-}
-| command_sequence simple_command {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-  asd_add_child($$, $2);
-};
-
-simple_command: variable_declaration_with_instantiation {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-}
-| function_call {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-}
-| attribution_command {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-}
-| return_command {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-}
-| flow_control_command {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-};
-
-variable_declaration: "variable" "identifier" ":=" var_type {
-  // this labels are just to see the tree in the output. Probably are wrong
-  $$ = asd_new("declare");
-  asd_add_child($$, $4);
-};
-
-variable_declaration_with_instantiation: "variable" "identifier" ":=" var_type optional_instantiation {
-    $$ = asd_new("declare with");
-    asd_add_child($$, $4);
-    asd_add_child($$, $5);
-};
-
-var_type: "decimal" {
-  $$ = asd_new("decimal");
-}
-         | "integer" {
-  $$ = asd_new("integer");
-};
-
-optional_instantiation: "with" literal {
-  $$ = asd_new("with");
-  asd_add_child($$, $2);
-}
-| %empty {
-  $$ = asd_new("empty with");
-};
-
-literal: "integer literal" {
+parameter: TK_ID TK_ATRIB var_type {
   $$ = asd_new($1.value);
-}
-| "decimal literal" {
-  $$ = asd_new($1.value);
+  //asd_add_child($$, $3);
 };
 
-attribution_command: "identifier" ":=" expression {
-  char buffer[256]; // Adjust size as needed
-  sprintf(buffer, "%s := %s", $1.value, $3->label);
-  $$ = asd_new(buffer);
-  // two children, the identifier and the expression.
+body: command_block { $$ = $1; };
+
+command_block: '[' command_sequence ']' { $$ = $2; }
+| '[' ']' { $$ = asd_new("empty command block"); };
+
+command_sequence:
+    %empty
+    {
+        $$ = NULL;
+    }
+|   simple_command command_sequence
+    {
+        if ($1 != NULL) { // Se o comando atual não for uma declaração nula
+            if ($2 != NULL) asd_add_child($1, $2); // Anexa o resto da corrente
+            $$ = $1;
+        } else {
+            $$ = $2; // Se o comando for nulo, a corrente começa do próximo
+        }
+    }
+;
+
+simple_command: variable_declaration_with_instantiation { $$ = $1; }
+| function_call { $$ = $1; }
+| attribution_command { $$ = $1; }
+| return_command { $$ = $1; }
+| flow_control_command { $$ = $1; };
+
+/* ALTERADO: Regras de declaração agora retornam NULL para serem ignoradas na árvore */
+variable_declaration: TK_VAR TK_ID TK_ATRIB var_type {
+  $$ = NULL;
+};
+
+variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional_instantiation {
+  $$ = NULL;
+};
+
+var_type: TK_DECIMAL { $$ = asd_new("decimal"); }
+| TK_INTEIRO { $$ = asd_new("integer"); };
+
+optional_instantiation: TK_COM literal { $$ = $2; }
+| %empty { $$ = NULL; };
+
+literal: TK_LI_INTEIRO { $$ = asd_new($1.value); }
+| TK_LI_DECIMAL { $$ = asd_new($1.value); };
+
+attribution_command: TK_ID TK_ATRIB expression {
+  $$ = asd_new(":=");
+  asd_tree_t *idnode = asd_new($1.value);
+  asd_add_child($$, idnode);
   asd_add_child($$, $3);
 };
 
-function_call: "identifier" '(' args ')' {
-  // Only used to concatenate function name with 'call' 
-  char buffer[256]; // Adjust size as needed
-  sprintf(buffer, "call %s", $1.value);
-  $$ = asd_new(buffer);
-  asd_add_child($$, $3);
+/* Regra 'function_call' simplificada */
+function_call: TK_ID '(' args ')' {
+    char buffer[256];
+    sprintf(buffer, "call %s", $1.value);
+    $$ = asd_new(buffer);
+    if ($3) asd_add_child($$, $3); // Adiciona a raiz da corrente de argumentos
 };
 
-args: %empty {
-  // for now creating node for args and leaving it without children as the else block.
-  $$ = asd_new("empty args");
-}
-| args ',' expression {
-  $$ = asd_new("args");
-  asd_add_child($$, $1);
-  asd_add_child($$, $3);
-}
-| expression {
-  $$ = asd_new("args");
-  asd_add_child($$, $1);
-};
+/* Regra 'args' com recursão à direita (para encadeamento arg1 -> arg2 -> ...) */
+args:
+    %empty
+    {
+        $$ = NULL;
+    }
+|   expression ',' args
+    {
+        /* Anexa o resto da corrente de argumentos ($3) ao argumento atual ($1) */
+        asd_add_child($1, $3);
+        $$ = $1;
+    }
+;
 
-return_command: "return" expression ":=" var_type {
-  $$ = asd_new("return");
-  // return has only one child that is the expression.
+return_command: TK_RETORNA expression TK_ATRIB var_type {
+  $$ = asd_new("retorna");
   asd_add_child($$, $2);
 };
 
-flow_control_command: conditional_struct {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
+flow_control_command: conditional_struct { $$ = $1; }
+| iterative_struct { $$ = $1; };
+
+/* Substitua sua regra conditional_struct por esta */
+conditional_struct: TK_SE '(' expression ')' command_block else_block {
+    $$ = asd_new("se");
+    asd_add_child($$, $3);
+    if ($5) asd_add_child($$, $5); // Adiciona o bloco 'then' diretamente
+    if ($6) asd_add_child($$, $6); // Adiciona o bloco 'else' diretamente
+};
+
+else_block: TK_SENAO command_block {
+    $$ = $2; // Apenas repassa o resultado de command_block
 }
-| iterative_struct {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
+| %empty { $$ = NULL; };
+
+iterative_struct: TK_ENQUANTO '(' expression ')' command_block {
+    $$ = asd_new("enquanto");
+    asd_add_child($$, $3);
+    if ($5) asd_add_child($$, $5); // Adiciona o corpo diretamente
 };
 
-conditional_struct: "if" '(' expression ')' command_block else_block {
-  $$ = asd_new("if");
-  asd_add_child($$, $3);
-  asd_add_child($$, $5);
-  asd_add_child($$, $6);
-};
+//EXPRESSOES
 
-else_block: %empty {
-  // maybe this should be empty, for now just putting the else node with zero or one children. and son of if node.
-  $$ = asd_new("empty else");
-}
-| "else" command_block {
-  $$ = asd_new("else");
-  asd_add_child($$, $2);
-};
+expression: logical_or_expression { $$ = $1; };
 
-iterative_struct: "while" '(' expression ')' command_block {
-  // maybe the label here should be just 'enquanto'
-  $$ = asd_new("while");
-  // two children, the expression and the command block
-  asd_add_child($$, $3);
-  asd_add_child($$, $5);
-};
-
-expression: logical_or_expression {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-};
-
-logical_or_expression: logical_and_expression {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-}
+logical_or_expression: logical_and_expression { $$ = $1; }
 | logical_or_expression '|' logical_and_expression {
-  $$ = asd_new(yytext);
+  $$ = asd_new("|");
   asd_add_child($$, $1);
   asd_add_child($$, $3);
 };
 
-logical_and_expression: equality_expression {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-}
+logical_and_expression: equality_expression { $$ = $1; }
 | logical_and_expression '&' equality_expression {
-  $$ = asd_new(yytext);
+  $$ = asd_new("&");
   asd_add_child($$, $1);
   asd_add_child($$, $3);
 };
 
-equality_expression: relational_expression {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-}
-| equality_expression "==" relational_expression {
-  $$ = asd_new(yytext);
+equality_expression: relational_expression { $$ = $1; }
+| equality_expression TK_OC_EQ relational_expression {
+  $$ = asd_new("==");
   asd_add_child($$, $1);
   asd_add_child($$, $3);
 }
-| equality_expression "!=" relational_expression {
-  $$ = asd_new(yytext);
+| equality_expression TK_OC_NE relational_expression {
+  $$ = asd_new("!=");
   asd_add_child($$, $1);
   asd_add_child($$, $3);
 };
 
-relational_expression: additive_expression {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-}
+relational_expression: additive_expression { $$ = $1; }
 | relational_expression '<' additive_expression {
-  $$ = asd_new(yytext);
+  $$ = asd_new("<");
   asd_add_child($$, $1);
   asd_add_child($$, $3);
 }
 | relational_expression '>' additive_expression {
-  $$ = asd_new(yytext);
+  $$ = asd_new(">");
   asd_add_child($$, $1);
   asd_add_child($$, $3);
 }
-| relational_expression "<=" additive_expression {
-  $$ = asd_new(yytext);
+| relational_expression TK_OC_LE additive_expression {
+  $$ = asd_new("<=");
   asd_add_child($$, $1);
   asd_add_child($$, $3);
 }
-| relational_expression ">=" additive_expression {
-  $$ = asd_new(yytext);
+| relational_expression TK_OC_GE additive_expression {
+  $$ = asd_new(">=");
   asd_add_child($$, $1);
   asd_add_child($$, $3);
 };
 
-additive_expression: multiplicative_expression {
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1);
-}
+additive_expression: multiplicative_expression { $$ = $1; }
 | additive_expression '+' multiplicative_expression {
   $$ = asd_new("+");
   asd_add_child($$, $1);
@@ -347,10 +324,7 @@ additive_expression: multiplicative_expression {
   asd_add_child($$, $3);
 };
 
-multiplicative_expression: unary_expression { 
-  $$ = asd_new($1->label);
-  asd_add_child($$, $1); 
-}
+multiplicative_expression: unary_expression { $$ = $1; }
 | multiplicative_expression '*' unary_expression {
   $$ = asd_new("*");
   asd_add_child($$, $1);
@@ -359,7 +333,7 @@ multiplicative_expression: unary_expression {
 | multiplicative_expression '/' unary_expression {
   $$ = asd_new("/");
   asd_add_child($$, $1);
-  asd_add_child($$, $3); 
+  asd_add_child($$, $3);
 }
 | multiplicative_expression '%' unary_expression {
   $$ = asd_new("%");
@@ -367,43 +341,31 @@ multiplicative_expression: unary_expression {
   asd_add_child($$, $3);
 };
 
-unary_expression: primary_expression { 
-    $$ = asd_new($1->label); 
-    asd_add_child($$, $1); 
-}
-| '+' unary_expression { 
-    $$ = asd_new("+"); 
-    asd_add_child($$, $2); 
-}
-| '-' unary_expression { 
-    $$ = asd_new("-"); 
-    asd_add_child($$, $2); 
-}
-| '!' unary_expression { 
-    $$ = asd_new("!"); 
-    asd_add_child($$, $2); 
-};
+unary_expression:
+    primary_expression { $$ = $1; }
+|   '!' unary_expression { 
+        $$ = asd_new("!"); 
+        asd_add_child($$, $2); 
+    }
+|   '+' unary_expression { 
+        $$ = asd_new("+");
+        asd_add_child($$, $2); 
+    }
+|   '-' unary_expression { 
+        $$ = asd_new("-");
+        asd_add_child($$, $2); 
+    }
+;
 
-primary_expression: "identifier" { 
-    $$ = asd_new($1.value); 
-}
-| "integer literal" { 
-    $$ = asd_new($1.value); 
-}
-| "decimal literal" { 
-    $$ = asd_new($1.value); 
-}
-| '(' expression ')' { 
-    $$ = asd_new($2->label); 
-    asd_add_child($$, $2); 
-}
-| function_call { 
-    $$ = asd_new($1->label); 
-    asd_add_child($$, $1); 
-};
+primary_expression: TK_ID { $$ = asd_new($1.value); }
+| TK_LI_INTEIRO { $$ = asd_new($1.value); }
+| TK_LI_DECIMAL { $$ = asd_new($1.value); }
+| '(' expression ')' { $$ = $2; }
+| function_call { $$ = $1; };
+
 %%
 
 void yyerror (char const *mensagem) {
-  extern int yylineno; // Declare yylineno to access the current line number
-  printf("ERROR FOUND at line %d: [%s]\n", yylineno, mensagem);
+ extern int yylineno; // Declare yylineno to access the current line number
+ printf("ERROR FOUND at line %d: [%s]\n", yylineno, mensagem);
 }
