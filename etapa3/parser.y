@@ -146,10 +146,10 @@ optional_parameter_list:
 parameter_list:
   parameter {
     $$ = asd_new("temp_param_list");
-    asd_add_child($$, $1);
+    //asd_add_child($$, $1);
   }
 | parameter_list ',' parameter {
-    asd_add_child($1, $3);
+    //asd_add_child($1, $3);
     $$ = $1;
   }
 ;
@@ -219,19 +219,26 @@ function_call: TK_ID '(' args ')' {
     if ($3) asd_add_child($$, $3); // Adiciona a raiz da corrente de argumentos
 };
 
+
+
 /* Regra 'args' com recursão à direita (para encadeamento arg1 -> arg2 -> ...) */
 args:
-    %empty
+    expression
     {
-        $$ = NULL;
+        $$ = $1;
     }
 |   expression ',' args
     {
-        /* Anexa o resto da corrente de argumentos ($3) ao argumento atual ($1) */
         asd_add_child($1, $3);
         $$ = $1;
     }
+|   %empty
+    {
+        $$ = NULL;
+    }
 ;
+
+
 
 return_command: TK_RETORNA expression TK_ATRIB var_type {
   $$ = asd_new("retorna");
@@ -241,7 +248,7 @@ return_command: TK_RETORNA expression TK_ATRIB var_type {
 flow_control_command: conditional_struct { $$ = $1; }
 | iterative_struct { $$ = $1; };
 
-/* Substitua sua regra conditional_struct por esta */
+
 conditional_struct: TK_SE '(' expression ')' command_block else_block {
     $$ = asd_new("se");
     asd_add_child($$, $3);
