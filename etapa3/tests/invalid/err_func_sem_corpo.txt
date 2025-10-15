@@ -1,3 +1,0 @@
-// Erro: corpo da função faltando
-f -> inteiro :=
-;
