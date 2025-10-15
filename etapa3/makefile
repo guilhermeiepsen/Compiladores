@@ -6,7 +6,7 @@ BISON = bison
 FLEX = flex
 
 # Flags
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g -fsanitize=address
 
 # Files
 LEX_FILE = scanner.l
@@ -31,12 +31,12 @@ asd.o: asd.c
 	$(CC) $(CFLAGS) -c $<
 
 $(YACC_C_FILE) $(YACC_H_FILE): $(YACC_FILE)
-	$(BISON) -d $<
+	$(BISON) -d -v $<
 
 $(LEX_C_FILE): $(LEX_FILE)
 	$(FLEX) $<
 
 clean:
-	rm -f $(EXEC) *.o $(LEX_C_FILE) $(YACC_C_FILE) $(YACC_H_FILE)
+	rm -f $(EXEC) *.o $(LEX_C_FILE) $(YACC_C_FILE) $(YACC_H_FILE) parser.output
 
 .PHONY: all clean

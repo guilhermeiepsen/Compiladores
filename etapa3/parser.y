@@ -1,6 +1,7 @@
 %{
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "asd.h"
 int yylex(void);
@@ -19,6 +20,7 @@ extern asd_tree_t *arvore;
   char *token_type;
   char *value;
  } lexical_value_t;
+
 }
 %define parse.error verbose
 
@@ -164,12 +166,11 @@ body: command_block { $$ = $1; };
 command_block: '[' command_sequence ']' { $$ = $2; }
 | '[' ']' { $$ = NULL; }; // se for vazio retorna NULL
 
-command_sequence:
-    %empty
+command_sequence: simple_command
     {
-        $$ = NULL;
+        $$ = $1;
     }
-|   simple_command command_sequence
+|  simple_command command_sequence
     {
         if ($1 != NULL) { // Se o comando atual não for uma declaração nula
             if ($2 != NULL) asd_add_child($1, $2); // Anexa o resto da corrente
@@ -194,13 +195,20 @@ variable_declaration: TK_VAR TK_ID TK_ATRIB var_type {
 };
 
 variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional_instantiation {
-  $$ = NULL;
+  $$ = $5;
+  if ($$ != NULL) {
+    asd_tree_t *idnode = asd_new($2.value);
+    asd_add_child($$, idnode);
+  }
 };
 
 var_type: TK_DECIMAL { $$ = asd_new("decimal"); }
 | TK_INTEIRO { $$ = asd_new("integer"); };
 
-optional_instantiation: TK_COM literal { $$ = $2; }
+optional_instantiation: TK_COM literal { 
+  $$ = asd_new("com");
+  asd_add_child($$, $2);
+}
 | %empty { $$ = NULL; };
 
 literal: TK_LI_INTEIRO { $$ = asd_new($1.value); }
@@ -366,9 +374,16 @@ unary_expression:
     }
 ;
 
-primary_expression: TK_ID { $$ = asd_new($1.value); }
-| TK_LI_INTEIRO { $$ = asd_new($1.value); }
-| TK_LI_DECIMAL { $$ = asd_new($1.value); }
+primary_expression: TK_ID {
+  $$ = asd_new($1.value);
+  free($1.value);
+}
+| TK_LI_INTEIRO { $$ = asd_new($1.value); 
+  free($1.value);
+}
+| TK_LI_DECIMAL { $$ = asd_new($1.value); 
+  free($1.value);
+}
 | '(' expression ')' { $$ = $2; }
 | function_call { $$ = $1; };
 
