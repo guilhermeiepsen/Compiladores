@@ -162,7 +162,7 @@ parameter: TK_ID TK_ATRIB var_type {
 body: command_block { $$ = $1; };
 
 command_block: '[' command_sequence ']' { $$ = $2; }
-| '[' ']' { $$ = asd_new("empty command block"); };
+| '[' ']' { $$ = NULL; }; // se for vazio retorna NULL
 
 command_sequence:
     %empty
@@ -184,7 +184,9 @@ simple_command: variable_declaration_with_instantiation { $$ = $1; }
 | function_call { $$ = $1; }
 | attribution_command { $$ = $1; }
 | return_command { $$ = $1; }
-| flow_control_command { $$ = $1; };
+| flow_control_command { $$ = $1; }
+| command_block { $$ = $1; };
+
 
 /* ALTERADO: Regras de declaração agora retornam NULL para serem ignoradas na árvore */
 variable_declaration: TK_VAR TK_ID TK_ATRIB var_type {
