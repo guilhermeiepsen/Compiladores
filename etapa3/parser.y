@@ -89,8 +89,6 @@ extern asd_tree_t *arvore;
 program:
   list ';'
   {
-    $$ = asd_new("program");
-    asd_add_child($$, $1);
     arvore = $1;
   }
 ;
@@ -127,39 +125,23 @@ function_definition: header body {
 
 /* ALTERADO: Header simplificado para remover tipo de retorno e sempre desempacotar parâmetros */
 header: TK_ID TK_SETA var_type optional_parameter_list TK_ATRIB {
-  $$ = asd_new($1.value);       /* nome da função */
-  /* asd_add_child($$, $3); */  /* Linha removida para omitir o tipo de retorno */
-
-  /* $4 é a lista de parâmetros. Vamos sempre desempacotar os filhos. */
-  if ($4) {
-    for (int i = 0; i < $4->number_of_children; i++) {
-      asd_add_child($$, $4->children[i]);
-    }
-  }
+  $$ = asd_new($1.value);    /* nome da função */
+  free($1.value);
 };
 
 /* ALTERADO: Regra simplificada para sempre passar a lista para o header desempacotar */
 optional_parameter_list:
-  %empty { $$ = NULL; }
-| TK_COM parameter_list { $$ = $2; }
-| parameter_list { $$ = $1; }
+  %empty {}
+| TK_COM parameter_list {}
+| parameter_list {}
 ;
 
 parameter_list:
-  parameter {
-    $$ = asd_new("temp_param_list");
-    //asd_add_child($$, $1);
-  }
-| parameter_list ',' parameter {
-    //asd_add_child($1, $3);
-    $$ = $1;
-  }
+  parameter {}
+| parameter_list ',' parameter {}
 ;
 
-parameter: TK_ID TK_ATRIB var_type {
-  $$ = asd_new($1.value);
-  //asd_add_child($$, $3);
-};
+parameter: TK_ID TK_ATRIB var_type {};
 
 body: command_block { $$ = $1; };
 
@@ -190,18 +172,20 @@ simple_command: variable_declaration_with_instantiation { $$ = $1; }
 /* ALTERADO: Regras de declaração agora retornam NULL para serem ignoradas na árvore */
 variable_declaration: TK_VAR TK_ID TK_ATRIB var_type {
   $$ = NULL;
+  free($2.value);  // Liberar memória do identificador
 };
 
 variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional_instantiation {
   $$ = $5;
   if ($$ != NULL) {
     asd_tree_t *idnode = asd_new($2.value);
+    free($2.value);
     asd_add_child($$, idnode);
   }
 };
 
-var_type: TK_DECIMAL { $$ = asd_new("decimal"); }
-| TK_INTEIRO { $$ = asd_new("integer"); };
+var_type: TK_DECIMAL { }
+| TK_INTEIRO { };
 
 optional_instantiation: TK_COM literal { 
   $$ = asd_new("com");
@@ -209,12 +193,17 @@ optional_instantiation: TK_COM literal {
 }
 | %empty { $$ = NULL; };
 
-literal: TK_LI_INTEIRO { $$ = asd_new($1.value); }
-| TK_LI_DECIMAL { $$ = asd_new($1.value); };
+literal: TK_LI_INTEIRO { $$ = asd_new($1.value);
+ free($1.value);
+ }
+| TK_LI_DECIMAL { $$ = asd_new($1.value);
+ free($1.value);
+ };
 
 attribution_command: TK_ID TK_ATRIB expression {
   $$ = asd_new(":=");
   asd_tree_t *idnode = asd_new($1.value);
+  free($1.value);
   asd_add_child($$, idnode);
   asd_add_child($$, $3);
 };
@@ -224,6 +213,7 @@ function_call: TK_ID '(' args ')' {
     char buffer[256];
     sprintf(buffer, "call %s", $1.value);
     $$ = asd_new(buffer);
+    free($1.value);
     if ($3) asd_add_child($$, $3); // Adiciona a raiz da corrente de argumentos
 };
 
@@ -359,7 +349,7 @@ multiplicative_expression: unary_expression { $$ = $1; }
 unary_expression:
     primary_expression { $$ = $1; }
 |   '!' unary_expression { 
-        $$ = asd_new("!"); 
+        $$ = asd_new("!");
         asd_add_child($$, $2); 
     }
 |   '+' unary_expression { 
