@@ -141,12 +141,12 @@ parameter_list:
 | parameter_list ',' parameter {}
 ;
 
-parameter: TK_ID TK_ATRIB var_type {};
+parameter: TK_ID TK_ATRIB var_type { free($1.value);};
 
 body: command_block { $$ = $1; };
 
 command_block: '[' command_sequence ']' { $$ = $2; }
-| '[' ']' { $$ = asd_new("empty command block"); };
+| '[' ']' {  };
 
 command_sequence: simple_command
     {
@@ -172,7 +172,7 @@ simple_command: variable_declaration_with_instantiation { $$ = $1; }
 /* ALTERADO: Regras de declaração agora retornam NULL para serem ignoradas na árvore */
 variable_declaration: TK_VAR TK_ID TK_ATRIB var_type {
   $$ = NULL;
-  free($2.value);  // Liberar memória do identificador
+  free($2.value);
 };
 
 variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional_instantiation {
