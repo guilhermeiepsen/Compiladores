@@ -179,9 +179,10 @@ variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional
   $$ = $5;
   if ($$ != NULL) {
     asd_tree_t *idnode = asd_new($2.value);
-    free($2.value);
     asd_add_child($$, idnode);
   }
+
+  free($2.value);
 };
 
 var_type: TK_DECIMAL { }
