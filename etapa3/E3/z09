@@ -1,0 +1,8 @@
+g -> inteiro := [
+  var v := inteiro
+],
+f -> inteiro := [
+  var b := inteiro
+  var z := inteiro
+  var k := inteiro
+];

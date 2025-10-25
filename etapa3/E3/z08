@@ -1,0 +1,11 @@
+g -> inteiro com i := inteiro, j := inteiro, k := inteiro := [
+],
+f -> inteiro :=[
+    var a := inteiro
+    var b := inteiro
+    var c := inteiro
+    a := 1
+    b := 2
+    c := 3
+    g(a, b, c)
+];

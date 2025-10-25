@@ -16,7 +16,7 @@ YACC_C_FILE = parser.tab.c
 YACC_H_FILE = parser.tab.h
 
 # Output
-EXEC = etapa3
+EXEC = ast_parser
 
 # Rules
 all: $(EXEC)

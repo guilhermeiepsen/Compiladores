@@ -1,0 +1,6 @@
+//CORRECT
+main -> inteiro := [
+  se (a == 2) [ ]
+  se ((a+b) <= 10) [ ]
+  a := 2 * (c + k)
+];

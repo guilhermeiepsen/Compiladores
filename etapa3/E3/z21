@@ -1,0 +1,11 @@
+f -> inteiro :=[
+    var a := inteiro
+    var b := inteiro
+    var c := inteiro
+    se (a) [
+       a := b
+       b := a
+    ]
+    c := 2
+    c := 4
+];

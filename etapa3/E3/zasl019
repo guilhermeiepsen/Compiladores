@@ -1,0 +1,4 @@
+//CORRECT
+main -> inteiro := [
+  se (a) [ x := 2 ] senao [ x := 3 ]
+];

@@ -1,0 +1,4 @@
+//CORRECT
+main -> inteiro := [
+   a := (( b * 1) + c) & (1)
+];

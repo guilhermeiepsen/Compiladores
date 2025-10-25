@@ -1,0 +1,12 @@
+f -> inteiro :=[
+    var a := inteiro
+    var b := inteiro
+    var c := inteiro
+    se (a) [
+       a := b
+     ]senao[
+       a := 3
+     ]
+     c := 4
+     c := 5
+];

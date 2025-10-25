@@ -1,0 +1,3 @@
+f -> inteiro :=[
+  z := a <= b < c > d >= e
+];

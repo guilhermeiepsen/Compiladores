@@ -1,0 +1,4 @@
+//CORRECT
+main -> inteiro := [
+  enquanto (a == 2) [ ]
+];

@@ -1,0 +1,7 @@
+fa -> inteiro com k := decimal, l := inteiro :=
+[
+  var va := inteiro
+  var a := inteiro
+  var vc := inteiro
+];
+

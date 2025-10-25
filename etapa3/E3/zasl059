@@ -1,0 +1,4 @@
+//CORRECT
+main -> inteiro := [
+  var a := inteiro
+];

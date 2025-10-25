@@ -1,0 +1,4 @@
+//CORRECT
+main -> inteiro := [
+  a := 2 * c + a / b
+];

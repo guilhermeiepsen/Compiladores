@@ -1,0 +1,5 @@
+//CORRECT
+main -> inteiro := [
+  var x := inteiro
+  x := x | 3
+];

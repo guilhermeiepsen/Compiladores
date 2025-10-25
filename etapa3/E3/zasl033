@@ -1,0 +1,7 @@
+//CORRECT
+main -> inteiro := [
+  var a := inteiro
+  var b := inteiro
+  a := b & a | a & 43
+  retorna 0 := inteiro
+];

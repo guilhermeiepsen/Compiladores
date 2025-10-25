@@ -1,0 +1,12 @@
+pilha de escopos
+pilha de ponteiros para as tabelas de simbolos de cada escopo
+
+Tabela deve ser uma lista encadeada de structs
+
+criar terminais 
+escopo_init
+escopo_end
+
+e colocamos nos inícios e fins de onde deveriam ser os escopos, 
+deriva o não terminal pra vazio, então ele não interfere em gramática.
+mas quando identificado 

@@ -1,0 +1,4 @@
+//CORRECT
+main -> inteiro := [
+  var  x := inteiro com 2
+];

@@ -1,0 +1,6 @@
+//CORRECT
+main -> decimal := [
+  var a := inteiro
+  a := 1 + 12
+  retorna a := decimal
+];

@@ -1,0 +1,5 @@
+f -> inteiro com c := inteiro :=
+[
+  var a := inteiro
+  c := 3 * f(a) + a
+];

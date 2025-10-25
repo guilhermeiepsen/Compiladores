@@ -1,0 +1,5 @@
+f -> inteiro :=
+[
+  var b := inteiro com 10
+  var a := inteiro com 30
+];

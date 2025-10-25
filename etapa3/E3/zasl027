@@ -1,0 +1,7 @@
+//CORRECT
+main -> inteiro := [
+  var a := inteiro
+  a := 1
+  retorna 0 := inteiro
+  [ ]
+];
