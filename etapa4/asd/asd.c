@@ -41,6 +41,76 @@ void asd_add_child(asd_tree_t *tree, asd_tree_t *child)
   }
 }
 
+asd_tree_t *asd_add_child_to_node(asd_tree_t *node, asd_tree_t *child)
+{
+  if (node != NULL && child != NULL){
+    asd_add_child(node, child);
+  }
+  return node;
+}
+
+asd_tree_t *asd_select_head_and_attach_tail(asd_tree_t *head, asd_tree_t *tail)
+{
+  if (head != NULL){
+    if (tail != NULL) asd_add_child(head, tail);
+    return head;
+  }
+  return tail;
+}
+
+asd_tree_t *asd_new_trinary(const char *label, asd_tree_t *left, asd_tree_t *middle, asd_tree_t *right)
+{
+  asd_tree_t *node = asd_new(label);
+  if (node != NULL){
+    if (left != NULL) asd_add_child(node, left);
+    if (middle != NULL) asd_add_child(node, middle);
+    if (right != NULL) asd_add_child(node, right);
+  }
+  return node;
+}
+
+asd_tree_t *asd_new_binary(const char *label, asd_tree_t *left, asd_tree_t *right)
+{
+  asd_tree_t *node = asd_new(label);
+  if (node != NULL){
+    if (left != NULL) asd_add_child(node, left);
+    if (right != NULL) asd_add_child(node, right);
+  }
+  return node;
+}
+
+asd_tree_t *asd_new_node_from_value(lexical_value_t *value)
+{
+  if (value == NULL || value->value == NULL) return NULL;
+  asd_tree_t *node = asd_new(value->value);
+  free(value->value);
+  value->value = NULL;
+  return node;
+}
+
+asd_tree_t *asd_new_function_call_node(lexical_value_t *id, asd_tree_t *args_root)
+{
+  const char *name = (id && id->value) ? id->value : "";
+  char buffer[256];
+  snprintf(buffer, sizeof(buffer), "call %s", name);
+  asd_tree_t *node = asd_new(buffer);
+  if (id && id->value) {
+    free(id->value);
+    id->value = NULL;
+  }
+  if (args_root != NULL) asd_add_child(node, args_root);
+  return node;
+}
+
+asd_tree_t *asd_new_unary(const char *label, asd_tree_t *child)
+{
+  asd_tree_t *node = asd_new(label);
+  if (node != NULL && child != NULL){
+    asd_add_child(node, child);
+  }
+  return node;
+}
+
 static void _asd_print (FILE *foutput, asd_tree_t *tree, int profundidade)
 {
   int i;

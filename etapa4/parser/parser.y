@@ -12,15 +12,7 @@ extern asd_tree_t *arvore;
 
 %code requires {
  #include "asd.h"
- #include "parser.tab.h"
-
- // Declaring lexical_value in here makes it accessible in .h
- typedef struct {
-  int line_number;
-  char *token_type;
-  char *value;
- } lexical_value_t;
-
+ #include "lexical_value.h"
 }
 %define parse.error verbose
 
@@ -87,12 +79,15 @@ extern asd_tree_t *arvore;
 
 %%
 
-program:
-  escope_init list escope_end ';'
-  {
-    arvore = $2;
-  }
-;
+/*
+  Para as ações de criação de arvore, queremos limitar a "One Liners" para melhorar a legibilidade do código
+  Por isso, várias funções adicionadas ao módulo asd serão quase redundantes, em um esforço de facilitar o entendimento
+  das ações que serão tomadas tanto para a criação da arvore, quanto para etapas futuras.
+*/
+
+program: escope_init list escope_end ';' {
+  arvore = $2;
+};
 
 escope_init: %empty { 
   $$ = NULL;
@@ -111,280 +106,261 @@ escope_end: %empty {
  };
 
 /* Regra 'list' com recursão à direita (para encadeamento A -> B -> C) */
-list:
-    element
-    {
-        $$ = $1;
-    }
-|   element ',' list
-    {
-        /* Anexa o resto da lista ($3) como filho do elemento atual ($1) */
-        if ($1 != NULL) {
-            if ($3 != NULL) asd_add_child($1, $3);
-            $$ = $1;
-        } else {
-            /* Se o elemento atual for nulo (uma declaração global), a lista começa do próximo */
-            $$ = $3;
-        }
-    }
-;
+list: element {
+  $$ = $1;
+}
+| element ',' list {
+  $$ = asd_select_head_and_attach_tail($1, $3);
+};
 
-
-
-element: function_definition { $$ = $1; }
-| variable_declaration { $$ = $1; };
+element: function_definition {
+  $$ = $1;
+}
+| variable_declaration {
+  $$ = $1;
+};
 
 function_definition: header body {
-    $$ = $1;
-    if ($2) asd_add_child($$, $2); // Adiciona o corpo diretamente
+  $$ = asd_add_child_to_node($1, $2);
 };
 
 header: TK_ID TK_SETA var_type optional_parameter_list TK_ATRIB {
-  $$ = asd_new($1.value);
-  free($1.value);
+  $$ = asd_new_node_from_value(&$1);
 };
 
-optional_parameter_list:
-    %empty              { $$ = NULL; }
-  | TK_COM parameter_list { $$ = $2; }
-  | parameter_list        { $$ = $1; };
-
-parameter_list:
-    parameter                { $$ = NULL; }
-  | parameter_list ',' parameter { $$ = NULL; };
-
-parameter: TK_ID TK_ATRIB var_type { free($1.value); $$ = NULL;};
-
-body: command_block { $$ = $1; };
-
-command_block: '[' command_sequence ']' { $$ = $2; }
-| '[' ']' { $$ = NULL; };
-
-command_sequence: simple_command
-    {
-        $$ = $1;
-    }
-|  simple_command command_sequence
-    {
-        if ($1 != NULL) { // Se o comando atual não for uma declaração nula
-            if ($2 != NULL) asd_add_child($1, $2); // Anexa o resto da corrente
-            $$ = $1;
-        } else {
-            $$ = $2; // Se o comando for nulo, a corrente começa do próximo
-        }
-    }
-;
-
-simple_command: variable_declaration_with_instantiation { $$ = $1; }
-| function_call { $$ = $1; }
-| attribution_command { $$ = $1; }
-| return_command { $$ = $1; }
-| flow_control_command { $$ = $1; }
-| command_block { $$ = $1; };
-
-/* ALTERADO: Regras de declaração agora retornam NULL para serem ignoradas na árvore */
-variable_declaration: TK_VAR TK_ID TK_ATRIB var_type {
+optional_parameter_list: %empty {
   $$ = NULL;
-  free($2.value);
+}
+| TK_COM parameter_list {
+  $$ = $2;
+}
+| parameter_list { 
+  $$ = $1;
+};
+
+parameter_list: parameter {
+  $$ = NULL; 
+}
+| parameter_list ',' parameter {
+  $$ = NULL;
+};
+
+parameter: TK_ID TK_ATRIB var_type {
+  $$ = NULL; free($1.value);
+};
+
+body: command_block {
+  $$ = $1;
+};
+
+command_block: '[' command_sequence ']' {
+  $$ = $2;
+}
+| '[' ']' {
+  $$ = NULL;
+};
+
+command_sequence: simple_command {
+  $$ = $1;
+}
+| simple_command command_sequence {
+  $$ = asd_select_head_and_attach_tail($1, $2);
+};
+
+simple_command: variable_declaration_with_instantiation {
+  $$ = $1;
+}
+| function_call {
+  $$ = $1;
+}
+| attribution_command {
+  $$ = $1;
+}
+| return_command {
+  $$ = $1;
+}
+| flow_control_command {
+  $$ = $1;
+}
+| command_block {
+  $$ = $1;
+};
+
+variable_declaration: TK_VAR TK_ID TK_ATRIB var_type {
+  $$ = NULL;  free($2.value);
 };
 
 variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional_instantiation {
+  // Only rule that is difficult to reduce
   $$ = $5;
   if ($$ != NULL) {
-    asd_tree_t *idnode = asd_new($2.value);
+    asd_tree_t *idnode = asd_new_node_from_value(&$2);
     asd_add_child($$, idnode);
+  } else {
+    free($2.value);
   }
-
-  free($2.value);
 };
 
-var_type: TK_DECIMAL { $$ = NULL; }
-| TK_INTEIRO { $$ = NULL; };
+var_type: TK_DECIMAL {
+  $$ = NULL;
+}
+| TK_INTEIRO {
+  $$ = NULL;
+};
 
 optional_instantiation: TK_COM literal { 
-  $$ = asd_new("com");
-  asd_add_child($$, $2);
+  $$ = asd_new_unary("com", $2);
 }
-| %empty { $$ = NULL; };
+| %empty {
+  $$ = NULL;
+};
 
-literal: TK_LI_INTEIRO { $$ = asd_new($1.value);
- free($1.value);
- }
-| TK_LI_DECIMAL { $$ = asd_new($1.value);
- free($1.value);
- };
+literal: TK_LI_INTEIRO {
+  $$ = asd_new_node_from_value(&$1);
+}
+| TK_LI_DECIMAL {
+  $$ = asd_new_node_from_value(&$1);
+};
 
 attribution_command: TK_ID TK_ATRIB expression {
-  $$ = asd_new(":=");
-  asd_tree_t *idnode = asd_new($1.value);
-  free($1.value);
-  asd_add_child($$, idnode);
-  asd_add_child($$, $3);
+  asd_tree_t *idnode = asd_new_node_from_value(&$1);
+  $$ = asd_new_binary(":=", idnode, $3);
 };
 
-/* Regra 'function_call' simplificada */
 function_call: TK_ID '(' args ')' {
-    char buffer[256];
-    sprintf(buffer, "call %s", $1.value);
-    $$ = asd_new(buffer);
-    free($1.value);
-    if ($3) asd_add_child($$, $3); // Adiciona a raiz da corrente de argumentos
+    $$ = asd_new_function_call_node(&$1, $3);
 };
-
 
 
 /* Regra 'args' com recursão à direita (para encadeamento arg1 -> arg2 -> ...) */
-args:
-    expression
-    {
-        $$ = $1;
-    }
-|   expression ',' args
-    {
-        asd_add_child($1, $3);
-        $$ = $1;
-    }
-|   %empty
-    {
-        $$ = NULL;
-    }
-;
-
+args: expression {
+  $$ = $1;
+}
+| expression ',' args {
+  $$ = asd_add_child_to_node($1, $3);
+}
+| %empty {
+  $$ = NULL;
+};
 
 
 return_command: TK_RETORNA expression TK_ATRIB var_type {
-  $$ = asd_new("retorna");
-  asd_add_child($$, $2);
+  $$ = asd_new_unary("retorna", $2);
 };
 
-flow_control_command: conditional_struct { $$ = $1; }
-| iterative_struct { $$ = $1; };
+flow_control_command: conditional_struct {
+  $$ = $1;
+}
+| iterative_struct {
+  $$ = $1;
+}
 
 
 conditional_struct: TK_SE '(' expression ')' command_block else_block {
-    $$ = asd_new("se");
-    asd_add_child($$, $3);
-    if ($5) asd_add_child($$, $5); // Adiciona o bloco 'then' diretamente
-    if ($6) asd_add_child($$, $6); // Adiciona o bloco 'else' diretamente
+  $$ = asd_new_trinary("se", $3, $5, $6);
 };
 
-else_block: TK_SENAO command_block {
-    $$ = $2; // Apenas repassa o resultado de command_block
+else_block: TK_SENAO command_block { 
+  $$ = $2; 
 }
-| %empty { $$ = NULL; };
+| %empty {
+  $$ = NULL;
+};
 
 iterative_struct: TK_ENQUANTO '(' expression ')' command_block {
-    $$ = asd_new("enquanto");
-    asd_add_child($$, $3);
-    if ($5) asd_add_child($$, $5); // Adiciona o corpo diretamente
+  $$ = asd_new_binary("enquanto", $3, $5);
 };
 
 //EXPRESSOES
 
-expression: logical_or_expression { $$ = $1; };
+expression: logical_or_expression {
+  $$ = $1;
+};
 
-logical_or_expression: logical_and_expression { $$ = $1; }
+logical_or_expression: logical_and_expression {
+  $$ = $1;
+}
 | logical_or_expression '|' logical_and_expression {
-  $$ = asd_new("|");
-  asd_add_child($$, $1);
-  asd_add_child($$, $3);
+  $$ = asd_new_binary("|", $1, $3);
 };
 
-logical_and_expression: equality_expression { $$ = $1; }
+logical_and_expression: equality_expression {
+  $$ = $1;
+}
 | logical_and_expression '&' equality_expression {
-  $$ = asd_new("&");
-  asd_add_child($$, $1);
-  asd_add_child($$, $3);
+  $$ = asd_new_binary("&", $1, $3);
 };
 
-equality_expression: relational_expression { $$ = $1; }
+equality_expression: relational_expression {
+  $$ = $1;
+}
 | equality_expression TK_OC_EQ relational_expression {
-  $$ = asd_new("==");
-  asd_add_child($$, $1);
-  asd_add_child($$, $3);
+  $$ = asd_new_binary("==", $1, $3);
 }
 | equality_expression TK_OC_NE relational_expression {
-  $$ = asd_new("!=");
-  asd_add_child($$, $1);
-  asd_add_child($$, $3);
+  $$ = asd_new_binary("!=", $1, $3);
 };
 
-relational_expression: additive_expression { $$ = $1; }
+relational_expression: additive_expression {
+  $$ = $1;
+}
 | relational_expression '<' additive_expression {
-  $$ = asd_new("<");
-  asd_add_child($$, $1);
-  asd_add_child($$, $3);
+  $$ = asd_new_binary("<", $1, $3);
 }
 | relational_expression '>' additive_expression {
-  $$ = asd_new(">");
-  asd_add_child($$, $1);
-  asd_add_child($$, $3);
+  $$ = asd_new_binary(">", $1, $3);
 }
 | relational_expression TK_OC_LE additive_expression {
-  $$ = asd_new("<=");
-  asd_add_child($$, $1);
-  asd_add_child($$, $3);
+  $$ = asd_new_binary("<=", $1, $3);
 }
 | relational_expression TK_OC_GE additive_expression {
-  $$ = asd_new(">=");
-  asd_add_child($$, $1);
-  asd_add_child($$, $3);
+  $$ = asd_new_binary(">=", $1, $3);
 };
 
-additive_expression: multiplicative_expression { $$ = $1; }
+additive_expression: multiplicative_expression {
+  $$ = $1;
+}
 | additive_expression '+' multiplicative_expression {
-  $$ = asd_new("+");
-  asd_add_child($$, $1);
-  asd_add_child($$, $3);
+  $$ = asd_new_binary("+", $1, $3);
 }
 | additive_expression '-' multiplicative_expression {
-  $$ = asd_new("-");
-  asd_add_child($$, $1);
-  asd_add_child($$, $3);
+  $$ = asd_new_binary("-", $1, $3);
 };
 
-multiplicative_expression: unary_expression { $$ = $1; }
+multiplicative_expression: unary_expression {
+  $$ = $1;
+}
 | multiplicative_expression '*' unary_expression {
-  $$ = asd_new("*");
-  asd_add_child($$, $1);
-  asd_add_child($$, $3);
+  $$ = asd_new_binary("*", $1, $3);
 }
 | multiplicative_expression '/' unary_expression {
-  $$ = asd_new("/");
-  asd_add_child($$, $1);
-  asd_add_child($$, $3);
+  $$ = asd_new_binary("/", $1, $3);
 }
 | multiplicative_expression '%' unary_expression {
-  $$ = asd_new("%");
-  asd_add_child($$, $1);
-  asd_add_child($$, $3);
+  $$ = asd_new_binary("%", $1, $3);
 };
 
-unary_expression:
-    primary_expression { $$ = $1; }
-|   '!' unary_expression { 
-        $$ = asd_new("!");
-        asd_add_child($$, $2); 
-    }
-|   '+' unary_expression { 
-        $$ = asd_new("+");
-        asd_add_child($$, $2); 
-    }
-|   '-' unary_expression { 
-        $$ = asd_new("-");
-        asd_add_child($$, $2); 
-    }
-;
+unary_expression: primary_expression {
+  $$ = $1;
+}
+| '!' unary_expression { 
+  $$ = asd_new_unary("!", $2);
+}
+| '+' unary_expression { 
+  $$ = asd_new_unary("+", $2);
+}
+| '-' unary_expression { 
+  $$ = asd_new_unary("-", $2);
+};
 
 primary_expression: TK_ID {
-  $$ = asd_new($1.value);
-  free($1.value);
+  $$ = asd_new_node_from_value(&$1);
 }
-| TK_LI_INTEIRO { $$ = asd_new($1.value); 
-  free($1.value);
+| TK_LI_INTEIRO {
+  $$ = asd_new_node_from_value(&$1);
 }
-| TK_LI_DECIMAL { $$ = asd_new($1.value); 
-  free($1.value);
+| TK_LI_DECIMAL {
+  $$ = asd_new_node_from_value(&$1);
 }
 | '(' expression ')' { $$ = $2; }
 | function_call { $$ = $1; };

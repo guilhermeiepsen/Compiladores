@@ -48,17 +48,9 @@ extern int yydebug;
 #line 13 "parser/parser.y"
 
  #include "asd.h"
- #include "parser.tab.h"
+ #include "lexical_value.h"
 
- // Declaring lexical_value in here makes it accessible in .h
- typedef struct {
-  int line_number;
-  char *token_type;
-  char *value;
- } lexical_value_t;
-
-
-#line 62 "parser/parser.tab.h"
+#line 54 "parser/parser.tab.h"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -96,12 +88,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 27 "parser/parser.y"
+#line 19 "parser/parser.y"
 
  asd_tree_t *node;
  lexical_value_t lexical_value;
 
-#line 105 "parser/parser.tab.h"
+#line 97 "parser/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
