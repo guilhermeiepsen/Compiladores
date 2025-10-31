@@ -1,7 +1,0 @@
-f -> inteiro :=
-[
-  var a := inteiro
-  var b := inteiro
-  var c := inteiro
-  a := 2*c+a/b
-];

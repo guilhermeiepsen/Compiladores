@@ -1,5 +1,0 @@
-k -> inteiro com x := inteiro, y := inteiro, z := inteiro := [],
-//f -> inteiro :=[
-//        k(10+11, 20+21, 30+31)
-//],
-var x := inteiro;

@@ -1,6 +1,0 @@
-f -> inteiro com f := inteiro :=
-[
-    var a := inteiro
-    var b := inteiro
-    a := !b
-];

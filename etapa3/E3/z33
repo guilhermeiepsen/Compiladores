@@ -1,9 +1,0 @@
-f -> inteiro :=[
-    var a := inteiro
-    var b := inteiro
-    var c := inteiro
-    var d := inteiro
-    var e := inteiro
-    var f := inteiro
-    a := b + c * d / e - f
-];

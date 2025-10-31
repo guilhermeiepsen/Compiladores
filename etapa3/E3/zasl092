@@ -1,4 +1,0 @@
-//CORRECT
-main -> inteiro := [
-  x := !(!(!(!x)))
-];

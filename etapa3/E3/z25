@@ -1,5 +1,0 @@
-f -> inteiro :=[
-    var a := inteiro
-    []
-    a := 2
-];

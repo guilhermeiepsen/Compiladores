@@ -1,6 +1,0 @@
-f -> inteiro :=[
-    var i := inteiro
-    enquanto(i) [
-    	i := 2
-    ]
-];

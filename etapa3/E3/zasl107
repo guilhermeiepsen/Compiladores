@@ -1,5 +1,0 @@
-//CORRECT
-main -> inteiro := [
-  x := a * f() - g(h()-2)
-];
-

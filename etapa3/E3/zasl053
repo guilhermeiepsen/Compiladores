@@ -1,4 +1,0 @@
-//CORRECT
-main -> decimal com argc := inteiro, argv := inteiro, c := decimal := [
-  retorna argc := inteiro
-];

@@ -1,6 +1,0 @@
-//CORRECT
-main -> decimal := [
-  var a := inteiro
-  a := a + a
-  retorna a := inteiro
-];
