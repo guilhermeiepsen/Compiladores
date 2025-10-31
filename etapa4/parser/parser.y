@@ -62,7 +62,8 @@ extern asd_tree_t *arvore;
 %type <node> multiplicative_expression
 %type <node> unary_expression
 %type <node> primary_expression
-
+%type <node> escope_init
+%type <node> escope_end
 
 %token TK_TIPO "type"
 %token TK_VAR "variable"
@@ -89,11 +90,12 @@ extern asd_tree_t *arvore;
 program:
   escope_init list escope_end ';'
   {
-    arvore = $1;
+    arvore = $2;
   }
 ;
 
 escope_init: %empty { 
+  $$ = NULL;
   /*
   create empty table
   push table to stack
@@ -101,6 +103,7 @@ escope_init: %empty {
  };
 
 escope_end: %empty {
+  $$ = NULL;
 /*
   pop table from stack
   free table recursively
@@ -142,22 +145,20 @@ header: TK_ID TK_SETA var_type optional_parameter_list TK_ATRIB {
 };
 
 optional_parameter_list:
-  %empty {}
-| TK_COM parameter_list {}
-| parameter_list {}
-;
+    %empty              { $$ = NULL; }
+  | TK_COM parameter_list { $$ = $2; }
+  | parameter_list        { $$ = $1; };
 
 parameter_list:
-  parameter {}
-| parameter_list ',' parameter {}
-;
+    parameter                { $$ = NULL; }
+  | parameter_list ',' parameter { $$ = NULL; };
 
-parameter: TK_ID TK_ATRIB var_type { free($1.value);};
+parameter: TK_ID TK_ATRIB var_type { free($1.value); $$ = NULL;};
 
 body: command_block { $$ = $1; };
 
 command_block: '[' command_sequence ']' { $$ = $2; }
-| '[' ']' {  };
+| '[' ']' { $$ = NULL; };
 
 command_sequence: simple_command
     {
@@ -178,7 +179,8 @@ simple_command: variable_declaration_with_instantiation { $$ = $1; }
 | function_call { $$ = $1; }
 | attribution_command { $$ = $1; }
 | return_command { $$ = $1; }
-| flow_control_command { $$ = $1; };
+| flow_control_command { $$ = $1; }
+| command_block { $$ = $1; };
 
 /* ALTERADO: Regras de declaração agora retornam NULL para serem ignoradas na árvore */
 variable_declaration: TK_VAR TK_ID TK_ATRIB var_type {
@@ -196,8 +198,8 @@ variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional
   free($2.value);
 };
 
-var_type: TK_DECIMAL { }
-| TK_INTEIRO { };
+var_type: TK_DECIMAL { $$ = NULL; }
+| TK_INTEIRO { $$ = NULL; };
 
 optional_instantiation: TK_COM literal { 
   $$ = asd_new("com");

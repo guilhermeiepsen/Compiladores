@@ -7,6 +7,12 @@
   #include "parser.tab.h"
   #include <string.h>
 
+  static void set_lexical_value(const char *kind) {
+    yylval.lexical_value.line_number = yylineno;
+    yylval.lexical_value.token_type = kind;
+    yylval.lexical_value.value = strdup(yytext);
+  }
+
 %}
 
 %option noyywrap
@@ -24,24 +30,9 @@ retorna { return TK_RETORNA; }
 enquanto { return TK_ENQUANTO; }
 com { return TK_COM; }
 [!*/%+\-<>\[\]()=,;&|] { return (int) yytext[0]; }
-[a-z_][a-z0-9_]* {
-  yylval.lexical_value.line_number = yylineno;
-  yylval.lexical_value.token_type = "identifier";
-  yylval.lexical_value.value = strdup(yytext);
-  return TK_ID;
-}
-[0-9]+ {
-  yylval.lexical_value.line_number = yylineno;
-  yylval.lexical_value.token_type = "integer literal";
-  yylval.lexical_value.value = strdup(yytext);
-  return TK_LI_INTEIRO;
-}
-[0-9]*\.[0-9]+ {
-  yylval.lexical_value.line_number = yylineno;
-  yylval.lexical_value.token_type = "decimal literal";
-  yylval.lexical_value.value = strdup(yytext);
-  return TK_LI_DECIMAL;
-}
+[a-z_][a-z0-9_]* { set_lexical_value("identifier"); return TK_ID; }
+[0-9]+ { set_lexical_value("integer literal"); return TK_LI_INTEIRO; }
+[0-9]*\.[0-9]+ { set_lexical_value("decimal literal"); return TK_LI_DECIMAL; }
 "==" { return TK_OC_EQ; }
 "<=" { return TK_OC_LE; }
 ">=" { return TK_OC_GE; }
