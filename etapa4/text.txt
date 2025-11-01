@@ -10,3 +10,24 @@ escopo_end
 e colocamos nos inícios e fins de onde deveriam ser os escopos, 
 deriva o não terminal pra vazio, então ele não interfere em gramática.
 mas quando identificado 
+
+
+### anotações gui ################
+
+AULA LABORATÓRIO ETAPA4
+
+verificar se variável ja foi declarada
+
+
+
+cria escopo: %empty { //1. Cria tabela vazia; 2. Empilha tabela };
+destroi_escopo: %empty { //1. Desempilha a tabela do topo; 2. Free profundo desta tabela };
+
+head
+escopo da função começa antes dos parameters
+-> 
+
+chamada de função (function call) e chamada (call)
+-> verificar se a variável(TK_ID) ja foi declarada e se o TK_ID é o nome da função tb
+
+Todos os TK_ID's têm que ser verificados (vai ter alguma verificação p fazer em todos eles)
