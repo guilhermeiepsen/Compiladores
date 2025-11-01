@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "scope.h"
+#include <stdio.h>
 
 /* args helpers */
 arg_type_node_t *args_append(arg_type_node_t *head, data_type_t type) {
@@ -131,4 +132,84 @@ symbol_entry_t *scope_insert_current(scope_stack_t *stack,
   return symtab_insert(cur->table, key, nature, data_type, lexical_opt);
 }
 
+/* ----------------- logging ----------------- */
+static const char *scope_kind_str(scope_kind_t k) {
+  switch (k) {
+    case SCOPE_GLOBAL: return "GLOBAL";
+    case SCOPE_FUNCTION: return "FUNCTION";
+    case SCOPE_BLOCK: return "BLOCK";
+    default: return "UNKNOWN";
+  }
+}
 
+static const char *nature_str(symbol_nature_t n) {
+  switch (n) {
+    case SYMBOL_LITERAL: return "literal";
+    case SYMBOL_VARIABLE: return "variable";
+    case SYMBOL_FUNCTION: return "function";
+    default: return "?";
+  }
+}
+
+static const char *dtype_str(data_type_t t) {
+  switch (t) {
+    case TYPE_INT: return "int";
+    case TYPE_FLOAT: return "float";
+    case TYPE_UNDEFINED: default: return "undef";
+  }
+}
+
+static void print_args_list(FILE *out, const arg_type_node_t *args) {
+  fprintf(out, "(");
+  const arg_type_node_t *cur = args;
+  int first = 1;
+  while (cur) {
+    if (!first) fprintf(out, ", ");
+    const char *name = cur->name ? cur->name : "_";
+    fprintf(out, "%s %s", dtype_str(cur->type), name);
+    first = 0;
+    cur = cur->next;
+  }
+  fprintf(out, ")");
+}
+
+static void symtab_print_with_header(FILE *out, scope_t *sc, const char *header) {
+  if (!sc || !sc->table) return;
+  fprintf(out, "===== %s SCOPE [%s] =====\n", header, scope_kind_str(sc->kind));
+  for (symbol_entry_t *e = sc->table->head; e; e = e->next) {
+    fprintf(out, "- %s: key='%s' type=%s", nature_str(e->nature), e->key ? e->key : "",
+            dtype_str(e->data_type));
+    if (e->nature == SYMBOL_FUNCTION) {
+      fprintf(out, " args=");
+      print_args_list(out, e->args);
+    }
+    if (e->lexical.value) {
+      fprintf(out, " lexval='%s'", e->lexical.value);
+    }
+    if (e->lexical.token_type) {
+      fprintf(out, " token=%s", e->lexical.token_type);
+    }
+    if (e->lexical.line_number) {
+      fprintf(out, " line=%d", e->lexical.line_number);
+    }
+    fprintf(out, "\n");
+  }
+  fprintf(out, "==============================\n");
+}
+
+static void scope_log_top(scope_stack_t *stack, const char *header) {
+  if (!stack || !stack->top) return;
+  symtab_print_with_header(stderr, stack->top, header);
+}
+
+void scope_log_global_end(scope_stack_t *stack) {
+  scope_log_top(stack, "END OF");
+}
+
+void scope_log_function_end(scope_stack_t *stack) {
+  scope_log_top(stack, "END OF");
+}
+
+void scope_log_block_end(scope_stack_t *stack) {
+  scope_log_top(stack, "END OF");
+}

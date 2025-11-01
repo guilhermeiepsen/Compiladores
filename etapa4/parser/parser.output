@@ -8,11 +8,11 @@ Gramática
 
     0 $accept: program $end
 
-    1 program: escope_init list escope_end ';'
+    1 program: global_escope_init list global_escope_end ';'
 
-    2 escope_init: ε
+    2 global_escope_init: ε
 
-    3 escope_end: ε
+    3 global_escope_end: ε
 
     4 list: element
     5     | element ',' list
@@ -168,10 +168,10 @@ Não terminais com as regras onde eles aparecem
     program <node> (39)
         à esquerda: 1
         à direita: 0
-    escope_init <node> (40)
+    global_escope_init <node> (40)
         à esquerda: 2
         à direita: 1
-    escope_end <node> (41)
+    global_escope_end <node> (41)
         à esquerda: 3
         à direita: 1
     list <node> (42)
@@ -213,7 +213,7 @@ Não terminais com as regras onde eles aparecem
     variable_declaration_with_instantiation <node> (54)
         à esquerda: 28
         à direita: 21
-    var_type <node> (55)
+    var_type <lexical_value> (55)
         à esquerda: 29 30
         à direita: 9 15 27 28 40
     optional_instantiation <node> (56)
@@ -279,10 +279,10 @@ Estado 0
 
     0 $accept: • program $end
 
-    $padrão  reduzir usando a regra 2 (escope_init)
+    $padrão  reduzir usando a regra 2 (global_escope_init)
 
-    program      ir ao estado 1
-    escope_init  ir ao estado 2
+    program             ir ao estado 1
+    global_escope_init  ir ao estado 2
 
 
 Estado 1
@@ -294,7 +294,7 @@ Estado 1
 
 Estado 2
 
-    1 program: escope_init • list escope_end ';'
+    1 program: global_escope_init • list global_escope_end ';'
 
     "variable"    deslocar, e ir ao estado 4
     "identifier"  deslocar, e ir ao estado 5
@@ -329,11 +329,11 @@ Estado 5
 
 Estado 6
 
-    1 program: escope_init list • escope_end ';'
+    1 program: global_escope_init list • global_escope_end ';'
 
-    $padrão  reduzir usando a regra 3 (escope_end)
+    $padrão  reduzir usando a regra 3 (global_escope_end)
 
-    escope_end  ir ao estado 13
+    global_escope_end  ir ao estado 13
 
 
 Estado 7
@@ -389,7 +389,7 @@ Estado 12
 
 Estado 13
 
-    1 program: escope_init list escope_end • ';'
+    1 program: global_escope_init list global_escope_end • ';'
 
     ';'  deslocar, e ir ao estado 22
 
@@ -487,7 +487,7 @@ Estado 21
 
 Estado 22
 
-    1 program: escope_init list escope_end ';' •
+    1 program: global_escope_init list global_escope_end ';' •
 
     $padrão  reduzir usando a regra 1 (program)
 

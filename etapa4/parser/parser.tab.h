@@ -45,12 +45,13 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 13 "parser/parser.y"
+#line 17 "parser/parser.y"
 
  #include "asd.h"
  #include "lexical_value.h"
+ #include "scope.h"
 
-#line 54 "parser/parser.tab.h"
+#line 55 "parser/parser.tab.h"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -88,12 +89,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 19 "parser/parser.y"
+#line 24 "parser/parser.y"
 
  asd_tree_t *node;
  lexical_value_t lexical_value;
 
-#line 97 "parser/parser.tab.h"
+#line 98 "parser/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

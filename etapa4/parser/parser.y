@@ -4,15 +4,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include "asd.h"
+#include "scope.h"
+extern int yylineno; /* provided by Flex with %option yylineno */
 int yylex(void);
 void yyerror (char const *mensagem);
 extern char *yytext;
 extern asd_tree_t *arvore;
+/* Global scope stack to persist across reductions */
+scope_stack_t *scope_stack_pointer = NULL;
 %}
 
 %code requires {
  #include "asd.h"
  #include "lexical_value.h"
+ #include "scope.h"
 }
 %define parse.error verbose
 
@@ -34,7 +39,7 @@ extern asd_tree_t *arvore;
 %type <node> simple_command
 %type <node> variable_declaration
 %type <node> variable_declaration_with_instantiation
-%type <node> var_type
+%type <lexical_value> var_type
 %type <node> optional_instantiation
 %type <node> literal
 %type <node> attribution_command
@@ -54,8 +59,8 @@ extern asd_tree_t *arvore;
 %type <node> multiplicative_expression
 %type <node> unary_expression
 %type <node> primary_expression
-%type <node> escope_init
-%type <node> escope_end
+%type <node> global_escope_init
+%type <node> global_escope_end
 
 %token TK_TIPO "type"
 %token TK_VAR "variable"
@@ -85,24 +90,30 @@ extern asd_tree_t *arvore;
   das ações que serão tomadas tanto para a criação da arvore, quanto para etapas futuras.
 */
 
-program: escope_init list escope_end ';' {
+program: global_escope_init list global_escope_end ';' {
   arvore = $2;
 };
 
-escope_init: %empty { 
+global_escope_init: %empty { 
   $$ = NULL;
   /*
   create empty table
   push table to stack
   */
+  if (!scope_stack_pointer) scope_stack_pointer = scope_stack_create();
+  scope_push(scope_stack_pointer, SCOPE_GLOBAL);
  };
 
-escope_end: %empty {
+global_escope_end: %empty {
   $$ = NULL;
 /*
   pop table from stack
   free table recursively
   */
+  scope_log_global_end(scope_stack_pointer);
+  scope_pop(scope_stack_pointer);
+  scope_stack_destroy(scope_stack_pointer);
+  scope_stack_pointer = NULL;
  };
 
 /* Regra 'list' com recursão à direita (para encadeamento A -> B -> C) */
@@ -187,6 +198,8 @@ simple_command: variable_declaration_with_instantiation {
 };
 
 variable_declaration: TK_VAR TK_ID TK_ATRIB var_type {
+  const data_type_t data_type = (strcmp($4.value, "decimal") == 0) ? TYPE_FLOAT : TYPE_INT;
+  scope_insert_current(scope_stack_pointer, $2.value, SYMBOL_VARIABLE, data_type, &$2);
   $$ = NULL;  free($2.value);
 };
 
@@ -202,10 +215,14 @@ variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional
 };
 
 var_type: TK_DECIMAL {
-  $$ = NULL;
+  $$.value = "decimal";
+  $$.line_number = yylineno;
+  $$.token_type = "decimal";
 }
 | TK_INTEIRO {
-  $$ = NULL;
+  $$.value = "integer";
+  $$.line_number = yylineno;
+  $$.token_type = "integer";
 };
 
 optional_instantiation: TK_COM literal { 

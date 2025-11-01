@@ -21,7 +21,7 @@ scope_stack_destroy(stack);
 // Basic definition of symbol nature
 typedef enum {
   SYMBOL_LITERAL = 1,
-  SYMBOL_IDENTIFIER = 2,
+  SYMBOL_VARIABLE = 2,
   SYMBOL_FUNCTION = 3
 } symbol_nature_t;
 
@@ -46,7 +46,7 @@ typedef struct arg_type_node {
 
 /*
 A symbol in the symbol table has,according to the definition::
-• natureza (literal, identificador ou função) - symbol_nature_t nature
+• natureza (literal, variable ou função) - symbol_nature_t nature
 • tipo do dado do símbolo (int ou float) - data_type_t data_type
 • argumentos e seus tipos (no caso de funções) - arg_type_node_t *args - pointer for the args list
 • dados do valor do token pelo yylval (veja E3) - lexical_value_t lexical
@@ -55,7 +55,7 @@ A symbol in the symbol table has,according to the definition::
 */
 typedef struct symbol_entry {
   char *key;                       /* unique key for the symbol */
-  symbol_nature_t nature;          /* literal, identifier, function */
+  symbol_nature_t nature;          /* literal, variable, function */
   data_type_t data_type;           /* int or float */
   arg_type_node_t *args;           /* only for functions, NULL otherwise */
   lexical_value_t lexical;         /* token data (line, token_type, value copy) */
@@ -133,6 +133,11 @@ void args_free(arg_type_node_t *head);
 static inline symbol_entry_t *sym_select_head_and_attach_tail(symbol_entry_t *head, symbol_entry_t *tail) {
   if (head != NULL) return head; else return tail;
 }
+
+/* logging helpers: print the top scope's table before popping */
+void scope_log_global_end(scope_stack_t *stack);
+void scope_log_function_end(scope_stack_t *stack);
+void scope_log_block_end(scope_stack_t *stack);
 
 #endif /* SCOPE_H */
 
