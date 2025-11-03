@@ -294,8 +294,7 @@ variable_declaration: TK_VAR TK_ID TK_ATRIB var_type {
   
   const data_type_t data_type = $4;
     
-    //Verifies declaration error
-
+  //Verifies declaration error
   if(scope_insert_current(scope_stack_pointer, $2.value, SYMBOL_VARIABLE, data_type, &$2) == NULL) {
     semantic_error(ERR_DECLARED, $2.line_number, $2.value);
     }
@@ -305,10 +304,34 @@ variable_declaration: TK_VAR TK_ID TK_ATRIB var_type {
 };
 
 variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional_instantiation {
-  // Only rule that is difficult to reduce
-  $$ = $5;
+  
+  const data_type_t var_type = $4;
+  //1. Declares variable in current scope
+  symbol_entry_t *entry = scope_insert_current(scope_stack_pointer,
+                                                    $2.value,
+                                                    SYMBOL_VARIABLE,
+                                                    var_type,
+                                                    &$2);
+
+  //2. Verifies declaration error
+  if(entry == NULL) {
+    semantic_error(ERR_DECLARED, $2.line_number, $2.value);
+  }
+
+  asd_tree_t *instatiation_node = $5;
+
+  //3. Verifies instantiation type
+  if(instatiation_node != NULL) {
+    if(instatiation_node->type != var_type) {
+      semantic_error(ERR_WRONG_TYPE, $2.line_number, "variable instantiation type mismatch");
+    }
+  }
+
+  //4. AST building
+  $$ = instatiation_node;
   if ($$ != NULL) {
     asd_tree_t *idnode = asd_new_node_from_value(&$2);
+    if(idnode) idnode->type = var_type; //Assigns ID type in AST
     asd_add_child($$, idnode);
   } else {
     free($2.value);
@@ -324,6 +347,7 @@ var_type: TK_DECIMAL {
 
 optional_instantiation: TK_COM literal { 
   $$ = asd_new_unary("com", $2);
+  if($$) $$->type = $2->type; //Propagates son's type
 }
 | %empty {
   $$ = NULL;
@@ -331,9 +355,14 @@ optional_instantiation: TK_COM literal {
 
 literal: TK_LI_INTEIRO {
   $$ = asd_new_node_from_value(&$1);
+  if($$) $$->type = TYPE_INT; //Assigns type
+  //appends literal on symbol table. IS IT NECESSARY? IDK
+  scope_insert_current(scope_stack_pointer, $1.value, SYMBOL_LITERAL, TYPE_INT, &$1);
 }
 | TK_LI_DECIMAL {
   $$ = asd_new_node_from_value(&$1);
+  if($$) $$->type = TYPE_FLOAT; //Assigns type
+  scope_insert_current(scope_stack_pointer, $1.value, SYMBOL_LITERAL, TYPE_FLOAT, &$1);
 };
 
 attribution_command: TK_ID TK_ATRIB expression {
