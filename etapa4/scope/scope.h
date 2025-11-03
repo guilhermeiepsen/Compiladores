@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include "lexical_value.h"
+#include "errors.h"
 
 /*
 USAGE EXEMPLE::
@@ -108,7 +109,7 @@ symbol_entry_t *symtab_insert(symbol_table_t *table,
                               symbol_nature_t nature,
                               data_type_t data_type,
                               const lexical_value_t *lexical_opt);
-void symbol_entry_add_arg(symbol_entry_t *entry, data_type_t type, const char *name); //modificado para adicionar nome do argumento
+void symbol_entry_add_arg(symbol_entry_t *entry, data_type_t type);
 
 /* scope stack api */
 scope_stack_t *scope_stack_create(void);
@@ -125,7 +126,7 @@ symbol_entry_t *scope_insert_current(scope_stack_t *stack,
                                      const lexical_value_t *lexical_opt);
 
 /* helpers for args list */
-arg_type_node_t *args_append(arg_type_node_t *head, data_type_t type, const char *name); //modificado para adicionar nome do argumento
+arg_type_node_t *args_append(arg_type_node_t *head, data_type_t type, const char* name);
 void args_free(arg_type_node_t *head);
 
 /* selection helper analogous to parser rules: choose head, attach tail, else return tail */

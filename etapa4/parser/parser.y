@@ -6,6 +6,9 @@
 #include "asd.h"
 #include "scope.h"
 extern int yylineno; /* provided by Flex with %option yylineno */
+
+void semantic_error(int error_code, int line, const char *text);
+
 int yylex(void);
 void yyerror (char const *mensagem);
 extern char *yytext;
@@ -27,22 +30,23 @@ scope_stack_t *scope_stack_pointer = NULL;
  arg_type_node_t *arg_list; //for parameters list
  data_type_t data_type; //for "var_type"
  symbol_entry_t *symbol; //for the header to return symbol
+ struct {
+  data_type_t type;
+  char *name;
+ } param_info;
 }
 
 %type <node> program
 %type <node> list
 %type <node> element
 %type <node> function_definition
-%type <node> header
-%type <node> optional_parameter_list
-%type <node> parameter_list
-%type <node> parameter
+
 %type <node> body command_block
 %type <node> command_sequence
 %type <node> simple_command
 %type <node> variable_declaration
 %type <node> variable_declaration_with_instantiation
-%type <lexical_value> var_type
+
 %type <node> optional_instantiation
 %type <node> literal
 %type <node> attribution_command
@@ -62,14 +66,15 @@ scope_stack_t *scope_stack_pointer = NULL;
 %type <node> multiplicative_expression
 %type <node> unary_expression
 %type <node> primary_expression
+
 %type <node> global_escope_init
-%type <node> global_escope_end
 %type <node> global_escope_end
 
 %type <node> block_scope_init
 
 %type <data_type> var_type
-%type <arg_list> optional_parameter_list parameter_list parameter
+%type <arg_list> optional_parameter_list parameter_list
+%type <param_info> parameter 
 %type <symbol> header
 
 
@@ -142,12 +147,62 @@ element: function_definition {
   $$ = $1;
 };
 
-function_definition: header body {
-  $$ = asd_add_child_to_node($1, $2);
+function_definition: header  {
+
+  //$1 is symbol_entry_t* returned by header
+  //1. Create new function scope
+  scope_push(scope_stack_pointer, SCOPE_FUNCTION);
+
+  //2. Add parameters as LOCAL VARIABLES in this new scope
+  for(arg_type_node_t *arg = $1->args; arg; arg = arg->next) {
+    
+    lexical_value_t param_lex;
+    param_lex.line_number = $1->lexical.line_number;
+    param_lex.token_type = "param";
+    param_lex.value = arg->name; //do not free this
+
+    symbol_entry_t *param_entry = scope_insert_current(scope_stack_pointer, arg->name, SYMBOL_VARIABLE, arg->type, &param_lex);
+
+    //Verifies double declaration of parameters
+    if(param_entry == NULL) {
+      semantic_error(ERR_DECLARED, param_lex.line_number, arg->name);
+    }
+  }
+} body {
+  //$1 = header, $3 = body (AST node)
+
+  //3. Create AST NODE for fuction function definition
+  char buffer[256];
+  snprintf(buffer, sizeof(buffer), "function %s", $1->key);
+  $$ = asd_new(buffer);
+
+  //Assigns node function type with its return type
+  $$->type = $1->data_type;
+
+  //Appends function's body
+  asd_add_child($$, $3);
+
+  //4. Destroys function's scope
+  scope_log_function_end(scope_stack_pointer);
+  scope_pop(scope_stack_pointer);
+
 };
 
 header: TK_ID TK_SETA var_type optional_parameter_list TK_ATRIB {
-  $$ = asd_new_node_from_value(&$1);
+  //1. Declares function in current scope
+  symbol_entry_t *entry = scope_insert_current(scope_stack_pointer, $1.value, SYMBOL_FUNCTION, $3, &$1);
+  
+  //2. Verifies double declaration error
+  if(entry == NULL) {
+    semantic_error(ERR_DECLARED, $1.line_number, $1.value);
+  }
+
+  //3. Appends parameter's list to function symbol
+  entry->args = $4;
+
+  //4. Returns entry of symbol table
+  $$ = entry;
+  free($1.value);
 };
 
 optional_parameter_list: %empty {
@@ -161,14 +216,26 @@ optional_parameter_list: %empty {
 };
 
 parameter_list: parameter {
-  $$ = NULL; 
+  //$1 is param_info
+  //creates list's 1st node
+  
+  $$ = NULL;
+  $$ = args_append($$, $1.type, $1.name);
+  free($1.name);
 }
 | parameter_list ',' parameter {
-  $$ = NULL;
+  //$1 is arg_list
+  //$3 is param_info
+  //appends new parameter to the existent list
+
+  $$ = $1;
+  $$ = args_append($$, $3.type, $3.name);
+  free($3.name);
 };
 
 parameter: TK_ID TK_ATRIB var_type {
-  $$ = NULL; free($1.value);
+  $$.type = $3;
+  $$.name = $1.value;
 };
 
 body: command_block {
@@ -226,11 +293,12 @@ variable_declaration: TK_VAR TK_ID TK_ATRIB var_type {
   //const data_type_t data_type = (strcmp($4.value, "decimal") == 0) ? TYPE_FLOAT : TYPE_INT;
   
   const data_type_t data_type = $4;
-  
-  /* verifies declaration error */
-  if (scope_insert_current(scope_stack_pointer, $2.value, SYMBOL_VARIABLE, data_type, &$2) == NULL) {
-    semantic_error(ERR_DECLARED, $2.line_number, $2.value);
-  }
+    
+    //Verifies declaration error
+
+  if(scope_insert_current(scope_stack_pointer, $2.value, SYMBOL_VARIABLE, data_type, &$2) == NULL) {
+    semantic_error(ERR_DECLARED, $2.line_number, $2.value);
+    }
 
   $$ = NULL;  
   free($2.value);
@@ -416,4 +484,9 @@ primary_expression: TK_ID {
 void yyerror (char const *mensagem) {
  extern int yylineno; // Declare yylineno to access the current line number
  printf("ERROR FOUND at line %d: [%s]\n", yylineno, mensagem);
+}
+
+void semantic_error(int error_code, int line, const char *text) {
+  fprintf(stderr, "Semantic ERROR at line %d: %s (Code: %d)\n", line, text, error_code);
+  exit(error_code); // O PDF exige que o programa saia imediatamente [cite: 67]
 }

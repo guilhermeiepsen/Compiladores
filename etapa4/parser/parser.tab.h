@@ -45,7 +45,7 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 17 "parser/parser.y"
+#line 20 "parser/parser.y"
 
  #include "asd.h"
  #include "lexical_value.h"
@@ -89,12 +89,19 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 24 "parser/parser.y"
+#line 27 "parser/parser.y"
 
  asd_tree_t *node;
  lexical_value_t lexical_value;
+ arg_type_node_t *arg_list; //for parameters list
+ data_type_t data_type; //for "var_type"
+ symbol_entry_t *symbol; //for the header to return symbol
+ struct {
+  data_type_t type;
+  char *name;
+ } param_info;
 
-#line 98 "parser/parser.tab.h"
+#line 105 "parser/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -9,7 +9,7 @@ arg_type_node_t *args_append(arg_type_node_t *head, data_type_t type, const char
   if (!node) return head;
   node->type = type;
 
-  // Armazena uma cópia do nome
+  // Stores a copy of the name
   if (name) {
     node->name = strdup(name);
   } else {
@@ -26,7 +26,7 @@ arg_type_node_t *args_append(arg_type_node_t *head, data_type_t type, const char
 void args_free(arg_type_node_t *head) {
   while (head) {
     arg_type_node_t *nxt = head->next;
-    // Libera o nome que foi copiado com strdup
+    // Frees name copy created in args_append with strdup
     if (head->name) free(head->name);
     free(head);
     head = nxt;
