@@ -24,6 +24,9 @@ scope_stack_t *scope_stack_pointer = NULL;
 %union {
  asd_tree_t *node;
  lexical_value_t lexical_value;
+ arg_type_node_t *arg_list; //for parameters list
+ data_type_t data_type; //for "var_type"
+ symbol_entry_t *symbol; //for the header to return symbol
 }
 
 %type <node> program
@@ -61,6 +64,14 @@ scope_stack_t *scope_stack_pointer = NULL;
 %type <node> primary_expression
 %type <node> global_escope_init
 %type <node> global_escope_end
+%type <node> global_escope_end
+
+%type <node> block_scope_init
+
+%type <data_type> var_type
+%type <arg_list> optional_parameter_list parameter_list parameter
+%type <symbol> header
+
 
 %token TK_TIPO "type"
 %token TK_VAR "variable"
@@ -164,11 +175,25 @@ body: command_block {
   $$ = $1;
 };
 
-command_block: '[' command_sequence ']' {
+/*
+every ']' must create a new scope as well as every '[' must destroy it.
+*/
+
+command_block: block_scope_init command_sequence ']' {
   $$ = $2;
+  scope_log_block_end(scope_stack_pointer);
+  scope_pop(scope_stack_pointer);
 }
-| '[' ']' {
+| block_scope_init ']' {
   $$ = NULL;
+  scope_log_block_end(scope_stack_pointer);
+  scope_pop(scope_stack_pointer); // destroys scope's block
+};
+
+/* new rule to stack scope before processing commands */
+block_scope_init: '[' {
+  $$ = NULL;
+  scope_push(scope_stack_pointer, SCOPE_BLOCK);
 };
 
 command_sequence: simple_command {
@@ -198,9 +223,17 @@ simple_command: variable_declaration_with_instantiation {
 };
 
 variable_declaration: TK_VAR TK_ID TK_ATRIB var_type {
-  const data_type_t data_type = (strcmp($4.value, "decimal") == 0) ? TYPE_FLOAT : TYPE_INT;
-  scope_insert_current(scope_stack_pointer, $2.value, SYMBOL_VARIABLE, data_type, &$2);
-  $$ = NULL;  free($2.value);
+  //const data_type_t data_type = (strcmp($4.value, "decimal") == 0) ? TYPE_FLOAT : TYPE_INT;
+  
+  const data_type_t data_type = $4;
+  
+  /* verifies declaration error */
+  if (scope_insert_current(scope_stack_pointer, $2.value, SYMBOL_VARIABLE, data_type, &$2) == NULL) {
+    semantic_error(ERR_DECLARED, $2.line_number, $2.value);
+  }
+
+  $$ = NULL;  
+  free($2.value);
 };
 
 variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional_instantiation {
@@ -215,14 +248,10 @@ variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional
 };
 
 var_type: TK_DECIMAL {
-  $$.value = "decimal";
-  $$.line_number = yylineno;
-  $$.token_type = "decimal";
+  $$ = TYPE_FLOAT;
 }
 | TK_INTEIRO {
-  $$.value = "integer";
-  $$.line_number = yylineno;
-  $$.token_type = "integer";
+  $$ = TYPE_INT;
 };
 
 optional_instantiation: TK_COM literal { 

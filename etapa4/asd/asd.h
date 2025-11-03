@@ -2,11 +2,13 @@
 #define _ASD_H_
 
 #include "lexical_value.h"
+#include "scope.h"
 
 typedef struct asd_tree {
   char *label;
   int number_of_children;
   struct asd_tree **children;
+  data_type_t type; // type annotation for semantic analysis
 } asd_tree_t;
 
 /*

@@ -1,10 +1,10 @@
-Terminais sem uso na gramática
+Terminals unused in grammar
 
     "type"
     "error"
 
 
-Gramática
+Grammar
 
     0 $accept: program $end
 
@@ -120,7 +120,7 @@ Gramática
    75                   | function_call
 
 
-Terminais, com as regras onde eles aparecem
+Terminals, with rules where they appear
 
     $end (0) 0
     '!' (33) 68
@@ -161,719 +161,719 @@ Terminais, com as regras onde eles aparecem
     "error" (276)
 
 
-Não terminais com as regras onde eles aparecem
+Nonterminals, with rules where they appear
 
     $accept (38)
-        à esquerda: 0
+        on left: 0
     program <node> (39)
-        à esquerda: 1
-        à direita: 0
+        on left: 1
+        on right: 0
     global_escope_init <node> (40)
-        à esquerda: 2
-        à direita: 1
+        on left: 2
+        on right: 1
     global_escope_end <node> (41)
-        à esquerda: 3
-        à direita: 1
+        on left: 3
+        on right: 1
     list <node> (42)
-        à esquerda: 4 5
-        à direita: 1 5
+        on left: 4 5
+        on right: 1 5
     element <node> (43)
-        à esquerda: 6 7
-        à direita: 4 5
+        on left: 6 7
+        on right: 4 5
     function_definition <node> (44)
-        à esquerda: 8
-        à direita: 6
+        on left: 8
+        on right: 6
     header <node> (45)
-        à esquerda: 9
-        à direita: 8
+        on left: 9
+        on right: 8
     optional_parameter_list <node> (46)
-        à esquerda: 10 11 12
-        à direita: 9
+        on left: 10 11 12
+        on right: 9
     parameter_list <node> (47)
-        à esquerda: 13 14
-        à direita: 11 12 14
+        on left: 13 14
+        on right: 11 12 14
     parameter <node> (48)
-        à esquerda: 15
-        à direita: 13 14
+        on left: 15
+        on right: 13 14
     body <node> (49)
-        à esquerda: 16
-        à direita: 8
+        on left: 16
+        on right: 8
     command_block <node> (50)
-        à esquerda: 17 18
-        à direita: 16 26 43 44 46
+        on left: 17 18
+        on right: 16 26 43 44 46
     command_sequence <node> (51)
-        à esquerda: 19 20
-        à direita: 17 20
+        on left: 19 20
+        on right: 17 20
     simple_command <node> (52)
-        à esquerda: 21 22 23 24 25 26
-        à direita: 19 20
+        on left: 21 22 23 24 25 26
+        on right: 19 20
     variable_declaration <node> (53)
-        à esquerda: 27
-        à direita: 7
+        on left: 27
+        on right: 7
     variable_declaration_with_instantiation <node> (54)
-        à esquerda: 28
-        à direita: 21
+        on left: 28
+        on right: 21
     var_type <lexical_value> (55)
-        à esquerda: 29 30
-        à direita: 9 15 27 28 40
+        on left: 29 30
+        on right: 9 15 27 28 40
     optional_instantiation <node> (56)
-        à esquerda: 31 32
-        à direita: 28
+        on left: 31 32
+        on right: 28
     literal <node> (57)
-        à esquerda: 33 34
-        à direita: 31
+        on left: 33 34
+        on right: 31
     attribution_command <node> (58)
-        à esquerda: 35
-        à direita: 23
+        on left: 35
+        on right: 23
     function_call <node> (59)
-        à esquerda: 36
-        à direita: 22 75
+        on left: 36
+        on right: 22 75
     args <node> (60)
-        à esquerda: 37 38 39
-        à direita: 36 38
+        on left: 37 38 39
+        on right: 36 38
     return_command <node> (61)
-        à esquerda: 40
-        à direita: 24
+        on left: 40
+        on right: 24
     flow_control_command <node> (62)
-        à esquerda: 41 42
-        à direita: 25
+        on left: 41 42
+        on right: 25
     conditional_struct <node> (63)
-        à esquerda: 43
-        à direita: 41
+        on left: 43
+        on right: 41
     else_block <node> (64)
-        à esquerda: 44 45
-        à direita: 43
+        on left: 44 45
+        on right: 43
     iterative_struct <node> (65)
-        à esquerda: 46
-        à direita: 42
+        on left: 46
+        on right: 42
     expression <node> (66)
-        à esquerda: 47
-        à direita: 35 37 38 40 43 46 74
+        on left: 47
+        on right: 35 37 38 40 43 46 74
     logical_or_expression <node> (67)
-        à esquerda: 48 49
-        à direita: 47 49
+        on left: 48 49
+        on right: 47 49
     logical_and_expression <node> (68)
-        à esquerda: 50 51
-        à direita: 48 49 51
+        on left: 50 51
+        on right: 48 49 51
     equality_expression <node> (69)
-        à esquerda: 52 53 54
-        à direita: 50 51 53 54
+        on left: 52 53 54
+        on right: 50 51 53 54
     relational_expression <node> (70)
-        à esquerda: 55 56 57 58 59
-        à direita: 52 53 54 56 57 58 59
+        on left: 55 56 57 58 59
+        on right: 52 53 54 56 57 58 59
     additive_expression <node> (71)
-        à esquerda: 60 61 62
-        à direita: 55 56 57 58 59 61 62
+        on left: 60 61 62
+        on right: 55 56 57 58 59 61 62
     multiplicative_expression <node> (72)
-        à esquerda: 63 64 65 66
-        à direita: 60 61 62 64 65 66
+        on left: 63 64 65 66
+        on right: 60 61 62 64 65 66
     unary_expression <node> (73)
-        à esquerda: 67 68 69 70
-        à direita: 63 64 65 66 68 69 70
+        on left: 67 68 69 70
+        on right: 63 64 65 66 68 69 70
     primary_expression <node> (74)
-        à esquerda: 71 72 73 74 75
-        à direita: 67
+        on left: 71 72 73 74 75
+        on right: 67
 
 
-Estado 0
+State 0
 
     0 $accept: • program $end
 
-    $padrão  reduzir usando a regra 2 (global_escope_init)
+    $default  reduce using rule 2 (global_escope_init)
 
-    program             ir ao estado 1
-    global_escope_init  ir ao estado 2
+    program             go to state 1
+    global_escope_init  go to state 2
 
 
-Estado 1
+State 1
 
     0 $accept: program • $end
 
-    $end  deslocar, e ir ao estado 3
+    $end  shift, and go to state 3
 
 
-Estado 2
+State 2
 
     1 program: global_escope_init • list global_escope_end ';'
 
-    "variable"    deslocar, e ir ao estado 4
-    "identifier"  deslocar, e ir ao estado 5
+    "variable"    shift, and go to state 4
+    "identifier"  shift, and go to state 5
 
-    list                  ir ao estado 6
-    element               ir ao estado 7
-    function_definition   ir ao estado 8
-    header                ir ao estado 9
-    variable_declaration  ir ao estado 10
+    list                  go to state 6
+    element               go to state 7
+    function_definition   go to state 8
+    header                go to state 9
+    variable_declaration  go to state 10
 
 
-Estado 3
+State 3
 
     0 $accept: program $end •
 
-    $padrão  aceitar
+    $default  accept
 
 
-Estado 4
+State 4
 
    27 variable_declaration: "variable" • "identifier" ":=" var_type
 
-    "identifier"  deslocar, e ir ao estado 11
+    "identifier"  shift, and go to state 11
 
 
-Estado 5
+State 5
 
     9 header: "identifier" • "->" var_type optional_parameter_list ":="
 
-    "->"  deslocar, e ir ao estado 12
+    "->"  shift, and go to state 12
 
 
-Estado 6
+State 6
 
     1 program: global_escope_init list • global_escope_end ';'
 
-    $padrão  reduzir usando a regra 3 (global_escope_end)
+    $default  reduce using rule 3 (global_escope_end)
 
-    global_escope_end  ir ao estado 13
+    global_escope_end  go to state 13
 
 
-Estado 7
+State 7
 
     4 list: element •
     5     | element • ',' list
 
-    ','  deslocar, e ir ao estado 14
+    ','  shift, and go to state 14
 
-    $padrão  reduzir usando a regra 4 (list)
+    $default  reduce using rule 4 (list)
 
 
-Estado 8
+State 8
 
     6 element: function_definition •
 
-    $padrão  reduzir usando a regra 6 (element)
+    $default  reduce using rule 6 (element)
 
 
-Estado 9
+State 9
 
     8 function_definition: header • body
 
-    '['  deslocar, e ir ao estado 15
+    '['  shift, and go to state 15
 
-    body           ir ao estado 16
-    command_block  ir ao estado 17
+    body           go to state 16
+    command_block  go to state 17
 
 
-Estado 10
+State 10
 
     7 element: variable_declaration •
 
-    $padrão  reduzir usando a regra 7 (element)
+    $default  reduce using rule 7 (element)
 
 
-Estado 11
+State 11
 
    27 variable_declaration: "variable" "identifier" • ":=" var_type
 
-    ":="  deslocar, e ir ao estado 18
+    ":="  shift, and go to state 18
 
 
-Estado 12
+State 12
 
     9 header: "identifier" "->" • var_type optional_parameter_list ":="
 
-    "decimal"  deslocar, e ir ao estado 19
-    "integer"  deslocar, e ir ao estado 20
+    "decimal"  shift, and go to state 19
+    "integer"  shift, and go to state 20
 
-    var_type  ir ao estado 21
+    var_type  go to state 21
 
 
-Estado 13
+State 13
 
     1 program: global_escope_init list global_escope_end • ';'
 
-    ';'  deslocar, e ir ao estado 22
+    ';'  shift, and go to state 22
 
 
-Estado 14
+State 14
 
     5 list: element ',' • list
 
-    "variable"    deslocar, e ir ao estado 4
-    "identifier"  deslocar, e ir ao estado 5
+    "variable"    shift, and go to state 4
+    "identifier"  shift, and go to state 5
 
-    list                  ir ao estado 23
-    element               ir ao estado 7
-    function_definition   ir ao estado 8
-    header                ir ao estado 9
-    variable_declaration  ir ao estado 10
+    list                  go to state 23
+    element               go to state 7
+    function_definition   go to state 8
+    header                go to state 9
+    variable_declaration  go to state 10
 
 
-Estado 15
+State 15
 
    17 command_block: '[' • command_sequence ']'
    18              | '[' • ']'
 
-    "variable"    deslocar, e ir ao estado 24
-    "if"          deslocar, e ir ao estado 25
-    "return"      deslocar, e ir ao estado 26
-    "while"       deslocar, e ir ao estado 27
-    "identifier"  deslocar, e ir ao estado 28
-    '['           deslocar, e ir ao estado 15
-    ']'           deslocar, e ir ao estado 29
+    "variable"    shift, and go to state 24
+    "if"          shift, and go to state 25
+    "return"      shift, and go to state 26
+    "while"       shift, and go to state 27
+    "identifier"  shift, and go to state 28
+    '['           shift, and go to state 15
+    ']'           shift, and go to state 29
 
-    command_block                            ir ao estado 30
-    command_sequence                         ir ao estado 31
-    simple_command                           ir ao estado 32
-    variable_declaration_with_instantiation  ir ao estado 33
-    attribution_command                      ir ao estado 34
-    function_call                            ir ao estado 35
-    return_command                           ir ao estado 36
-    flow_control_command                     ir ao estado 37
-    conditional_struct                       ir ao estado 38
-    iterative_struct                         ir ao estado 39
+    command_block                            go to state 30
+    command_sequence                         go to state 31
+    simple_command                           go to state 32
+    variable_declaration_with_instantiation  go to state 33
+    attribution_command                      go to state 34
+    function_call                            go to state 35
+    return_command                           go to state 36
+    flow_control_command                     go to state 37
+    conditional_struct                       go to state 38
+    iterative_struct                         go to state 39
 
 
-Estado 16
+State 16
 
     8 function_definition: header body •
 
-    $padrão  reduzir usando a regra 8 (function_definition)
+    $default  reduce using rule 8 (function_definition)
 
 
-Estado 17
+State 17
 
    16 body: command_block •
 
-    $padrão  reduzir usando a regra 16 (body)
+    $default  reduce using rule 16 (body)
 
 
-Estado 18
+State 18
 
    27 variable_declaration: "variable" "identifier" ":=" • var_type
 
-    "decimal"  deslocar, e ir ao estado 19
-    "integer"  deslocar, e ir ao estado 20
+    "decimal"  shift, and go to state 19
+    "integer"  shift, and go to state 20
 
-    var_type  ir ao estado 40
+    var_type  go to state 40
 
 
-Estado 19
+State 19
 
    29 var_type: "decimal" •
 
-    $padrão  reduzir usando a regra 29 (var_type)
+    $default  reduce using rule 29 (var_type)
 
 
-Estado 20
+State 20
 
    30 var_type: "integer" •
 
-    $padrão  reduzir usando a regra 30 (var_type)
+    $default  reduce using rule 30 (var_type)
 
 
-Estado 21
+State 21
 
     9 header: "identifier" "->" var_type • optional_parameter_list ":="
 
-    "with"        deslocar, e ir ao estado 41
-    "identifier"  deslocar, e ir ao estado 42
+    "with"        shift, and go to state 41
+    "identifier"  shift, and go to state 42
 
-    $padrão  reduzir usando a regra 10 (optional_parameter_list)
+    $default  reduce using rule 10 (optional_parameter_list)
 
-    optional_parameter_list  ir ao estado 43
-    parameter_list           ir ao estado 44
-    parameter                ir ao estado 45
+    optional_parameter_list  go to state 43
+    parameter_list           go to state 44
+    parameter                go to state 45
 
 
-Estado 22
+State 22
 
     1 program: global_escope_init list global_escope_end ';' •
 
-    $padrão  reduzir usando a regra 1 (program)
+    $default  reduce using rule 1 (program)
 
 
-Estado 23
+State 23
 
     5 list: element ',' list •
 
-    $padrão  reduzir usando a regra 5 (list)
+    $default  reduce using rule 5 (list)
 
 
-Estado 24
+State 24
 
    28 variable_declaration_with_instantiation: "variable" • "identifier" ":=" var_type optional_instantiation
 
-    "identifier"  deslocar, e ir ao estado 46
+    "identifier"  shift, and go to state 46
 
 
-Estado 25
+State 25
 
    43 conditional_struct: "if" • '(' expression ')' command_block else_block
 
-    '('  deslocar, e ir ao estado 47
+    '('  shift, and go to state 47
 
 
-Estado 26
+State 26
 
    40 return_command: "return" • expression ":=" var_type
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call              ir ao estado 55
-    expression                 ir ao estado 56
-    logical_or_expression      ir ao estado 57
-    logical_and_expression     ir ao estado 58
-    equality_expression        ir ao estado 59
-    relational_expression      ir ao estado 60
-    additive_expression        ir ao estado 61
-    multiplicative_expression  ir ao estado 62
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    expression                 go to state 56
+    logical_or_expression      go to state 57
+    logical_and_expression     go to state 58
+    equality_expression        go to state 59
+    relational_expression      go to state 60
+    additive_expression        go to state 61
+    multiplicative_expression  go to state 62
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 27
+State 27
 
    46 iterative_struct: "while" • '(' expression ')' command_block
 
-    '('  deslocar, e ir ao estado 65
+    '('  shift, and go to state 65
 
 
-Estado 28
+State 28
 
    35 attribution_command: "identifier" • ":=" expression
    36 function_call: "identifier" • '(' args ')'
 
-    ":="  deslocar, e ir ao estado 66
-    '('   deslocar, e ir ao estado 67
+    ":="  shift, and go to state 66
+    '('   shift, and go to state 67
 
 
-Estado 29
+State 29
 
    18 command_block: '[' ']' •
 
-    $padrão  reduzir usando a regra 18 (command_block)
+    $default  reduce using rule 18 (command_block)
 
 
-Estado 30
+State 30
 
    26 simple_command: command_block •
 
-    $padrão  reduzir usando a regra 26 (simple_command)
+    $default  reduce using rule 26 (simple_command)
 
 
-Estado 31
+State 31
 
    17 command_block: '[' command_sequence • ']'
 
-    ']'  deslocar, e ir ao estado 68
+    ']'  shift, and go to state 68
 
 
-Estado 32
+State 32
 
    19 command_sequence: simple_command •
    20                 | simple_command • command_sequence
 
-    "variable"    deslocar, e ir ao estado 24
-    "if"          deslocar, e ir ao estado 25
-    "return"      deslocar, e ir ao estado 26
-    "while"       deslocar, e ir ao estado 27
-    "identifier"  deslocar, e ir ao estado 28
-    '['           deslocar, e ir ao estado 15
+    "variable"    shift, and go to state 24
+    "if"          shift, and go to state 25
+    "return"      shift, and go to state 26
+    "while"       shift, and go to state 27
+    "identifier"  shift, and go to state 28
+    '['           shift, and go to state 15
 
-    $padrão  reduzir usando a regra 19 (command_sequence)
+    $default  reduce using rule 19 (command_sequence)
 
-    command_block                            ir ao estado 30
-    command_sequence                         ir ao estado 69
-    simple_command                           ir ao estado 32
-    variable_declaration_with_instantiation  ir ao estado 33
-    attribution_command                      ir ao estado 34
-    function_call                            ir ao estado 35
-    return_command                           ir ao estado 36
-    flow_control_command                     ir ao estado 37
-    conditional_struct                       ir ao estado 38
-    iterative_struct                         ir ao estado 39
+    command_block                            go to state 30
+    command_sequence                         go to state 69
+    simple_command                           go to state 32
+    variable_declaration_with_instantiation  go to state 33
+    attribution_command                      go to state 34
+    function_call                            go to state 35
+    return_command                           go to state 36
+    flow_control_command                     go to state 37
+    conditional_struct                       go to state 38
+    iterative_struct                         go to state 39
 
 
-Estado 33
+State 33
 
    21 simple_command: variable_declaration_with_instantiation •
 
-    $padrão  reduzir usando a regra 21 (simple_command)
+    $default  reduce using rule 21 (simple_command)
 
 
-Estado 34
+State 34
 
    23 simple_command: attribution_command •
 
-    $padrão  reduzir usando a regra 23 (simple_command)
+    $default  reduce using rule 23 (simple_command)
 
 
-Estado 35
+State 35
 
    22 simple_command: function_call •
 
-    $padrão  reduzir usando a regra 22 (simple_command)
+    $default  reduce using rule 22 (simple_command)
 
 
-Estado 36
+State 36
 
    24 simple_command: return_command •
 
-    $padrão  reduzir usando a regra 24 (simple_command)
+    $default  reduce using rule 24 (simple_command)
 
 
-Estado 37
+State 37
 
    25 simple_command: flow_control_command •
 
-    $padrão  reduzir usando a regra 25 (simple_command)
+    $default  reduce using rule 25 (simple_command)
 
 
-Estado 38
+State 38
 
    41 flow_control_command: conditional_struct •
 
-    $padrão  reduzir usando a regra 41 (flow_control_command)
+    $default  reduce using rule 41 (flow_control_command)
 
 
-Estado 39
+State 39
 
    42 flow_control_command: iterative_struct •
 
-    $padrão  reduzir usando a regra 42 (flow_control_command)
+    $default  reduce using rule 42 (flow_control_command)
 
 
-Estado 40
+State 40
 
    27 variable_declaration: "variable" "identifier" ":=" var_type •
 
-    $padrão  reduzir usando a regra 27 (variable_declaration)
+    $default  reduce using rule 27 (variable_declaration)
 
 
-Estado 41
+State 41
 
    11 optional_parameter_list: "with" • parameter_list
 
-    "identifier"  deslocar, e ir ao estado 42
+    "identifier"  shift, and go to state 42
 
-    parameter_list  ir ao estado 70
-    parameter       ir ao estado 45
+    parameter_list  go to state 70
+    parameter       go to state 45
 
 
-Estado 42
+State 42
 
    15 parameter: "identifier" • ":=" var_type
 
-    ":="  deslocar, e ir ao estado 71
+    ":="  shift, and go to state 71
 
 
-Estado 43
+State 43
 
     9 header: "identifier" "->" var_type optional_parameter_list • ":="
 
-    ":="  deslocar, e ir ao estado 72
+    ":="  shift, and go to state 72
 
 
-Estado 44
+State 44
 
    12 optional_parameter_list: parameter_list •
    14 parameter_list: parameter_list • ',' parameter
 
-    ','  deslocar, e ir ao estado 73
+    ','  shift, and go to state 73
 
-    $padrão  reduzir usando a regra 12 (optional_parameter_list)
+    $default  reduce using rule 12 (optional_parameter_list)
 
 
-Estado 45
+State 45
 
    13 parameter_list: parameter •
 
-    $padrão  reduzir usando a regra 13 (parameter_list)
+    $default  reduce using rule 13 (parameter_list)
 
 
-Estado 46
+State 46
 
    28 variable_declaration_with_instantiation: "variable" "identifier" • ":=" var_type optional_instantiation
 
-    ":="  deslocar, e ir ao estado 74
+    ":="  shift, and go to state 74
 
 
-Estado 47
+State 47
 
    43 conditional_struct: "if" '(' • expression ')' command_block else_block
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call              ir ao estado 55
-    expression                 ir ao estado 75
-    logical_or_expression      ir ao estado 57
-    logical_and_expression     ir ao estado 58
-    equality_expression        ir ao estado 59
-    relational_expression      ir ao estado 60
-    additive_expression        ir ao estado 61
-    multiplicative_expression  ir ao estado 62
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    expression                 go to state 75
+    logical_or_expression      go to state 57
+    logical_and_expression     go to state 58
+    equality_expression        go to state 59
+    relational_expression      go to state 60
+    additive_expression        go to state 61
+    multiplicative_expression  go to state 62
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 48
+State 48
 
    36 function_call: "identifier" • '(' args ')'
    71 primary_expression: "identifier" •
 
-    '('  deslocar, e ir ao estado 67
+    '('  shift, and go to state 67
 
-    $padrão  reduzir usando a regra 71 (primary_expression)
+    $default  reduce using rule 71 (primary_expression)
 
 
-Estado 49
+State 49
 
    72 primary_expression: "integer literal" •
 
-    $padrão  reduzir usando a regra 72 (primary_expression)
+    $default  reduce using rule 72 (primary_expression)
 
 
-Estado 50
+State 50
 
    73 primary_expression: "decimal literal" •
 
-    $padrão  reduzir usando a regra 73 (primary_expression)
+    $default  reduce using rule 73 (primary_expression)
 
 
-Estado 51
+State 51
 
    74 primary_expression: '(' • expression ')'
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call              ir ao estado 55
-    expression                 ir ao estado 76
-    logical_or_expression      ir ao estado 57
-    logical_and_expression     ir ao estado 58
-    equality_expression        ir ao estado 59
-    relational_expression      ir ao estado 60
-    additive_expression        ir ao estado 61
-    multiplicative_expression  ir ao estado 62
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    expression                 go to state 76
+    logical_or_expression      go to state 57
+    logical_and_expression     go to state 58
+    equality_expression        go to state 59
+    relational_expression      go to state 60
+    additive_expression        go to state 61
+    multiplicative_expression  go to state 62
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 52
+State 52
 
    69 unary_expression: '+' • unary_expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call       ir ao estado 55
-    unary_expression    ir ao estado 77
-    primary_expression  ir ao estado 64
+    function_call       go to state 55
+    unary_expression    go to state 77
+    primary_expression  go to state 64
 
 
-Estado 53
+State 53
 
    70 unary_expression: '-' • unary_expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call       ir ao estado 55
-    unary_expression    ir ao estado 78
-    primary_expression  ir ao estado 64
+    function_call       go to state 55
+    unary_expression    go to state 78
+    primary_expression  go to state 64
 
 
-Estado 54
+State 54
 
    68 unary_expression: '!' • unary_expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call       ir ao estado 55
-    unary_expression    ir ao estado 79
-    primary_expression  ir ao estado 64
+    function_call       go to state 55
+    unary_expression    go to state 79
+    primary_expression  go to state 64
 
 
-Estado 55
+State 55
 
    75 primary_expression: function_call •
 
-    $padrão  reduzir usando a regra 75 (primary_expression)
+    $default  reduce using rule 75 (primary_expression)
 
 
-Estado 56
+State 56
 
    40 return_command: "return" expression • ":=" var_type
 
-    ":="  deslocar, e ir ao estado 80
+    ":="  shift, and go to state 80
 
 
-Estado 57
+State 57
 
    47 expression: logical_or_expression •
    49 logical_or_expression: logical_or_expression • '|' logical_and_expression
 
-    '|'  deslocar, e ir ao estado 81
+    '|'  shift, and go to state 81
 
-    $padrão  reduzir usando a regra 47 (expression)
+    $default  reduce using rule 47 (expression)
 
 
-Estado 58
+State 58
 
    48 logical_or_expression: logical_and_expression •
    51 logical_and_expression: logical_and_expression • '&' equality_expression
 
-    '&'  deslocar, e ir ao estado 82
+    '&'  shift, and go to state 82
 
-    $padrão  reduzir usando a regra 48 (logical_or_expression)
+    $default  reduce using rule 48 (logical_or_expression)
 
 
-Estado 59
+State 59
 
    50 logical_and_expression: equality_expression •
    53 equality_expression: equality_expression • "==" relational_expression
    54                    | equality_expression • "!=" relational_expression
 
-    "=="  deslocar, e ir ao estado 83
-    "!="  deslocar, e ir ao estado 84
+    "=="  shift, and go to state 83
+    "!="  shift, and go to state 84
 
-    $padrão  reduzir usando a regra 50 (logical_and_expression)
+    $default  reduce using rule 50 (logical_and_expression)
 
 
-Estado 60
+State 60
 
    52 equality_expression: relational_expression •
    56 relational_expression: relational_expression • '<' additive_expression
@@ -881,582 +881,582 @@ Estado 60
    58                      | relational_expression • "<=" additive_expression
    59                      | relational_expression • ">=" additive_expression
 
-    "<="  deslocar, e ir ao estado 85
-    ">="  deslocar, e ir ao estado 86
-    '<'   deslocar, e ir ao estado 87
-    '>'   deslocar, e ir ao estado 88
+    "<="  shift, and go to state 85
+    ">="  shift, and go to state 86
+    '<'   shift, and go to state 87
+    '>'   shift, and go to state 88
 
-    $padrão  reduzir usando a regra 52 (equality_expression)
+    $default  reduce using rule 52 (equality_expression)
 
 
-Estado 61
+State 61
 
    55 relational_expression: additive_expression •
    61 additive_expression: additive_expression • '+' multiplicative_expression
    62                    | additive_expression • '-' multiplicative_expression
 
-    '+'  deslocar, e ir ao estado 89
-    '-'  deslocar, e ir ao estado 90
+    '+'  shift, and go to state 89
+    '-'  shift, and go to state 90
 
-    $padrão  reduzir usando a regra 55 (relational_expression)
+    $default  reduce using rule 55 (relational_expression)
 
 
-Estado 62
+State 62
 
    60 additive_expression: multiplicative_expression •
    64 multiplicative_expression: multiplicative_expression • '*' unary_expression
    65                          | multiplicative_expression • '/' unary_expression
    66                          | multiplicative_expression • '%' unary_expression
 
-    '*'  deslocar, e ir ao estado 91
-    '/'  deslocar, e ir ao estado 92
-    '%'  deslocar, e ir ao estado 93
+    '*'  shift, and go to state 91
+    '/'  shift, and go to state 92
+    '%'  shift, and go to state 93
 
-    $padrão  reduzir usando a regra 60 (additive_expression)
+    $default  reduce using rule 60 (additive_expression)
 
 
-Estado 63
+State 63
 
    63 multiplicative_expression: unary_expression •
 
-    $padrão  reduzir usando a regra 63 (multiplicative_expression)
+    $default  reduce using rule 63 (multiplicative_expression)
 
 
-Estado 64
+State 64
 
    67 unary_expression: primary_expression •
 
-    $padrão  reduzir usando a regra 67 (unary_expression)
+    $default  reduce using rule 67 (unary_expression)
 
 
-Estado 65
+State 65
 
    46 iterative_struct: "while" '(' • expression ')' command_block
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call              ir ao estado 55
-    expression                 ir ao estado 94
-    logical_or_expression      ir ao estado 57
-    logical_and_expression     ir ao estado 58
-    equality_expression        ir ao estado 59
-    relational_expression      ir ao estado 60
-    additive_expression        ir ao estado 61
-    multiplicative_expression  ir ao estado 62
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    expression                 go to state 94
+    logical_or_expression      go to state 57
+    logical_and_expression     go to state 58
+    equality_expression        go to state 59
+    relational_expression      go to state 60
+    additive_expression        go to state 61
+    multiplicative_expression  go to state 62
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 66
+State 66
 
    35 attribution_command: "identifier" ":=" • expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call              ir ao estado 55
-    expression                 ir ao estado 95
-    logical_or_expression      ir ao estado 57
-    logical_and_expression     ir ao estado 58
-    equality_expression        ir ao estado 59
-    relational_expression      ir ao estado 60
-    additive_expression        ir ao estado 61
-    multiplicative_expression  ir ao estado 62
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    expression                 go to state 95
+    logical_or_expression      go to state 57
+    logical_and_expression     go to state 58
+    equality_expression        go to state 59
+    relational_expression      go to state 60
+    additive_expression        go to state 61
+    multiplicative_expression  go to state 62
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 67
+State 67
 
    36 function_call: "identifier" '(' • args ')'
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    $padrão  reduzir usando a regra 39 (args)
+    $default  reduce using rule 39 (args)
 
-    function_call              ir ao estado 55
-    args                       ir ao estado 96
-    expression                 ir ao estado 97
-    logical_or_expression      ir ao estado 57
-    logical_and_expression     ir ao estado 58
-    equality_expression        ir ao estado 59
-    relational_expression      ir ao estado 60
-    additive_expression        ir ao estado 61
-    multiplicative_expression  ir ao estado 62
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    args                       go to state 96
+    expression                 go to state 97
+    logical_or_expression      go to state 57
+    logical_and_expression     go to state 58
+    equality_expression        go to state 59
+    relational_expression      go to state 60
+    additive_expression        go to state 61
+    multiplicative_expression  go to state 62
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 68
+State 68
 
    17 command_block: '[' command_sequence ']' •
 
-    $padrão  reduzir usando a regra 17 (command_block)
+    $default  reduce using rule 17 (command_block)
 
 
-Estado 69
+State 69
 
    20 command_sequence: simple_command command_sequence •
 
-    $padrão  reduzir usando a regra 20 (command_sequence)
+    $default  reduce using rule 20 (command_sequence)
 
 
-Estado 70
+State 70
 
    11 optional_parameter_list: "with" parameter_list •
    14 parameter_list: parameter_list • ',' parameter
 
-    ','  deslocar, e ir ao estado 73
+    ','  shift, and go to state 73
 
-    $padrão  reduzir usando a regra 11 (optional_parameter_list)
+    $default  reduce using rule 11 (optional_parameter_list)
 
 
-Estado 71
+State 71
 
    15 parameter: "identifier" ":=" • var_type
 
-    "decimal"  deslocar, e ir ao estado 19
-    "integer"  deslocar, e ir ao estado 20
+    "decimal"  shift, and go to state 19
+    "integer"  shift, and go to state 20
 
-    var_type  ir ao estado 98
+    var_type  go to state 98
 
 
-Estado 72
+State 72
 
     9 header: "identifier" "->" var_type optional_parameter_list ":=" •
 
-    $padrão  reduzir usando a regra 9 (header)
+    $default  reduce using rule 9 (header)
 
 
-Estado 73
+State 73
 
    14 parameter_list: parameter_list ',' • parameter
 
-    "identifier"  deslocar, e ir ao estado 42
+    "identifier"  shift, and go to state 42
 
-    parameter  ir ao estado 99
+    parameter  go to state 99
 
 
-Estado 74
+State 74
 
    28 variable_declaration_with_instantiation: "variable" "identifier" ":=" • var_type optional_instantiation
 
-    "decimal"  deslocar, e ir ao estado 19
-    "integer"  deslocar, e ir ao estado 20
+    "decimal"  shift, and go to state 19
+    "integer"  shift, and go to state 20
 
-    var_type  ir ao estado 100
+    var_type  go to state 100
 
 
-Estado 75
+State 75
 
    43 conditional_struct: "if" '(' expression • ')' command_block else_block
 
-    ')'  deslocar, e ir ao estado 101
+    ')'  shift, and go to state 101
 
 
-Estado 76
+State 76
 
    74 primary_expression: '(' expression • ')'
 
-    ')'  deslocar, e ir ao estado 102
+    ')'  shift, and go to state 102
 
 
-Estado 77
+State 77
 
    69 unary_expression: '+' unary_expression •
 
-    $padrão  reduzir usando a regra 69 (unary_expression)
+    $default  reduce using rule 69 (unary_expression)
 
 
-Estado 78
+State 78
 
    70 unary_expression: '-' unary_expression •
 
-    $padrão  reduzir usando a regra 70 (unary_expression)
+    $default  reduce using rule 70 (unary_expression)
 
 
-Estado 79
+State 79
 
    68 unary_expression: '!' unary_expression •
 
-    $padrão  reduzir usando a regra 68 (unary_expression)
+    $default  reduce using rule 68 (unary_expression)
 
 
-Estado 80
+State 80
 
    40 return_command: "return" expression ":=" • var_type
 
-    "decimal"  deslocar, e ir ao estado 19
-    "integer"  deslocar, e ir ao estado 20
+    "decimal"  shift, and go to state 19
+    "integer"  shift, and go to state 20
 
-    var_type  ir ao estado 103
+    var_type  go to state 103
 
 
-Estado 81
+State 81
 
    49 logical_or_expression: logical_or_expression '|' • logical_and_expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call              ir ao estado 55
-    logical_and_expression     ir ao estado 104
-    equality_expression        ir ao estado 59
-    relational_expression      ir ao estado 60
-    additive_expression        ir ao estado 61
-    multiplicative_expression  ir ao estado 62
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    logical_and_expression     go to state 104
+    equality_expression        go to state 59
+    relational_expression      go to state 60
+    additive_expression        go to state 61
+    multiplicative_expression  go to state 62
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 82
+State 82
 
    51 logical_and_expression: logical_and_expression '&' • equality_expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call              ir ao estado 55
-    equality_expression        ir ao estado 105
-    relational_expression      ir ao estado 60
-    additive_expression        ir ao estado 61
-    multiplicative_expression  ir ao estado 62
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    equality_expression        go to state 105
+    relational_expression      go to state 60
+    additive_expression        go to state 61
+    multiplicative_expression  go to state 62
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 83
+State 83
 
    53 equality_expression: equality_expression "==" • relational_expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call              ir ao estado 55
-    relational_expression      ir ao estado 106
-    additive_expression        ir ao estado 61
-    multiplicative_expression  ir ao estado 62
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    relational_expression      go to state 106
+    additive_expression        go to state 61
+    multiplicative_expression  go to state 62
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 84
+State 84
 
    54 equality_expression: equality_expression "!=" • relational_expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call              ir ao estado 55
-    relational_expression      ir ao estado 107
-    additive_expression        ir ao estado 61
-    multiplicative_expression  ir ao estado 62
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    relational_expression      go to state 107
+    additive_expression        go to state 61
+    multiplicative_expression  go to state 62
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 85
+State 85
 
    58 relational_expression: relational_expression "<=" • additive_expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call              ir ao estado 55
-    additive_expression        ir ao estado 108
-    multiplicative_expression  ir ao estado 62
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    additive_expression        go to state 108
+    multiplicative_expression  go to state 62
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 86
+State 86
 
    59 relational_expression: relational_expression ">=" • additive_expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call              ir ao estado 55
-    additive_expression        ir ao estado 109
-    multiplicative_expression  ir ao estado 62
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    additive_expression        go to state 109
+    multiplicative_expression  go to state 62
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 87
+State 87
 
    56 relational_expression: relational_expression '<' • additive_expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call              ir ao estado 55
-    additive_expression        ir ao estado 110
-    multiplicative_expression  ir ao estado 62
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    additive_expression        go to state 110
+    multiplicative_expression  go to state 62
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 88
+State 88
 
    57 relational_expression: relational_expression '>' • additive_expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call              ir ao estado 55
-    additive_expression        ir ao estado 111
-    multiplicative_expression  ir ao estado 62
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    additive_expression        go to state 111
+    multiplicative_expression  go to state 62
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 89
+State 89
 
    61 additive_expression: additive_expression '+' • multiplicative_expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call              ir ao estado 55
-    multiplicative_expression  ir ao estado 112
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    multiplicative_expression  go to state 112
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 90
+State 90
 
    62 additive_expression: additive_expression '-' • multiplicative_expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call              ir ao estado 55
-    multiplicative_expression  ir ao estado 113
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    multiplicative_expression  go to state 113
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 91
+State 91
 
    64 multiplicative_expression: multiplicative_expression '*' • unary_expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call       ir ao estado 55
-    unary_expression    ir ao estado 114
-    primary_expression  ir ao estado 64
+    function_call       go to state 55
+    unary_expression    go to state 114
+    primary_expression  go to state 64
 
 
-Estado 92
+State 92
 
    65 multiplicative_expression: multiplicative_expression '/' • unary_expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call       ir ao estado 55
-    unary_expression    ir ao estado 115
-    primary_expression  ir ao estado 64
+    function_call       go to state 55
+    unary_expression    go to state 115
+    primary_expression  go to state 64
 
 
-Estado 93
+State 93
 
    66 multiplicative_expression: multiplicative_expression '%' • unary_expression
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    function_call       ir ao estado 55
-    unary_expression    ir ao estado 116
-    primary_expression  ir ao estado 64
+    function_call       go to state 55
+    unary_expression    go to state 116
+    primary_expression  go to state 64
 
 
-Estado 94
+State 94
 
    46 iterative_struct: "while" '(' expression • ')' command_block
 
-    ')'  deslocar, e ir ao estado 117
+    ')'  shift, and go to state 117
 
 
-Estado 95
+State 95
 
    35 attribution_command: "identifier" ":=" expression •
 
-    $padrão  reduzir usando a regra 35 (attribution_command)
+    $default  reduce using rule 35 (attribution_command)
 
 
-Estado 96
+State 96
 
    36 function_call: "identifier" '(' args • ')'
 
-    ')'  deslocar, e ir ao estado 118
+    ')'  shift, and go to state 118
 
 
-Estado 97
+State 97
 
    37 args: expression •
    38     | expression • ',' args
 
-    ','  deslocar, e ir ao estado 119
+    ','  shift, and go to state 119
 
-    $padrão  reduzir usando a regra 37 (args)
+    $default  reduce using rule 37 (args)
 
 
-Estado 98
+State 98
 
    15 parameter: "identifier" ":=" var_type •
 
-    $padrão  reduzir usando a regra 15 (parameter)
+    $default  reduce using rule 15 (parameter)
 
 
-Estado 99
+State 99
 
    14 parameter_list: parameter_list ',' parameter •
 
-    $padrão  reduzir usando a regra 14 (parameter_list)
+    $default  reduce using rule 14 (parameter_list)
 
 
-Estado 100
+State 100
 
    28 variable_declaration_with_instantiation: "variable" "identifier" ":=" var_type • optional_instantiation
 
-    "with"  deslocar, e ir ao estado 120
+    "with"  shift, and go to state 120
 
-    $padrão  reduzir usando a regra 32 (optional_instantiation)
+    $default  reduce using rule 32 (optional_instantiation)
 
-    optional_instantiation  ir ao estado 121
+    optional_instantiation  go to state 121
 
 
-Estado 101
+State 101
 
    43 conditional_struct: "if" '(' expression ')' • command_block else_block
 
-    '['  deslocar, e ir ao estado 15
+    '['  shift, and go to state 15
 
-    command_block  ir ao estado 122
+    command_block  go to state 122
 
 
-Estado 102
+State 102
 
    74 primary_expression: '(' expression ')' •
 
-    $padrão  reduzir usando a regra 74 (primary_expression)
+    $default  reduce using rule 74 (primary_expression)
 
 
-Estado 103
+State 103
 
    40 return_command: "return" expression ":=" var_type •
 
-    $padrão  reduzir usando a regra 40 (return_command)
+    $default  reduce using rule 40 (return_command)
 
 
-Estado 104
+State 104
 
    49 logical_or_expression: logical_or_expression '|' logical_and_expression •
    51 logical_and_expression: logical_and_expression • '&' equality_expression
 
-    '&'  deslocar, e ir ao estado 82
+    '&'  shift, and go to state 82
 
-    $padrão  reduzir usando a regra 49 (logical_or_expression)
+    $default  reduce using rule 49 (logical_or_expression)
 
 
-Estado 105
+State 105
 
    51 logical_and_expression: logical_and_expression '&' equality_expression •
    53 equality_expression: equality_expression • "==" relational_expression
    54                    | equality_expression • "!=" relational_expression
 
-    "=="  deslocar, e ir ao estado 83
-    "!="  deslocar, e ir ao estado 84
+    "=="  shift, and go to state 83
+    "!="  shift, and go to state 84
 
-    $padrão  reduzir usando a regra 51 (logical_and_expression)
+    $default  reduce using rule 51 (logical_and_expression)
 
 
-Estado 106
+State 106
 
    53 equality_expression: equality_expression "==" relational_expression •
    56 relational_expression: relational_expression • '<' additive_expression
@@ -1464,15 +1464,15 @@ Estado 106
    58                      | relational_expression • "<=" additive_expression
    59                      | relational_expression • ">=" additive_expression
 
-    "<="  deslocar, e ir ao estado 85
-    ">="  deslocar, e ir ao estado 86
-    '<'   deslocar, e ir ao estado 87
-    '>'   deslocar, e ir ao estado 88
+    "<="  shift, and go to state 85
+    ">="  shift, and go to state 86
+    '<'   shift, and go to state 87
+    '>'   shift, and go to state 88
 
-    $padrão  reduzir usando a regra 53 (equality_expression)
+    $default  reduce using rule 53 (equality_expression)
 
 
-Estado 107
+State 107
 
    54 equality_expression: equality_expression "!=" relational_expression •
    56 relational_expression: relational_expression • '<' additive_expression
@@ -1480,235 +1480,235 @@ Estado 107
    58                      | relational_expression • "<=" additive_expression
    59                      | relational_expression • ">=" additive_expression
 
-    "<="  deslocar, e ir ao estado 85
-    ">="  deslocar, e ir ao estado 86
-    '<'   deslocar, e ir ao estado 87
-    '>'   deslocar, e ir ao estado 88
+    "<="  shift, and go to state 85
+    ">="  shift, and go to state 86
+    '<'   shift, and go to state 87
+    '>'   shift, and go to state 88
 
-    $padrão  reduzir usando a regra 54 (equality_expression)
+    $default  reduce using rule 54 (equality_expression)
 
 
-Estado 108
+State 108
 
    58 relational_expression: relational_expression "<=" additive_expression •
    61 additive_expression: additive_expression • '+' multiplicative_expression
    62                    | additive_expression • '-' multiplicative_expression
 
-    '+'  deslocar, e ir ao estado 89
-    '-'  deslocar, e ir ao estado 90
+    '+'  shift, and go to state 89
+    '-'  shift, and go to state 90
 
-    $padrão  reduzir usando a regra 58 (relational_expression)
+    $default  reduce using rule 58 (relational_expression)
 
 
-Estado 109
+State 109
 
    59 relational_expression: relational_expression ">=" additive_expression •
    61 additive_expression: additive_expression • '+' multiplicative_expression
    62                    | additive_expression • '-' multiplicative_expression
 
-    '+'  deslocar, e ir ao estado 89
-    '-'  deslocar, e ir ao estado 90
+    '+'  shift, and go to state 89
+    '-'  shift, and go to state 90
 
-    $padrão  reduzir usando a regra 59 (relational_expression)
+    $default  reduce using rule 59 (relational_expression)
 
 
-Estado 110
+State 110
 
    56 relational_expression: relational_expression '<' additive_expression •
    61 additive_expression: additive_expression • '+' multiplicative_expression
    62                    | additive_expression • '-' multiplicative_expression
 
-    '+'  deslocar, e ir ao estado 89
-    '-'  deslocar, e ir ao estado 90
+    '+'  shift, and go to state 89
+    '-'  shift, and go to state 90
 
-    $padrão  reduzir usando a regra 56 (relational_expression)
+    $default  reduce using rule 56 (relational_expression)
 
 
-Estado 111
+State 111
 
    57 relational_expression: relational_expression '>' additive_expression •
    61 additive_expression: additive_expression • '+' multiplicative_expression
    62                    | additive_expression • '-' multiplicative_expression
 
-    '+'  deslocar, e ir ao estado 89
-    '-'  deslocar, e ir ao estado 90
+    '+'  shift, and go to state 89
+    '-'  shift, and go to state 90
 
-    $padrão  reduzir usando a regra 57 (relational_expression)
+    $default  reduce using rule 57 (relational_expression)
 
 
-Estado 112
+State 112
 
    61 additive_expression: additive_expression '+' multiplicative_expression •
    64 multiplicative_expression: multiplicative_expression • '*' unary_expression
    65                          | multiplicative_expression • '/' unary_expression
    66                          | multiplicative_expression • '%' unary_expression
 
-    '*'  deslocar, e ir ao estado 91
-    '/'  deslocar, e ir ao estado 92
-    '%'  deslocar, e ir ao estado 93
+    '*'  shift, and go to state 91
+    '/'  shift, and go to state 92
+    '%'  shift, and go to state 93
 
-    $padrão  reduzir usando a regra 61 (additive_expression)
+    $default  reduce using rule 61 (additive_expression)
 
 
-Estado 113
+State 113
 
    62 additive_expression: additive_expression '-' multiplicative_expression •
    64 multiplicative_expression: multiplicative_expression • '*' unary_expression
    65                          | multiplicative_expression • '/' unary_expression
    66                          | multiplicative_expression • '%' unary_expression
 
-    '*'  deslocar, e ir ao estado 91
-    '/'  deslocar, e ir ao estado 92
-    '%'  deslocar, e ir ao estado 93
+    '*'  shift, and go to state 91
+    '/'  shift, and go to state 92
+    '%'  shift, and go to state 93
 
-    $padrão  reduzir usando a regra 62 (additive_expression)
+    $default  reduce using rule 62 (additive_expression)
 
 
-Estado 114
+State 114
 
    64 multiplicative_expression: multiplicative_expression '*' unary_expression •
 
-    $padrão  reduzir usando a regra 64 (multiplicative_expression)
+    $default  reduce using rule 64 (multiplicative_expression)
 
 
-Estado 115
+State 115
 
    65 multiplicative_expression: multiplicative_expression '/' unary_expression •
 
-    $padrão  reduzir usando a regra 65 (multiplicative_expression)
+    $default  reduce using rule 65 (multiplicative_expression)
 
 
-Estado 116
+State 116
 
    66 multiplicative_expression: multiplicative_expression '%' unary_expression •
 
-    $padrão  reduzir usando a regra 66 (multiplicative_expression)
+    $default  reduce using rule 66 (multiplicative_expression)
 
 
-Estado 117
+State 117
 
    46 iterative_struct: "while" '(' expression ')' • command_block
 
-    '['  deslocar, e ir ao estado 15
+    '['  shift, and go to state 15
 
-    command_block  ir ao estado 123
+    command_block  go to state 123
 
 
-Estado 118
+State 118
 
    36 function_call: "identifier" '(' args ')' •
 
-    $padrão  reduzir usando a regra 36 (function_call)
+    $default  reduce using rule 36 (function_call)
 
 
-Estado 119
+State 119
 
    38 args: expression ',' • args
 
-    "identifier"       deslocar, e ir ao estado 48
-    "integer literal"  deslocar, e ir ao estado 49
-    "decimal literal"  deslocar, e ir ao estado 50
-    '('                deslocar, e ir ao estado 51
-    '+'                deslocar, e ir ao estado 52
-    '-'                deslocar, e ir ao estado 53
-    '!'                deslocar, e ir ao estado 54
+    "identifier"       shift, and go to state 48
+    "integer literal"  shift, and go to state 49
+    "decimal literal"  shift, and go to state 50
+    '('                shift, and go to state 51
+    '+'                shift, and go to state 52
+    '-'                shift, and go to state 53
+    '!'                shift, and go to state 54
 
-    $padrão  reduzir usando a regra 39 (args)
+    $default  reduce using rule 39 (args)
 
-    function_call              ir ao estado 55
-    args                       ir ao estado 124
-    expression                 ir ao estado 97
-    logical_or_expression      ir ao estado 57
-    logical_and_expression     ir ao estado 58
-    equality_expression        ir ao estado 59
-    relational_expression      ir ao estado 60
-    additive_expression        ir ao estado 61
-    multiplicative_expression  ir ao estado 62
-    unary_expression           ir ao estado 63
-    primary_expression         ir ao estado 64
+    function_call              go to state 55
+    args                       go to state 124
+    expression                 go to state 97
+    logical_or_expression      go to state 57
+    logical_and_expression     go to state 58
+    equality_expression        go to state 59
+    relational_expression      go to state 60
+    additive_expression        go to state 61
+    multiplicative_expression  go to state 62
+    unary_expression           go to state 63
+    primary_expression         go to state 64
 
 
-Estado 120
+State 120
 
    31 optional_instantiation: "with" • literal
 
-    "integer literal"  deslocar, e ir ao estado 125
-    "decimal literal"  deslocar, e ir ao estado 126
+    "integer literal"  shift, and go to state 125
+    "decimal literal"  shift, and go to state 126
 
-    literal  ir ao estado 127
+    literal  go to state 127
 
 
-Estado 121
+State 121
 
    28 variable_declaration_with_instantiation: "variable" "identifier" ":=" var_type optional_instantiation •
 
-    $padrão  reduzir usando a regra 28 (variable_declaration_with_instantiation)
+    $default  reduce using rule 28 (variable_declaration_with_instantiation)
 
 
-Estado 122
+State 122
 
    43 conditional_struct: "if" '(' expression ')' command_block • else_block
 
-    "else"  deslocar, e ir ao estado 128
+    "else"  shift, and go to state 128
 
-    $padrão  reduzir usando a regra 45 (else_block)
+    $default  reduce using rule 45 (else_block)
 
-    else_block  ir ao estado 129
+    else_block  go to state 129
 
 
-Estado 123
+State 123
 
    46 iterative_struct: "while" '(' expression ')' command_block •
 
-    $padrão  reduzir usando a regra 46 (iterative_struct)
+    $default  reduce using rule 46 (iterative_struct)
 
 
-Estado 124
+State 124
 
    38 args: expression ',' args •
 
-    $padrão  reduzir usando a regra 38 (args)
+    $default  reduce using rule 38 (args)
 
 
-Estado 125
+State 125
 
    33 literal: "integer literal" •
 
-    $padrão  reduzir usando a regra 33 (literal)
+    $default  reduce using rule 33 (literal)
 
 
-Estado 126
+State 126
 
    34 literal: "decimal literal" •
 
-    $padrão  reduzir usando a regra 34 (literal)
+    $default  reduce using rule 34 (literal)
 
 
-Estado 127
+State 127
 
    31 optional_instantiation: "with" literal •
 
-    $padrão  reduzir usando a regra 31 (optional_instantiation)
+    $default  reduce using rule 31 (optional_instantiation)
 
 
-Estado 128
+State 128
 
    44 else_block: "else" • command_block
 
-    '['  deslocar, e ir ao estado 15
+    '['  shift, and go to state 15
 
-    command_block  ir ao estado 130
+    command_block  go to state 130
 
 
-Estado 129
+State 129
 
    43 conditional_struct: "if" '(' expression ')' command_block else_block •
 
-    $padrão  reduzir usando a regra 43 (conditional_struct)
+    $default  reduce using rule 43 (conditional_struct)
 
 
-Estado 130
+State 130
 
    44 else_block: "else" command_block •
 
-    $padrão  reduzir usando a regra 44 (else_block)
+    $default  reduce using rule 44 (else_block)

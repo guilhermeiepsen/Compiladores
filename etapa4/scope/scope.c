@@ -4,10 +4,18 @@
 #include <stdio.h>
 
 /* args helpers */
-arg_type_node_t *args_append(arg_type_node_t *head, data_type_t type) {
+arg_type_node_t *args_append(arg_type_node_t *head, data_type_t type, const char *name) {
   arg_type_node_t *node = (arg_type_node_t*)calloc(1, sizeof(arg_type_node_t));
   if (!node) return head;
   node->type = type;
+
+  // Armazena uma cópia do nome
+  if (name) {
+    node->name = strdup(name);
+  } else {
+    node->name = NULL;
+  }
+
   if (!head) return node;
   arg_type_node_t *cur = head;
   while (cur->next) cur = cur->next;
@@ -18,6 +26,8 @@ arg_type_node_t *args_append(arg_type_node_t *head, data_type_t type) {
 void args_free(arg_type_node_t *head) {
   while (head) {
     arg_type_node_t *nxt = head->next;
+    // Libera o nome que foi copiado com strdup
+    if (head->name) free(head->name);
     free(head);
     head = nxt;
   }
@@ -74,7 +84,7 @@ symbol_entry_t *symtab_insert(symbol_table_t *table,
 
 void symbol_entry_add_arg(symbol_entry_t *entry, data_type_t type) {
   if (!entry) return;
-  entry->args = args_append(entry->args, type);
+  entry->args = args_append(entry->args, type, entry->key);
 }
 
 /* scope stack */
