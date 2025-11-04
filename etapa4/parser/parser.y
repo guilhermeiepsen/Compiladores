@@ -9,6 +9,31 @@ extern int yylineno; /* provided by Flex with %option yylineno */
 
 void semantic_error(int error_code, int line, const char *text);
 
+/* Arithmetic operators
+ * (int, int) -> int
+ * (float, float) -> float
+ * (default) -> ERRO
+*/
+
+data_type_t check_arithmetic_types(data_type_t t1, data_type_t t2, int line) {
+    if (t1 == TYPE_INT && t2 == TYPE_INT) return TYPE_INT;
+    if (t1 == TYPE_FLOAT && t2 == TYPE_FLOAT) return TYPE_FLOAT;
+    semantic_error(ERR_WRONG_TYPE, line, "mismatched types (int/float)");
+    return TYPE_UNDEFINED;
+}
+
+/* Logic operators
+ * (int, int) -> int
+ * (default) -> ERRO
+ */
+data_type_t check_logical_types(data_type_t t1, data_type_t t2, int line) {
+    if (t1 == TYPE_INT && t2 == TYPE_INT) return TYPE_INT;
+    semantic_error(ERR_WRONG_TYPE, line, "logical operators require int operands");
+    return TYPE_UNDEFINED;
+}
+
+
+
 int yylex(void);
 void yyerror (char const *mensagem);
 extern char *yytext;
@@ -366,12 +391,67 @@ literal: TK_LI_INTEIRO {
 };
 
 attribution_command: TK_ID TK_ATRIB expression {
+  //1. Verifies undeclared error
+  symbol_entry_t *entry = scope_lookup(scope_stack_pointer, $1.value);
+  if(entry == NULL) {
+    semantic_error(ERR_UNDECLARED, $1.line_number, $1.value);
+  }
+
+  //2. Verifies function error
+  if(entry->nature != SYMBOL_VARIABLE) {
+    semantic_error(ERR_FUNCTION, $1.line_number, $1.value);
+  }
+
+  //3. Verifies type
+  if(entry->data_type != $3->type) {
+    semantic_error(ERR_WRONG_TYPE, $1.line_number, "attribution type mismatch");
+  }
+
   asd_tree_t *idnode = asd_new_node_from_value(&$1);
+  if(idnode) idnode->type = entry->data_type; //Type annotation
   $$ = asd_new_binary(":=", idnode, $3);
+
+  if($$) $$->type = entry->data_type;
 };
 
 function_call: TK_ID '(' args ')' {
-    $$ = asd_new_function_call_node(&$1, $3);
+  //1. Verifies undeclared error
+  symbol_entry_t *entry = scope_lookup(scope_stack_pointer, $1.value);
+  if(entry == NULL) {
+    semantic_error(ERR_UNDECLARED, $1.line_number, $1.value);
+  }
+
+  //2. Verifies variable error
+  if(entry->nature != SYMBOL_FUNCTION) {
+    semantic_error(ERR_VARIABLE, $1.line_number, $1.value);
+  }
+
+  //3. Args verification - subject 4
+  arg_type_node_t *expected_arg = entry->args;
+  asd_tree_t *provided_arg = $3; /* $3 é o nó 'args' */
+  
+  while (provided_arg && expected_arg) {
+    /* Verifica o tipo [cite: 53] */
+    if (provided_arg->type != expected_arg->type) {
+        semantic_error(ERR_WRONG_TYPE_ARGS, $1.line_number, $1.value);
+    }
+    expected_arg = expected_arg->next;
+    /* A sua gramática de 'args' cria uma lista encadeada via 'children' */
+    provided_arg = (provided_arg->number_of_children > 0) ? provided_arg->children[0] : NULL;
+  }
+  /* 3. VERIFICAÇÃO DE CONTAGEM DE ARGUMENTOS */
+  if (provided_arg != NULL && expected_arg == NULL) {
+    /* Argumentos fornecidos a mais */
+      semantic_error(ERR_EXCESS_ARGS, $1.line_number, $1.value);
+    }
+    if (provided_arg == NULL && expected_arg != NULL) {
+      /* Argumentos faltando */
+        semantic_error(ERR_MISSING_ARGS, $1.line_number, $1.value);
+    }
+
+
+  $$ = asd_new_function_call_node(&$1, $3);
+  if($$) $$->type = entry->data_type;
 };
 
 
@@ -389,6 +469,10 @@ args: expression {
 
 return_command: TK_RETORNA expression TK_ATRIB var_type {
   $$ = asd_new_unary("retorna", $2);
+  if($2->type != $4) {
+    semantic_error(ERR_WRONG_TYPE, yylineno, "return expression type mismatch");
+  }
+  if($$) $$->type = $2->type;
 };
 
 flow_control_command: conditional_struct {
@@ -400,7 +484,13 @@ flow_control_command: conditional_struct {
 
 
 conditional_struct: TK_SE '(' expression ')' command_block else_block {
+  if($3->type != TYPE_INT) {
+    semantic_error(ERR_WRONG_TYPE, yylineno, "if test expression must be int");
+  }
+  
+  
   $$ = asd_new_trinary("se", $3, $5, $6);
+  if($$) $$->type = $3->type;
 };
 
 else_block: TK_SENAO command_block { 
@@ -411,7 +501,11 @@ else_block: TK_SENAO command_block {
 };
 
 iterative_struct: TK_ENQUANTO '(' expression ')' command_block {
+  if($3->type != TYPE_INT) {
+    semantic_error(ERR_WRONG_TYPE, yylineno, "while test expression must be int");
+  }
   $$ = asd_new_binary("enquanto", $3, $5);
+  if($$) $$->type = $3->type;
 };
 
 //EXPRESSOES
@@ -425,6 +519,7 @@ logical_or_expression: logical_and_expression {
 }
 | logical_or_expression '|' logical_and_expression {
   $$ = asd_new_binary("|", $1, $3);
+  $$->type = check_logical_types($1->type, $3->type, yylineno);
 };
 
 logical_and_expression: equality_expression {
@@ -432,6 +527,7 @@ logical_and_expression: equality_expression {
 }
 | logical_and_expression '&' equality_expression {
   $$ = asd_new_binary("&", $1, $3);
+  $$->type = check_logical_types($1->type, $3->type, yylineno);
 };
 
 equality_expression: relational_expression {
@@ -439,9 +535,13 @@ equality_expression: relational_expression {
 }
 | equality_expression TK_OC_EQ relational_expression {
   $$ = asd_new_binary("==", $1, $3);
+  check_arithmetic_types($1->type, $3->type, yylineno);
+  $$->type = TYPE_INT;
 }
 | equality_expression TK_OC_NE relational_expression {
   $$ = asd_new_binary("!=", $1, $3);
+  check_arithmetic_types($1->type, $3->type, yylineno);
+  $$->type = TYPE_INT;
 };
 
 relational_expression: additive_expression {
@@ -449,15 +549,23 @@ relational_expression: additive_expression {
 }
 | relational_expression '<' additive_expression {
   $$ = asd_new_binary("<", $1, $3);
-}
+  check_arithmetic_types($1->type, $3->type, yylineno);
+  $$->type = TYPE_INT;
+  }
 | relational_expression '>' additive_expression {
   $$ = asd_new_binary(">", $1, $3);
+  check_arithmetic_types($1->type, $3->type, yylineno);
+  $$->type = TYPE_INT;
 }
 | relational_expression TK_OC_LE additive_expression {
   $$ = asd_new_binary("<=", $1, $3);
+  check_arithmetic_types($1->type, $3->type, yylineno);
+  $$->type = TYPE_INT;
 }
 | relational_expression TK_OC_GE additive_expression {
   $$ = asd_new_binary(">=", $1, $3);
+  check_arithmetic_types($1->type, $3->type, yylineno);
+  $$->type = TYPE_INT;
 };
 
 additive_expression: multiplicative_expression {
@@ -465,9 +573,11 @@ additive_expression: multiplicative_expression {
 }
 | additive_expression '+' multiplicative_expression {
   $$ = asd_new_binary("+", $1, $3);
+  $$->type = check_arithmetic_types($1->type, $3->type, yylineno);
 }
 | additive_expression '-' multiplicative_expression {
   $$ = asd_new_binary("-", $1, $3);
+  $$->type = check_arithmetic_types($1->type, $3->type, yylineno);
 };
 
 multiplicative_expression: unary_expression {
@@ -475,12 +585,19 @@ multiplicative_expression: unary_expression {
 }
 | multiplicative_expression '*' unary_expression {
   $$ = asd_new_binary("*", $1, $3);
+  $$->type = check_arithmetic_types($1->type, $3->type, yylineno);
 }
 | multiplicative_expression '/' unary_expression {
   $$ = asd_new_binary("/", $1, $3);
+  $$->type = check_arithmetic_types($1->type, $3->type, yylineno);
 }
 | multiplicative_expression '%' unary_expression {
   $$ = asd_new_binary("%", $1, $3);
+
+  if($1->type != TYPE_INT || $3->type != TYPE_INT) {
+    semantic_error(ERR_WRONG_TYPE, yylineno, "modulo (%) operator requires int operator");
+  }
+  $$->type = TYPE_INT;
 };
 
 unary_expression: primary_expression {
@@ -488,22 +605,50 @@ unary_expression: primary_expression {
 }
 | '!' unary_expression { 
   $$ = asd_new_unary("!", $2);
+  //'!' only works with int (boolean) and returns an int
+  if($2->type != TYPE_INT) {
+    semantic_error(ERR_WRONG_TYPE, yylineno, "logic NOT ('!') requires int operand");
+  }
+
+
 }
 | '+' unary_expression { 
   $$ = asd_new_unary("+", $2);
+  $$->type = $2->type;
 }
 | '-' unary_expression { 
   $$ = asd_new_unary("-", $2);
+  $$->type = $2->type;
 };
 
 primary_expression: TK_ID {
+  
+  //1. Verifies undeclared error
+  symbol_entry_t *entry = scope_lookup(scope_stack_pointer, $1.value);
+  if(entry == NULL) {
+    semantic_error(ERR_UNDECLARED, $1.line_number, $1.value);
+  }
+  
+  //2. Verifies fuction error
+  if(entry->nature != SYMBOL_VARIABLE) {
+    semantic_error(ERR_FUNCTION, $1.line_number, $1.value);
+  }
+
   $$ = asd_new_node_from_value(&$1);
+
+  //Type annotation - informs to AST the node type
+  if($$) $$->type = entry->data_type;
+
 }
 | TK_LI_INTEIRO {
   $$ = asd_new_node_from_value(&$1);
+  if($$) $$->type = TYPE_INT; //Type annotation
+  scope_insert_current(scope_stack_pointer, $1.value, SYMBOL_LITERAL, TYPE_INT, &$1);
 }
 | TK_LI_DECIMAL {
   $$ = asd_new_node_from_value(&$1);
+  if($$) $$->type = TYPE_FLOAT; //Type annotation
+  scope_insert_current(scope_stack_pointer, $1.value, SYMBOL_LITERAL, TYPE_FLOAT, &$1);
 }
 | '(' expression ')' { $$ = $2; }
 | function_call { $$ = $1; };
