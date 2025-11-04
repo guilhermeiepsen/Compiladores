@@ -1,0 +1,12 @@
+===== END OF SCOPE [BLOCK] =====
+==============================
+===== END OF SCOPE [FUNCTION] =====
+- variable: key='b' type=int lexval='b' token=param line=8
+- variable: key='a' type=int lexval='a' token=param line=8
+==============================
+===== END OF SCOPE [BLOCK] =====
+==============================
+===== END OF SCOPE [FUNCTION] =====
+- variable: key='v' type=int lexval='v' token=param line=13
+==============================
+Semantic ERROR at line 21: soma_e_multiplica (Code: 42)

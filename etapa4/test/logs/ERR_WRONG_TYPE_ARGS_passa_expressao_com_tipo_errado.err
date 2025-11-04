@@ -1,0 +1,6 @@
+===== END OF SCOPE [BLOCK] =====
+==============================
+===== END OF SCOPE [FUNCTION] =====
+- variable: key='x' type=int lexval='x' token=param line=4
+==============================
+Semantic ERROR at line 11: aceita_inteiro (Code: 42)

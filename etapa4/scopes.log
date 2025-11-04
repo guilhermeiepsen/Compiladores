@@ -1,3 +1,12 @@
-===== END OF SCOPE [GLOBAL] =====
-- variable: key='g_variavel_inteira' type=int lexval='g_variavel_inteira' token=identifier line=6
+===== END OF SCOPE [BLOCK] =====
 ==============================
+===== END OF SCOPE [FUNCTION] =====
+==============================
+===== END OF SCOPE [BLOCK] =====
+- variable: key='resultado' type=int lexval='resultado' token=identifier line=18
+==============================
+===== END OF SCOPE [FUNCTION] =====
+- variable: key='b' type=int lexval='b' token=param line=15
+- variable: key='a' type=int lexval='a' token=param line=15
+==============================
+Semantic ERROR at line 41: logical operators require int operands (Code: 30)

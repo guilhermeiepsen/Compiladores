@@ -1,0 +1,8 @@
+===== END OF SCOPE [BLOCK] =====
+==============================
+===== END OF SCOPE [FUNCTION] =====
+- variable: key='c' type=int lexval='c' token=param line=6
+- variable: key='b' type=float lexval='b' token=param line=6
+- variable: key='a' type=int lexval='a' token=param line=6
+==============================
+Semantic ERROR at line 13: processa (Code: 42)

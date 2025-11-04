@@ -1,0 +1,14 @@
+===== END OF SCOPE [BLOCK] =====
+==============================
+===== END OF SCOPE [FUNCTION] =====
+- variable: key='v' type=int lexval='v' token=param line=6
+==============================
+===== END OF SCOPE [BLOCK] =====
+- variable: key='imprime_local' type=int lexval='imprime_local' token=identifier line=13
+==============================
+===== END OF SCOPE [FUNCTION] =====
+==============================
+===== END OF SCOPE [GLOBAL] =====
+- function: key='principal' type=int args=() lexval='principal' token=identifier line=11
+- function: key='imprime' type=int args=(int v) lexval='imprime' token=identifier line=6
+==============================

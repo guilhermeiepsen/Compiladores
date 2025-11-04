@@ -1,0 +1,7 @@
+===== END OF SCOPE [BLOCK] =====
+==============================
+===== END OF SCOPE [FUNCTION] =====
+==============================
+===== END OF SCOPE [GLOBAL] =====
+- function: key='funcao_inteira' type=int args=() lexval='funcao_inteira' token=identifier line=6
+==============================

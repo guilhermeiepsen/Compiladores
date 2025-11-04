@@ -431,7 +431,7 @@ function_call: TK_ID '(' args ')' {
   asd_tree_t *provided_arg = $3; /* $3 é o nó 'args' */
   
   while (provided_arg && expected_arg) {
-    /* Verifica o tipo [cite: 53] */
+    /* Verifica o tipo */
     if (provided_arg->type != expected_arg->type) {
         semantic_error(ERR_WRONG_TYPE_ARGS, $1.line_number, $1.value);
     }
@@ -662,5 +662,5 @@ void yyerror (char const *mensagem) {
 
 void semantic_error(int error_code, int line, const char *text) {
   fprintf(stderr, "Semantic ERROR at line %d: %s (Code: %d)\n", line, text, error_code);
-  exit(error_code); // O PDF exige que o programa saia imediatamente [cite: 67]
+  exit(error_code); // O PDF exige que o programa saia imediatamente
 }

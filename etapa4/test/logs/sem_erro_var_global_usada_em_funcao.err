@@ -1,0 +1,8 @@
+===== END OF SCOPE [BLOCK] =====
+==============================
+===== END OF SCOPE [FUNCTION] =====
+==============================
+===== END OF SCOPE [GLOBAL] =====
+- function: key='usa_global' type=int args=() lexval='usa_global' token=identifier line=6
+- variable: key='g' type=int lexval='g' token=identifier line=4
+==============================

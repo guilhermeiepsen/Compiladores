@@ -1,0 +1,5 @@
+===== END OF SCOPE [BLOCK] =====
+==============================
+===== END OF SCOPE [FUNCTION] =====
+==============================
+Semantic ERROR at line 12: func_usada_como_var (Code: 21)
