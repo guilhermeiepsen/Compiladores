@@ -264,8 +264,10 @@ parameter: TK_ID TK_ATRIB var_type {
 };
 
 /* Function body does NOT create an extra scope; it reuses the function scope */
-body: '[' command_sequence ']' {
+body: '[' command_sequence ']'{
   $$ = $2;
+} | '[' ']' {
+  $$ = NULL;
 };
 
 /*
