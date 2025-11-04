@@ -8,8 +8,6 @@
 ===== END OF SCOPE [BLOCK] =====
 - variable: key='variavel_decimal' type=float lexval='variavel_decimal' token=identifier line=11
 ==============================
-===== END OF SCOPE [BLOCK] =====
-==============================
 ===== END OF SCOPE [FUNCTION] =====
 ==============================
 ===== END OF SCOPE [GLOBAL] =====

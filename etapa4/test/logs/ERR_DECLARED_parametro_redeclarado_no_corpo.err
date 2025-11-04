@@ -1,10 +1,1 @@
-===== END OF SCOPE [BLOCK] =====
-- variable: key='x' type=int lexval='x' token=identifier line=6
-==============================
-===== END OF SCOPE [FUNCTION] =====
-- variable: key='y' type=int lexval='y' token=param line=4
-- variable: key='x' type=int lexval='x' token=param line=4
-==============================
-===== END OF SCOPE [GLOBAL] =====
-- function: key='soma' type=int args=(int x, int y) lexval='soma' token=identifier line=4
-==============================
+Semantic ERROR at line 6: x (Code: 11)

@@ -263,8 +263,9 @@ parameter: TK_ID TK_ATRIB var_type {
   $$.name = $1.value;
 };
 
-body: command_block {
-  $$ = $1;
+/* Function body does NOT create an extra scope; it reuses the function scope */
+body: '[' command_sequence ']' {
+  $$ = $2;
 };
 
 /*

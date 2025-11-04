@@ -8,8 +8,6 @@
 ===== END OF SCOPE [BLOCK] =====
 - variable: key='variavel_inteira' type=int lexval='variavel_inteira' token=identifier line=11
 ==============================
-===== END OF SCOPE [BLOCK] =====
-==============================
 ===== END OF SCOPE [FUNCTION] =====
 ==============================
 ===== END OF SCOPE [GLOBAL] =====

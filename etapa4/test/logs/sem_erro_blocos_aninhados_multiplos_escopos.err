@@ -4,10 +4,8 @@
 ==============================
 ===== END OF SCOPE [BLOCK] =====
 ==============================
-===== END OF SCOPE [BLOCK] =====
-- variable: key='a' type=int lexval='a' token=identifier line=6
-==============================
 ===== END OF SCOPE [FUNCTION] =====
+- variable: key='a' type=int lexval='a' token=identifier line=6
 ==============================
 ===== END OF SCOPE [GLOBAL] =====
 - function: key='principal' type=int args=() lexval='principal' token=identifier line=4

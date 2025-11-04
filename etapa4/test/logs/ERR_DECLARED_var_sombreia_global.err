@@ -1,7 +1,5 @@
-===== END OF SCOPE [BLOCK] =====
-- variable: key='g' type=int lexval='g' token=identifier line=8
-==============================
 ===== END OF SCOPE [FUNCTION] =====
+- variable: key='g' type=int lexval='g' token=identifier line=8
 ==============================
 ===== END OF SCOPE [GLOBAL] =====
 - function: key='principal' type=int args=() lexval='principal' token=identifier line=6

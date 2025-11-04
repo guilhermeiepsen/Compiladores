@@ -1,9 +1,5 @@
-===== END OF SCOPE [BLOCK] =====
-==============================
 ===== END OF SCOPE [FUNCTION] =====
 - variable: key='x' type=int lexval='x' token=param line=6
-==============================
-===== END OF SCOPE [BLOCK] =====
 ==============================
 ===== END OF SCOPE [FUNCTION] =====
 - variable: key='v' type=int lexval='v' token=param line=11
