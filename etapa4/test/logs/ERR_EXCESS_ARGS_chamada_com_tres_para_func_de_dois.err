@@ -1,0 +1,5 @@
+===== END OF SCOPE [FUNCTION] =====
+- variable: key='b' type=int lexval='b' token=param line=6
+- variable: key='a' type=int lexval='a' token=param line=6
+==============================
+Semantic ERROR at line 14: soma_e_multiplica (Code: 41)

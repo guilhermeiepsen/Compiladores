@@ -1,0 +1,6 @@
+===== END OF SCOPE [FUNCTION] =====
+==============================
+===== END OF SCOPE [FUNCTION] =====
+- variable: key='x' type=int lexval='x' token=param line=9
+==============================
+Semantic ERROR at line 16: recebe_inteiro (Code: 42)
