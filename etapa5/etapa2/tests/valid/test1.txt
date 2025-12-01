@@ -1,0 +1,14 @@
+main -> inteiro param := inteiro := [
+    var aaa := inteiro com 5
+    var bbb := decimal
+    ccc := 10
+    func_call()
+    func_call(a != b)
+    func_call(10)
+    func_call(a | c | b | ( aa == cc))
+    func_call(a,b,10,2)
+    retorna (0) := inteiro
+    retorna a := inteiro
+    retorna ccc := inteiro
+    retorna 0 := inteiro
+];

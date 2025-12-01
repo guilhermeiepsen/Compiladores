@@ -1,0 +1,5 @@
+===== END OF SCOPE [FUNCTION] =====
+- variable: key='y' type=float lexval='y' token=param line=6
+- variable: key='x' type=int lexval='x' token=param line=6
+==============================
+Semantic ERROR at line 13: mistura (Code: 42)
