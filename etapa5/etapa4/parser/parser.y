@@ -13,15 +13,33 @@ void yyerror (char const *mensagem);
 extern char *yytext;
 extern asd_tree_t *arvore;
 scope_stack_t *scope_stack_pointer = NULL;
+data_type_t current_function_return_type = TYPE_UNDEFINED;
+
+/* Helper function to map error codes to strings */
+const char* get_error_string(int error_code) {
+    switch(error_code) {
+        case 10: return "ERR_UNDECLARED";
+        case 11: return "ERR_DECLARED";
+        case 20: return "ERR_VARIABLE";
+        case 21: return "ERR_FUNCTION";
+        case 30: return "ERR_WRONG_TYPE";
+        case 40: return "ERR_MISSING_ARGS";
+        case 41: return "ERR_EXCESS_ARGS";
+        case 42: return "ERR_WRONG_TYPE_ARGS";
+        default: return "UNKNOWN_ERROR";
+    }
+}
 
 void semantic_error(int error_code, int line, const char *text) {
-    printf("Semantic ERROR at line %d: %s (Code: %d)\n", line, text ? text : "(null)", error_code);
+    const char* error_str = get_error_string(error_code);
+    fprintf(stderr, "Semantic ERROR at line %d: %s (Code: %d - %s)\n", 
+           line, text ? text : "(null)", error_code, error_str);
     exit(error_code);
 }
 
 static int get_reg_id(const char *temp_str) {
     if (!temp_str) {
-        fprintf(stderr, "FATAL ERROR: get_reg_id called with NULL pointer. Logic error in AST code gen.\n");
+        fprintf(stderr, "FATAL ERROR: get_reg_id called with NULL pointer.\n");
         exit(1);
     }
     if (temp_str[0] != 'r') {
@@ -50,7 +68,7 @@ static int get_reg_id(const char *temp_str) {
 
 %type <node> program list element function_definition body command_block command_sequence simple_command
 %type <node> variable_declaration variable_declaration_with_instantiation optional_instantiation literal
-%type <node> attribution_command function_call args return_command flow_control_command
+%type <node> attribution_command function_call args args_list return_command flow_control_command
 %type <node> conditional_struct else_block iterative_struct
 %type <node> expression logical_or_expression logical_and_expression equality_expression
 %type <node> relational_expression additive_expression multiplicative_expression unary_expression primary_expression
@@ -104,6 +122,8 @@ element: function_definition { $$ = $1; }
 
 function_definition: header {
   scope_push(scope_stack_pointer, SCOPE_FUNCTION);
+  current_function_return_type = $1->data_type;
+
   for(arg_type_node_t *arg = $1->args; arg; arg = arg->next) {
     lexical_value_t param_lex;
     param_lex.line_number = $1->lexical.line_number;
@@ -120,8 +140,10 @@ function_definition: header {
   $$->type = $1->data_type;
   asd_add_child($$, $3);
   if ($3) $$->code = $3->code;
+  
   scope_log_function_end(scope_stack_pointer);
   scope_pop(scope_stack_pointer);
+  current_function_return_type = TYPE_UNDEFINED;
 };
 
 header: TK_ID TK_SETA var_type optional_parameter_list TK_ATRIB {
@@ -228,7 +250,6 @@ literal: TK_LI_INTEIRO {
   $$ = asd_new_node_from_value(&$1);
   $$->type = TYPE_INT;
   $$->temp = iloc_new_reg();
-  // op2: destino (get_reg_id)
   $$->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, ILOC_OP_REG, get_reg_id($$->temp), 0,0);
 }
 | TK_LI_DECIMAL {
@@ -236,14 +257,15 @@ literal: TK_LI_INTEIRO {
   $$ = asd_new_node_from_value(&$1);
   $$->type = TYPE_FLOAT;
   $$->temp = iloc_new_reg();
-  // op2: destino
   $$->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, ILOC_OP_REG, get_reg_id($$->temp), 0,0);
 };
 
 attribution_command: TK_ID TK_ATRIB expression {
   symbol_entry_t *entry = scope_lookup(scope_stack_pointer, $1.value);
   if (!entry) semantic_error(10, $1.line_number, $1.value);
+  if (entry->nature == SYMBOL_FUNCTION) semantic_error(21, $1.line_number, $1.value);
   if (entry->nature != SYMBOL_VARIABLE) semantic_error(20, $1.line_number, $1.value);
+  
   if (entry->data_type != $3->type) semantic_error(30, $1.line_number, "Attribution type mismatch");
 
   asd_tree_t *idnode = asd_new_node_from_value(&$1);
@@ -258,24 +280,52 @@ attribution_command: TK_ID TK_ATRIB expression {
 function_call: TK_ID '(' args ')' {
     symbol_entry_t *entry = scope_lookup(scope_stack_pointer, $1.value);
     if (!entry) semantic_error(10, $1.line_number, $1.value);
-    if (entry->nature != SYMBOL_FUNCTION) semantic_error(21, $1.line_number, $1.value);
+    if (entry->nature != SYMBOL_FUNCTION) semantic_error(20, $1.line_number, $1.value);
     
+    int count_given = 0;
+    asd_tree_t *args_node = $3;
+    if (args_node) count_given = args_node->number_of_children;
+
+    int count_expected = 0;
+    arg_type_node_t *p = entry->args;
+    while(p) { count_expected++; p = p->next; }
+
+    if (count_given < count_expected) semantic_error(40, $1.line_number, "Missing arguments");
+    if (count_given > count_expected) semantic_error(41, $1.line_number, "Excess arguments");
+
+    p = entry->args;
+    if (args_node) {
+        for (int i = 0; i < args_node->number_of_children; i++) {
+            asd_tree_t *arg_expr = args_node->children[i];
+            if (arg_expr->type != p->type) semantic_error(42, $1.line_number, "Argument type mismatch");
+            p = p->next;
+        }
+    }
+
     $$ = asd_new_function_call_node(&$1, $3);
     $$->type = entry->data_type;
     if ($3) $$->code = $3->code;
     $$->temp = iloc_new_reg(); 
 };
 
-args: expression {
-  $$ = $1;
+args: args_list { $$ = $1; } | %empty { $$ = NULL; };
+
+args_list: expression {
+    $$ = asd_new("args");
+    asd_add_child($$, $1);
+    $$->code = $1->code;
 }
-| expression ',' args {
-  $$ = asd_add_child_to_node($1, $3);
-  if ($1 && $3) $$->code = iloc_append($1->code, $3->code);
-}
-| %empty { $$ = NULL; };
+| args_list ',' expression {
+    $$ = $1;
+    asd_add_child($$, $3);
+    $$->code = iloc_append($$->code, $3->code);
+};
 
 return_command: TK_RETORNA expression TK_ATRIB var_type {
+  if ($2->type != $4) semantic_error(30, yylineno, "Return command type mismatch");
+  if (current_function_return_type != TYPE_UNDEFINED && $4 != current_function_return_type) {
+      semantic_error(30, yylineno, "Function return type mismatch");
+  }
   $$ = asd_new_unary("retorna", $2);
   $$->code = $2->code;
 };
@@ -293,8 +343,6 @@ conditional_struct: TK_SE '(' expression ')' command_block else_block {
   
   $$->code = iloc_append($3->code, cbr);
   $$->code = iloc_append($$->code, l_true);
-  
-  // FIX SEGV: Check if block exists
   if ($5) $$->code = iloc_append($$->code, $5->code);
 
   if ($6 != NULL) {
@@ -302,14 +350,12 @@ conditional_struct: TK_SE '(' expression ')' command_block else_block {
       $$->code = iloc_append($$->code, jmp);
       $$->code = iloc_append($$->code, l_false);
       $$->code = iloc_append($$->code, $6->code);
-      
       iloc_code_t *l_out = iloc_create_inst(ILOC_NOP, ILOC_OP_LABEL, atoi(L_saida+1), 0,0,0,0);
       $$->code = iloc_append($$->code, l_out);
       free(L_saida);
   } else {
       $$->code = iloc_append($$->code, l_false);
   }
-
   free(L_true); free(L_false);
 };
 
@@ -329,13 +375,9 @@ iterative_struct: TK_ENQUANTO '(' expression ')' command_block {
   $$->code = iloc_append($$->code, $3->code);
   $$->code = iloc_append($$->code, cbr);
   $$->code = iloc_append($$->code, l_true);
-  
-  // FIX SEGV: Check if block exists
   if ($5) $$->code = iloc_append($$->code, $5->code);
-  
   $$->code = iloc_append($$->code, jmp);
   $$->code = iloc_append($$->code, l_out);
-
   free(L_ini); free(L_true); free(L_out);
 };
 
@@ -400,14 +442,16 @@ relational_expression: additive_expression { $$ = $1; }
 additive_expression: multiplicative_expression { $$ = $1; }
 | additive_expression '+' multiplicative_expression {
   $$ = asd_new_binary("+", $1, $3);
-  if ($1->type == $3->type) $$->type = $1->type; else semantic_error(30, yylineno, "Type error");
+  if ($1->type != $3->type) semantic_error(30, yylineno, "Type mismatch add");
+  $$->type = $1->type;
   $$->temp = iloc_new_reg();
   $$->code = iloc_append($1->code, $3->code);
   $$->code = iloc_append($$->code, iloc_create_inst(ILOC_ADD, ILOC_OP_REG, get_reg_id($1->temp), ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, get_reg_id($$->temp)));
 }
 | additive_expression '-' multiplicative_expression {
   $$ = asd_new_binary("-", $1, $3);
-  if ($1->type == $3->type) $$->type = $1->type; else semantic_error(30, yylineno, "Type error");
+  if ($1->type != $3->type) semantic_error(30, yylineno, "Type mismatch sub");
+  $$->type = $1->type;
   $$->temp = iloc_new_reg();
   $$->code = iloc_append($1->code, $3->code);
   $$->code = iloc_append($$->code, iloc_create_inst(ILOC_SUB, ILOC_OP_REG, get_reg_id($1->temp), ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, get_reg_id($$->temp)));
@@ -416,20 +460,23 @@ additive_expression: multiplicative_expression { $$ = $1; }
 multiplicative_expression: unary_expression { $$ = $1; }
 | multiplicative_expression '*' unary_expression {
   $$ = asd_new_binary("*", $1, $3);
-  if ($1->type == $3->type) $$->type = $1->type; else semantic_error(30, yylineno, "Type error");
+  if ($1->type != $3->type) semantic_error(30, yylineno, "Type mismatch mult");
+  $$->type = $1->type;
   $$->temp = iloc_new_reg();
   $$->code = iloc_append($1->code, $3->code);
   $$->code = iloc_append($$->code, iloc_create_inst(ILOC_MULT, ILOC_OP_REG, get_reg_id($1->temp), ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, get_reg_id($$->temp)));
 }
 | multiplicative_expression '/' unary_expression {
   $$ = asd_new_binary("/", $1, $3);
-  if ($1->type == $3->type) $$->type = $1->type; else semantic_error(30, yylineno, "Type error");
+  if ($1->type != $3->type) semantic_error(30, yylineno, "Type mismatch div");
+  $$->type = $1->type;
   $$->temp = iloc_new_reg();
   $$->code = iloc_append($1->code, $3->code);
   $$->code = iloc_append($$->code, iloc_create_inst(ILOC_DIV, ILOC_OP_REG, get_reg_id($1->temp), ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, get_reg_id($$->temp)));
 }
 | multiplicative_expression '%' unary_expression {
   $$ = asd_new_binary("%", $1, $3);
+  if ($1->type != TYPE_INT || $3->type != TYPE_INT) semantic_error(30, yylineno, "Modulo requires int");
   $$->type = TYPE_INT; $$->temp = iloc_new_reg();
   $$->code = iloc_append($1->code, $3->code);
 };
@@ -452,6 +499,7 @@ unary_expression: primary_expression { $$ = $1; }
 primary_expression: TK_ID {
   symbol_entry_t *entry = scope_lookup(scope_stack_pointer, $1.value);
   if (!entry) semantic_error(10, $1.line_number, $1.value);
+  if (entry->nature == SYMBOL_FUNCTION) semantic_error(21, $1.line_number, $1.value);
   if (entry->nature != SYMBOL_VARIABLE) semantic_error(20, $1.line_number, $1.value);
   
   data_type_t type = entry->data_type;
