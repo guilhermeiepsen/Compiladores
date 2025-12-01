@@ -1,4 +1,0 @@
-===== END OF SCOPE [FUNCTION] =====
-- variable: key='v' type=int lexval='v' token=param line=6
-==============================
-Semantic ERROR at line 13: usa_valor (Code: 40)

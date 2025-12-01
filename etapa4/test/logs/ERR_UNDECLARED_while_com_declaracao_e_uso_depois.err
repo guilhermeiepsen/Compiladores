@@ -1,4 +1,0 @@
-===== END OF SCOPE [BLOCK] =====
-- variable: key='i' type=int lexval='i' token=identifier line=8
-==============================
-Semantic ERROR at line 11: i (Code: 10)

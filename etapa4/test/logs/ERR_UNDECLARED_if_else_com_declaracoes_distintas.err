@@ -1,7 +1,0 @@
-===== END OF SCOPE [BLOCK] =====
-- variable: key='x' type=int lexval='x' token=identifier line=8
-==============================
-===== END OF SCOPE [BLOCK] =====
-- variable: key='y' type=int lexval='y' token=identifier line=12
-==============================
-Semantic ERROR at line 15: x (Code: 10)

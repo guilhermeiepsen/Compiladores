@@ -1,5 +1,0 @@
-// Erro: retorno sem tipo final
-principal -> inteiro :=
-[
-    retorna 0;
-];

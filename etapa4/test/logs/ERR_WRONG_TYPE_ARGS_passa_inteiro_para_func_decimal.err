@@ -1,4 +1,0 @@
-===== END OF SCOPE [FUNCTION] =====
-- variable: key='d' type=float lexval='d' token=param line=6
-==============================
-Semantic ERROR at line 13: usa_decimal (Code: 42)

@@ -1,4 +1,0 @@
-===== END OF SCOPE [FUNCTION] =====
-- variable: key='x' type=int lexval='x' token=param line=7
-==============================
-Semantic ERROR at line 15: valor (Code: 20)

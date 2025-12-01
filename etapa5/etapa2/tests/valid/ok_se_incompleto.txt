@@ -1,2 +1,0 @@
-// Versão correta: declaração única
-var resultado := decimal;

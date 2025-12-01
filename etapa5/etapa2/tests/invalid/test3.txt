@@ -1,7 +1,0 @@
-int factorial(int n) := integer {
-    if (n <= 1) [
-        return 1 := integer;
-    else [
-        return n * factorial(n - 1) := integer;
-    ]
-}
