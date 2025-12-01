@@ -37,9 +37,9 @@ typedef struct symbol_entry {
   lexical_value_t lexical;         /* token data (line, token_type, value copy) */
 
   // E5: Offset de memória para variáveis
-  // Se for global: offset relativo a rbss
-  // Se for local: offset relativo a rfp
   int offset; 
+  // E5: Flag para saber se é global (usa rbss) ou local (usa rfp)
+  int is_global;
 
   struct symbol_entry *next;       /* next entry in this scope's list */
 } symbol_entry_t;
@@ -51,7 +51,6 @@ typedef struct symbol_table {
   symbol_entry_t *head;            /* singly linked list of entries */
   
   // E5: Contador de offset local para este escopo específico
-  // Útil para saber qual o próximo endereço disponível neste escopo
   int current_offset; 
 } symbol_table_t;
 

@@ -16,8 +16,21 @@ scope_stack_t *scope_stack_pointer = NULL;
 
 /* Função de erro semântico centralizada */
 void semantic_error(int error_code, int line, const char *text) {
-    printf("Semantic ERROR at line %d: %s (Code: %d)\n", line, text, error_code);
+    printf("Semantic ERROR at line %d: %s (Code: %d)\n", line, text ? text : "(null)", error_code);
     exit(error_code);
+}
+
+/* * HELPER DE DEBUG (E5) */
+static int get_reg_id(const char *temp_str) {
+    if (!temp_str) {
+        fprintf(stderr, "FATAL ERROR: get_reg_id called with NULL pointer. Logic error in AST code gen.\n");
+        exit(1);
+    }
+    if (temp_str[0] != 'r') {
+        fprintf(stderr, "FATAL ERROR: Invalid register format: '%s'\n", temp_str);
+        exit(1);
+    }
+    return atoi(temp_str + 1);
 }
 %}
 
@@ -37,16 +50,7 @@ void semantic_error(int error_code, int line, const char *text) {
  symbol_entry_t *symbol;
 }
 
-/* * CORREÇÃO DO LEAK: DESTRUTOR
- * Isso ensina o Bison a liberar a memória do yylval quando um token
- * é descartado (ex: token de lookahead ao final do parse ou em erro).
- */
-%destructor { 
-    if ($$.value) { 
-        free($$.value); 
-        $$.value = NULL; 
-    } 
-} <lexical_value>
+/* DESTRUTOR REMOVIDO PARA EVITAR CORRUPÇÃO DE TOKENS EM ALGUMAS VERSÕES */
 
 /* Tipos das regras */
 %type <node> program list element function_definition body command_block command_sequence simple_command
@@ -100,7 +104,6 @@ list: element {
 | element ',' list {
   $$ = asd_select_head_and_attach_tail($1, $3);
   if ($1 && $3) {
-      // Concatena o código ILOC dos elementos da lista (funções/variáveis globais)
       $1->code = iloc_append($1->code, $3->code);
   }
 };
@@ -113,10 +116,7 @@ element: function_definition { $$ = $1; }
 /* ========================================================================== */
 
 function_definition: header {
-  /* Ação de meio de regra: executada após o header mas antes do body */
   scope_push(scope_stack_pointer, SCOPE_FUNCTION);
-
-  // Adiciona parâmetros ao escopo da função
   for(arg_type_node_t *arg = $1->args; arg; arg = arg->next) {
     lexical_value_t param_lex;
     param_lex.line_number = $1->lexical.line_number;
@@ -130,16 +130,13 @@ function_definition: header {
     }
   }
 } body {
-  /* Construção do nó da função */
   char buffer[256];
   snprintf(buffer, sizeof(buffer), "function %s", $1->key);
   $$ = asd_new(buffer);
-  $$->type = $1->data_type; // Tipo de retorno
+  $$->type = $1->data_type;
 
   asd_add_child($$, $3);
 
-  /* E5: O código da função é o código do corpo */
-  // Opcional: Gerar label da função aqui se necessário (ex: "main:")
   if ($3) $$->code = $3->code;
 
   scope_log_function_end(scope_stack_pointer);
@@ -148,11 +145,9 @@ function_definition: header {
 
 header: TK_ID TK_SETA var_type optional_parameter_list TK_ATRIB {
   symbol_entry_t *entry = scope_insert_current(scope_stack_pointer, $1.value, SYMBOL_FUNCTION, $3, &$1);
-  
   if(entry == NULL) {
     semantic_error(11, $1.line_number, $1.value); // ERR_DECLARED
   }
-
   entry->args = $4;
   $$ = entry;
   free($1.value);
@@ -209,7 +204,6 @@ command_sequence: simple_command {
 }
 | simple_command command_sequence {
   $$ = asd_select_head_and_attach_tail($1, $2);
-  // E5: Concatena códigos
   if ($1 && $2) {
       $1->code = iloc_append($1->code, $2->code);
   }
@@ -250,14 +244,11 @@ variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional
     }
     
     // E5: Geração de código para inicialização (storeAI)
-    // Inst_node (literal) já tem code (loadI) e temp. Precisamos dar store na variável.
-    
-    // offset já calculado no scope_insert_current
-    int base_reg = -1; // rfp (assumindo local)
-    // TODO: Verificar se é global para usar rbss (-2)
+    // Se for global -> rbss (-2), se local -> rfp (-1)
+    int base_reg = entry->is_global ? -2 : -1;
     
     iloc_code_t *store = iloc_create_inst(ILOC_STOREAI,
-                                          ILOC_OP_REG, atoi(inst_node->temp + 1),
+                                          ILOC_OP_REG, get_reg_id(inst_node->temp),
                                           ILOC_OP_REG, base_reg,
                                           ILOC_OP_INT, entry->offset);
     inst_node->code = iloc_append(inst_node->code, store);
@@ -276,25 +267,24 @@ variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional
 optional_instantiation: TK_COM literal { 
   $$ = asd_new_unary("com", $2);
   $$->type = $2->type;
-  // E5: Propaga código e temp do literal
   $$->code = $2->code;
   $$->temp = $2->temp;
 }
 | %empty { $$ = NULL; };
 
 literal: TK_LI_INTEIRO {
+  int val = atoi($1.value);
   $$ = asd_new_node_from_value(&$1);
   $$->type = TYPE_INT;
-  // E5: loadI val => r_new
   $$->temp = iloc_new_reg();
-  $$->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, atoi($1.value), 0,0, ILOC_OP_REG, atoi($$->temp + 1));
+  $$->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, 0,0, ILOC_OP_REG, get_reg_id($$->temp));
 }
 | TK_LI_DECIMAL {
+  int val = (int)atof($1.value);
   $$ = asd_new_node_from_value(&$1);
   $$->type = TYPE_FLOAT;
-  // Nota: ILOC simplificado não tem float nativo, trataremos como int ou ignorar
   $$->temp = iloc_new_reg();
-  $$->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, (int)atof($1.value), 0,0, ILOC_OP_REG, atoi($$->temp + 1));
+  $$->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, 0,0, ILOC_OP_REG, get_reg_id($$->temp));
 };
 
 /* ========================================================================== */
@@ -302,22 +292,24 @@ literal: TK_LI_INTEIRO {
 /* ========================================================================== */
 
 attribution_command: TK_ID TK_ATRIB expression {
-  asd_tree_t *idnode = asd_new_node_from_value(&$1);
+  // CORREÇÃO CRÍTICA: Buscar na tabela ANTES de consumir $1.value
   symbol_entry_t *entry = scope_lookup(scope_stack_pointer, $1.value);
   
   if (entry == NULL) semantic_error(10, $1.line_number, $1.value); // ERR_UNDECLARED
   if (entry->nature != SYMBOL_VARIABLE) semantic_error(20, $1.line_number, $1.value); // ERR_VARIABLE
   if (entry->data_type != $3->type) semantic_error(30, $1.line_number, "Attribution type mismatch"); // ERR_WRONG_TYPE
 
+  // Agora podemos consumir o token para criar o nó da AST
+  asd_tree_t *idnode = asd_new_node_from_value(&$1);
+
   $$ = asd_new_binary(":=", idnode, $3);
   $$->type = entry->data_type;
 
-  // E5: storeAI r_expr => rfp, offset
-  int base_reg = -1; // rfp
-  // TODO: verificar global/local
-  
+  // E5: Decide base_reg (rbss ou rfp)
+  int base_reg = entry->is_global ? -2 : -1;
+
   iloc_code_t *store = iloc_create_inst(ILOC_STOREAI,
-                                        ILOC_OP_REG, atoi($3->temp + 1),
+                                        ILOC_OP_REG, get_reg_id($3->temp),
                                         ILOC_OP_REG, base_reg,
                                         ILOC_OP_INT, entry->offset);
   $$->code = iloc_append($3->code, store);
@@ -332,22 +324,11 @@ function_call: TK_ID '(' args ')' {
     if (entry == NULL) semantic_error(10, $1.line_number, $1.value); // ERR_UNDECLARED
     if (entry->nature != SYMBOL_FUNCTION) semantic_error(21, $1.line_number, $1.value); // ERR_FUNCTION
     
-    // Verificação de argumentos (simplificada, assumindo implementação na E4)
-    // ...
-
     $$ = asd_new_function_call_node(&$1, $3);
     $$->type = entry->data_type;
 
-    // E5: call label (Simplificação: jump para label da função)
-    // O PDF não especifica detalhadamente chamadas complexas com frame, 
-    // mas se fosse implementar:
-    // param r_arg1
-    // call f_label => r_ret
-    // $$->temp = r_ret
-    
-    // Vamos gerar apenas o código dos argumentos por enquanto para não quebrar
     if ($3) $$->code = $3->code;
-    $$->temp = iloc_new_reg(); // Resultado fictício
+    $$->temp = iloc_new_reg(); 
 };
 
 args: expression {
@@ -365,8 +346,6 @@ args: expression {
 
 return_command: TK_RETORNA expression TK_ATRIB var_type {
   $$ = asd_new_unary("retorna", $2);
-  // E5: i2i r_expr => r_ret (se houver registrador de retorno convencionado)
-  // Ou simplesmente calcular a expressão.
   $$->code = $2->code;
 };
 
@@ -380,9 +359,8 @@ conditional_struct: TK_SE '(' expression ')' command_block else_block {
   char *L_false = iloc_new_label();
   char *L_saida = iloc_new_label();
 
-  // cbr r_expr -> L_true, L_false
   iloc_code_t *cbr = iloc_create_inst(ILOC_CBR,
-                                      ILOC_OP_REG, atoi($3->temp + 1),
+                                      ILOC_OP_REG, get_reg_id($3->temp), // << USA HELPER
                                       ILOC_OP_LABEL, atoi(L_true + 1),
                                       ILOC_OP_LABEL, atoi(L_false + 1));
 
@@ -418,7 +396,7 @@ iterative_struct: TK_ENQUANTO '(' expression ')' command_block {
   iloc_code_t *l_saida_node = iloc_create_inst(ILOC_NOP, ILOC_OP_LABEL, atoi(L_saida + 1), 0,0,0,0);
 
   iloc_code_t *cbr = iloc_create_inst(ILOC_CBR,
-                                      ILOC_OP_REG, atoi($3->temp + 1),
+                                      ILOC_OP_REG, get_reg_id($3->temp), // << USA HELPER
                                       ILOC_OP_LABEL, atoi(L_true + 1),
                                       ILOC_OP_LABEL, atoi(L_saida + 1));
   iloc_code_t *jump_back = iloc_create_inst(ILOC_JUMPI, 0,0,0,0, ILOC_OP_LABEL, atoi(L_inicio + 1));
@@ -445,7 +423,7 @@ logical_or_expression: logical_and_expression { $$ = $1; }
   $$ = asd_new_binary("|", $1, $3);
   $$->type = TYPE_INT;
   $$->temp = iloc_new_reg();
-  iloc_code_t *inst = iloc_create_inst(ILOC_OR, ILOC_OP_REG, atoi($1->temp + 1), ILOC_OP_REG, atoi($3->temp + 1), ILOC_OP_REG, atoi($$->temp + 1));
+  iloc_code_t *inst = iloc_create_inst(ILOC_OR, ILOC_OP_REG, get_reg_id($1->temp), ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, get_reg_id($$->temp));
   $$->code = iloc_append($1->code, $3->code);
   $$->code = iloc_append($$->code, inst);
 };
@@ -455,7 +433,7 @@ logical_and_expression: equality_expression { $$ = $1; }
   $$ = asd_new_binary("&", $1, $3);
   $$->type = TYPE_INT;
   $$->temp = iloc_new_reg();
-  iloc_code_t *inst = iloc_create_inst(ILOC_AND, ILOC_OP_REG, atoi($1->temp + 1), ILOC_OP_REG, atoi($3->temp + 1), ILOC_OP_REG, atoi($$->temp + 1));
+  iloc_code_t *inst = iloc_create_inst(ILOC_AND, ILOC_OP_REG, get_reg_id($1->temp), ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, get_reg_id($$->temp));
   $$->code = iloc_append($1->code, $3->code);
   $$->code = iloc_append($$->code, inst);
 };
@@ -465,7 +443,7 @@ equality_expression: relational_expression { $$ = $1; }
   $$ = asd_new_binary("==", $1, $3);
   $$->type = TYPE_INT;
   $$->temp = iloc_new_reg();
-  iloc_code_t *inst = iloc_create_inst(ILOC_CMP_EQ, ILOC_OP_REG, atoi($1->temp + 1), ILOC_OP_REG, atoi($3->temp + 1), ILOC_OP_REG, atoi($$->temp + 1));
+  iloc_code_t *inst = iloc_create_inst(ILOC_CMP_EQ, ILOC_OP_REG, get_reg_id($1->temp), ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, get_reg_id($$->temp));
   $$->code = iloc_append($1->code, $3->code);
   $$->code = iloc_append($$->code, inst);
 }
@@ -473,7 +451,7 @@ equality_expression: relational_expression { $$ = $1; }
   $$ = asd_new_binary("!=", $1, $3);
   $$->type = TYPE_INT;
   $$->temp = iloc_new_reg();
-  iloc_code_t *inst = iloc_create_inst(ILOC_CMP_NE, ILOC_OP_REG, atoi($1->temp + 1), ILOC_OP_REG, atoi($3->temp + 1), ILOC_OP_REG, atoi($$->temp + 1));
+  iloc_code_t *inst = iloc_create_inst(ILOC_CMP_NE, ILOC_OP_REG, get_reg_id($1->temp), ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, get_reg_id($$->temp));
   $$->code = iloc_append($1->code, $3->code);
   $$->code = iloc_append($$->code, inst);
 };
@@ -483,7 +461,7 @@ relational_expression: additive_expression { $$ = $1; }
   $$ = asd_new_binary("<", $1, $3);
   $$->type = TYPE_INT;
   $$->temp = iloc_new_reg();
-  iloc_code_t *inst = iloc_create_inst(ILOC_CMP_LT, ILOC_OP_REG, atoi($1->temp + 1), ILOC_OP_REG, atoi($3->temp + 1), ILOC_OP_REG, atoi($$->temp + 1));
+  iloc_code_t *inst = iloc_create_inst(ILOC_CMP_LT, ILOC_OP_REG, get_reg_id($1->temp), ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, get_reg_id($$->temp));
   $$->code = iloc_append($1->code, $3->code);
   $$->code = iloc_append($$->code, inst);
 }
@@ -491,7 +469,7 @@ relational_expression: additive_expression { $$ = $1; }
   $$ = asd_new_binary(">", $1, $3);
   $$->type = TYPE_INT;
   $$->temp = iloc_new_reg();
-  iloc_code_t *inst = iloc_create_inst(ILOC_CMP_GT, ILOC_OP_REG, atoi($1->temp + 1), ILOC_OP_REG, atoi($3->temp + 1), ILOC_OP_REG, atoi($$->temp + 1));
+  iloc_code_t *inst = iloc_create_inst(ILOC_CMP_GT, ILOC_OP_REG, get_reg_id($1->temp), ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, get_reg_id($$->temp));
   $$->code = iloc_append($1->code, $3->code);
   $$->code = iloc_append($$->code, inst);
 }
@@ -499,7 +477,7 @@ relational_expression: additive_expression { $$ = $1; }
   $$ = asd_new_binary("<=", $1, $3);
   $$->type = TYPE_INT;
   $$->temp = iloc_new_reg();
-  iloc_code_t *inst = iloc_create_inst(ILOC_CMP_LE, ILOC_OP_REG, atoi($1->temp + 1), ILOC_OP_REG, atoi($3->temp + 1), ILOC_OP_REG, atoi($$->temp + 1));
+  iloc_code_t *inst = iloc_create_inst(ILOC_CMP_LE, ILOC_OP_REG, get_reg_id($1->temp), ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, get_reg_id($$->temp));
   $$->code = iloc_append($1->code, $3->code);
   $$->code = iloc_append($$->code, inst);
 }
@@ -507,7 +485,7 @@ relational_expression: additive_expression { $$ = $1; }
   $$ = asd_new_binary(">=", $1, $3);
   $$->type = TYPE_INT;
   $$->temp = iloc_new_reg();
-  iloc_code_t *inst = iloc_create_inst(ILOC_CMP_GE, ILOC_OP_REG, atoi($1->temp + 1), ILOC_OP_REG, atoi($3->temp + 1), ILOC_OP_REG, atoi($$->temp + 1));
+  iloc_code_t *inst = iloc_create_inst(ILOC_CMP_GE, ILOC_OP_REG, get_reg_id($1->temp), ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, get_reg_id($$->temp));
   $$->code = iloc_append($1->code, $3->code);
   $$->code = iloc_append($$->code, inst);
 };
@@ -519,7 +497,7 @@ additive_expression: multiplicative_expression { $$ = $1; }
   else semantic_error(30, yylineno, "Type mismatch add");
   
   $$->temp = iloc_new_reg();
-  iloc_code_t *inst = iloc_create_inst(ILOC_ADD, ILOC_OP_REG, atoi($1->temp + 1), ILOC_OP_REG, atoi($3->temp + 1), ILOC_OP_REG, atoi($$->temp + 1));
+  iloc_code_t *inst = iloc_create_inst(ILOC_ADD, ILOC_OP_REG, get_reg_id($1->temp), ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, get_reg_id($$->temp));
   $$->code = iloc_append($1->code, $3->code);
   $$->code = iloc_append($$->code, inst);
 }
@@ -529,7 +507,7 @@ additive_expression: multiplicative_expression { $$ = $1; }
   else semantic_error(30, yylineno, "Type mismatch sub");
   
   $$->temp = iloc_new_reg();
-  iloc_code_t *inst = iloc_create_inst(ILOC_SUB, ILOC_OP_REG, atoi($1->temp + 1), ILOC_OP_REG, atoi($3->temp + 1), ILOC_OP_REG, atoi($$->temp + 1));
+  iloc_code_t *inst = iloc_create_inst(ILOC_SUB, ILOC_OP_REG, get_reg_id($1->temp), ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, get_reg_id($$->temp));
   $$->code = iloc_append($1->code, $3->code);
   $$->code = iloc_append($$->code, inst);
 };
@@ -541,7 +519,7 @@ multiplicative_expression: unary_expression { $$ = $1; }
   else semantic_error(30, yylineno, "Type mismatch mult");
   
   $$->temp = iloc_new_reg();
-  iloc_code_t *inst = iloc_create_inst(ILOC_MULT, ILOC_OP_REG, atoi($1->temp + 1), ILOC_OP_REG, atoi($3->temp + 1), ILOC_OP_REG, atoi($$->temp + 1));
+  iloc_code_t *inst = iloc_create_inst(ILOC_MULT, ILOC_OP_REG, get_reg_id($1->temp), ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, get_reg_id($$->temp));
   $$->code = iloc_append($1->code, $3->code);
   $$->code = iloc_append($$->code, inst);
 }
@@ -551,7 +529,7 @@ multiplicative_expression: unary_expression { $$ = $1; }
   else semantic_error(30, yylineno, "Type mismatch div");
   
   $$->temp = iloc_new_reg();
-  iloc_code_t *inst = iloc_create_inst(ILOC_DIV, ILOC_OP_REG, atoi($1->temp + 1), ILOC_OP_REG, atoi($3->temp + 1), ILOC_OP_REG, atoi($$->temp + 1));
+  iloc_code_t *inst = iloc_create_inst(ILOC_DIV, ILOC_OP_REG, get_reg_id($1->temp), ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, get_reg_id($$->temp));
   $$->code = iloc_append($1->code, $3->code);
   $$->code = iloc_append($$->code, inst);
 }
@@ -580,34 +558,45 @@ unary_expression: primary_expression { $$ = $1; }
   $$ = asd_new_unary("-", $2);
   $$->type = $2->type;
   $$->temp = iloc_new_reg();
-  iloc_code_t *inst = iloc_create_inst(ILOC_RSUBI, ILOC_OP_REG, atoi($2->temp + 1), ILOC_OP_INT, 0, ILOC_OP_REG, atoi($$->temp + 1));
+  iloc_code_t *inst = iloc_create_inst(ILOC_RSUBI, ILOC_OP_REG, get_reg_id($2->temp), ILOC_OP_INT, 0, ILOC_OP_REG, get_reg_id($$->temp));
   $$->code = iloc_append($2->code, inst);
 };
 
 primary_expression: TK_ID {
-  $$ = asd_new_node_from_value(&$1);
+  // CORREÇÃO CRÍTICA: Buscar na tabela ANTES de consumir $1.value
   symbol_entry_t *entry = scope_lookup(scope_stack_pointer, $1.value);
   if (entry == NULL) semantic_error(10, $1.line_number, $1.value);
   if (entry->nature != SYMBOL_VARIABLE) semantic_error(20, $1.line_number, $1.value);
   
-  $$->type = entry->data_type;
+  // Salvar dados importantes antes de consumir o token
+  data_type_t type = entry->data_type;
+  int offset = entry->offset;
+  int is_global = entry->is_global;
+
+  // Agora consome o token e libera memória
+  $$ = asd_new_node_from_value(&$1);
+  $$->type = type;
 
   $$->temp = iloc_new_reg();
-  int base_reg = -1; // rfp
-  iloc_code_t *load = iloc_create_inst(ILOC_LOADAI, ILOC_OP_REG, base_reg, ILOC_OP_INT, entry->offset, ILOC_OP_REG, atoi($$->temp + 1));
+  // Se for global -> rbss (-2), se local -> rfp (-1)
+  int base_reg = is_global ? -2 : -1;
+  
+  iloc_code_t *load = iloc_create_inst(ILOC_LOADAI, ILOC_OP_REG, base_reg, ILOC_OP_INT, offset, ILOC_OP_REG, get_reg_id($$->temp));
   $$->code = load;
 }
 | TK_LI_INTEIRO {
+  int val = atoi($1.value);
   $$ = asd_new_node_from_value(&$1);
   $$->type = TYPE_INT;
   $$->temp = iloc_new_reg();
-  $$->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, atoi($1.value), 0,0, ILOC_OP_REG, atoi($$->temp + 1));
+  $$->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, 0,0, ILOC_OP_REG, get_reg_id($$->temp));
 }
 | TK_LI_DECIMAL {
+  int val = (int)atof($1.value);
   $$ = asd_new_node_from_value(&$1);
   $$->type = TYPE_FLOAT;
   $$->temp = iloc_new_reg();
-  $$->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, (int)atof($1.value), 0,0, ILOC_OP_REG, atoi($$->temp + 1));
+  $$->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, 0,0, ILOC_OP_REG, get_reg_id($$->temp));
 }
 | '(' expression ')' { $$ = $2; }
 | function_call { $$ = $1; };

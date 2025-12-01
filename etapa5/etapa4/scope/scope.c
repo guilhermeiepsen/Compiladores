@@ -75,13 +75,13 @@ symbol_entry_t *symtab_insert(symbol_table_t *table,
   e->lexical.value = lexical_opt && lexical_opt->value ? strdup(lexical_opt->value) : NULL;
   
   // E5: Lógica de Cálculo de Endereço (Offset)
-  // Apenas variáveis ocupam espaço endereçável na pilha/segmento de dados
   if (nature == SYMBOL_VARIABLE) {
       e->offset = table->current_offset;
-      table->current_offset += 4; // Incrementa 4 bytes (tamanho de int/float)
+      table->current_offset += 4; 
   } else {
-      e->offset = -1; // Valor indicativo que não tem endereço de memória
+      e->offset = -1;
   }
+  e->is_global = 0; // Padrão, será atualizado pelo wrapper
 
   e->next = table->head;
   table->head = e;
@@ -145,7 +145,13 @@ symbol_entry_t *scope_insert_current(scope_stack_t *stack,
                                      const lexical_value_t *lexical_opt) {
   scope_t *cur = scope_current(stack);
   if (!cur) return NULL;
-  return symtab_insert(cur->table, key, nature, data_type, lexical_opt);
+  symbol_entry_t *entry = symtab_insert(cur->table, key, nature, data_type, lexical_opt);
+  
+  // E5: Define se é global
+  if (entry) {
+      entry->is_global = (cur->kind == SCOPE_GLOBAL);
+  }
+  return entry;
 }
 
 /* ----------------- logging ----------------- */
@@ -193,8 +199,9 @@ static void symtab_print_with_header(FILE *out, scope_t *sc, const char *header)
   if (!sc || !sc->table) return;
   fprintf(out, "===== %s SCOPE [%s] =====\n", header, scope_kind_str(sc->kind));
   for (symbol_entry_t *e = sc->table->head; e; e = e->next) {
-    fprintf(out, "- %s: key='%s' type=%s offset=%d", nature_str(e->nature), e->key ? e->key : "",
-            dtype_str(e->data_type), e->offset);
+    fprintf(out, "- %s: key='%s' type=%s offset=%d global=%d", 
+            nature_str(e->nature), e->key ? e->key : "",
+            dtype_str(e->data_type), e->offset, e->is_global);
     if (e->nature == SYMBOL_FUNCTION) {
       fprintf(out, " args=");
       print_args_list(out, e->args);

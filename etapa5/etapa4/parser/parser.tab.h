@@ -45,7 +45,7 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 24 "parser/parser.y"
+#line 37 "parser/parser.y"
 
  #include "asd.h"
  #include "lexical_value.h"
@@ -90,7 +90,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 32 "parser/parser.y"
+#line 45 "parser/parser.y"
 
  asd_tree_t *node;
  lexical_value_t lexical_value;

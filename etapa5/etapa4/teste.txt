@@ -1,7 +1,5 @@
+var b := inteiro,   // Declaração Global (separada por vírgula)
+
 main -> inteiro := [
-var a := inteiro com 10
-var b := inteiro com 20
-var c := inteiro
-c := a + b
-retorna c := inteiro
+  b := 2            // Uso Global
 ];
