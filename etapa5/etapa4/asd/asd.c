@@ -11,7 +11,11 @@ asd_tree_t *asd_new(const char *label)
     ret->label = strdup(label);
     ret->number_of_children = 0;
     ret->children = NULL;
-    ret->type = TYPE_UNDEFINED; // Default type
+    ret->type = TYPE_UNDEFINED; // E4 Default type
+    
+    // E5 Initialization
+    ret->code = NULL;
+    ret->temp = NULL;
   }
   return ret;
 }
@@ -25,6 +29,13 @@ void asd_free(asd_tree_t *tree)
     }
     free(tree->children);
     free(tree->label);
+    
+    // E5 Cleanup
+    if (tree->temp) free(tree->temp);
+    // Note: tree->code is a linked list often shared/concatenated. 
+    // Usually we don't free it here to avoid double-freeing if the list structure is complex,
+    // but if you want strict cleanup, you'd need a function to free the ILOC list.
+    
     free(tree);
   }else{
     printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
@@ -38,7 +49,7 @@ void asd_add_child(asd_tree_t *tree, asd_tree_t *child)
     tree->children = realloc(tree->children, tree->number_of_children * sizeof(asd_tree_t*));
     tree->children[tree->number_of_children-1] = child;
   }else{
-    printf("Erro: %s recebeu parâmetro tree = %p / %p.\n", __FUNCTION__, tree, child);
+    // printf("Erro: %s recebeu parâmetro tree = %p / %p.\n", __FUNCTION__, tree, child);
   }
 }
 
@@ -84,7 +95,10 @@ asd_tree_t *asd_new_node_from_value(lexical_value_t *value)
 {
   if (value == NULL || value->value == NULL) return NULL;
   asd_tree_t *node = asd_new(value->value);
-  free(value->value);
+  // Note: we don't free value->value here anymore if it's used elsewhere (like symbol table)
+  // But based on your previous code, you were freeing it. 
+  // Let's keep strictly to AST logic: copy label, free source if ownership is transferred.
+  free(value->value); 
   value->value = NULL;
   return node;
 }
@@ -120,8 +134,6 @@ static void _asd_print (FILE *foutput, asd_tree_t *tree, int profundidade)
     for (i = 0; i < tree->number_of_children; i++){
       _asd_print(foutput, tree->children[i], profundidade+1);
     }
-  }else{
-    printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
   }
 }
 
@@ -130,8 +142,6 @@ void asd_print(asd_tree_t *tree)
   FILE *foutput = stderr;
   if (tree != NULL){
     _asd_print(foutput, tree, 0);
-  }else{
-    printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
   }
 }
 
@@ -144,8 +154,6 @@ static void _asd_print_graphviz (FILE *foutput, asd_tree_t *tree)
       fprintf(foutput, "  %ld -> %ld;\n", (long)tree, (long)tree->children[i]);
       _asd_print_graphviz(foutput, tree->children[i]);
     }
-  }else{
-    printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
   }
 }
 
@@ -156,7 +164,5 @@ void asd_print_graphviz(asd_tree_t *tree)
     fprintf(foutput, "digraph grafo {\n");
     _asd_print_graphviz(foutput, tree);
     fprintf(foutput, "}\n");
-  }else{
-    printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
   }
 }

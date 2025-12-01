@@ -1,0 +1,1746 @@
+Terminals unused in grammar
+
+    TK_TIPO
+    TK_ER
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: global_escope_init list global_escope_end ';'
+
+    2 global_escope_init: ε
+
+    3 global_escope_end: ε
+
+    4 list: element
+    5     | element ',' list
+
+    6 element: function_definition
+    7        | variable_declaration
+
+    8 $@1: ε
+
+    9 function_definition: header $@1 body
+
+   10 header: TK_ID TK_SETA var_type optional_parameter_list TK_ATRIB
+
+   11 var_type: TK_DECIMAL
+   12         | TK_INTEIRO
+
+   13 optional_parameter_list: ε
+   14                        | TK_COM parameter_list
+   15                        | parameter_list
+
+   16 parameter_list: parameter
+   17               | parameter_list ',' parameter
+
+   18 parameter: TK_ID TK_ATRIB var_type
+
+   19 body: command_block
+
+   20 command_block: block_scope_init command_sequence ']'
+   21              | block_scope_init ']'
+
+   22 block_scope_init: '['
+
+   23 command_sequence: simple_command
+   24                 | simple_command command_sequence
+
+   25 simple_command: variable_declaration_with_instantiation
+   26               | function_call
+   27               | attribution_command
+   28               | return_command
+   29               | flow_control_command
+   30               | command_block
+
+   31 variable_declaration: TK_VAR TK_ID TK_ATRIB var_type
+
+   32 variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional_instantiation
+
+   33 optional_instantiation: TK_COM literal
+   34                       | ε
+
+   35 literal: TK_LI_INTEIRO
+   36        | TK_LI_DECIMAL
+
+   37 attribution_command: TK_ID TK_ATRIB expression
+
+   38 function_call: TK_ID '(' args ')'
+
+   39 args: expression
+   40     | expression ',' args
+   41     | ε
+
+   42 return_command: TK_RETORNA expression TK_ATRIB var_type
+
+   43 flow_control_command: conditional_struct
+   44                     | iterative_struct
+
+   45 conditional_struct: TK_SE '(' expression ')' command_block else_block
+
+   46 else_block: TK_SENAO command_block
+   47           | ε
+
+   48 iterative_struct: TK_ENQUANTO '(' expression ')' command_block
+
+   49 expression: logical_or_expression
+
+   50 logical_or_expression: logical_and_expression
+   51                      | logical_or_expression '|' logical_and_expression
+
+   52 logical_and_expression: equality_expression
+   53                       | logical_and_expression '&' equality_expression
+
+   54 equality_expression: relational_expression
+   55                    | equality_expression TK_OC_EQ relational_expression
+   56                    | equality_expression TK_OC_NE relational_expression
+
+   57 relational_expression: additive_expression
+   58                      | relational_expression '<' additive_expression
+   59                      | relational_expression '>' additive_expression
+   60                      | relational_expression TK_OC_LE additive_expression
+   61                      | relational_expression TK_OC_GE additive_expression
+
+   62 additive_expression: multiplicative_expression
+   63                    | additive_expression '+' multiplicative_expression
+   64                    | additive_expression '-' multiplicative_expression
+
+   65 multiplicative_expression: unary_expression
+   66                          | multiplicative_expression '*' unary_expression
+   67                          | multiplicative_expression '/' unary_expression
+   68                          | multiplicative_expression '%' unary_expression
+
+   69 unary_expression: primary_expression
+   70                 | '!' unary_expression
+   71                 | '+' unary_expression
+   72                 | '-' unary_expression
+
+   73 primary_expression: TK_ID
+   74                   | TK_LI_INTEIRO
+   75                   | TK_LI_DECIMAL
+   76                   | '(' expression ')'
+   77                   | function_call
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    '!' (33) 70
+    '%' (37) 68
+    '&' (38) 53
+    '(' (40) 38 45 48 76
+    ')' (41) 38 45 48 76
+    '*' (42) 66
+    '+' (43) 63 71
+    ',' (44) 5 17 40
+    '-' (45) 64 72
+    '/' (47) 67
+    ';' (59) 1
+    '<' (60) 58
+    '>' (62) 59
+    '[' (91) 22
+    ']' (93) 20 21
+    '|' (124) 51
+    error (256)
+    TK_TIPO (258)
+    TK_VAR (259) 31 32
+    TK_SENAO (260) 46
+    TK_DECIMAL (261) 11
+    TK_SE (262) 45
+    TK_INTEIRO (263) 12
+    TK_ATRIB (264) 10 18 31 32 37 42
+    TK_RETORNA (265) 42
+    TK_SETA (266) 10
+    TK_ENQUANTO (267) 48
+    TK_COM (268) 14 33
+    TK_OC_LE (269) 60
+    TK_OC_GE (270) 61
+    TK_OC_EQ (271) 55
+    TK_OC_NE (272) 56
+    TK_ID <lexical_value> (273) 10 18 31 32 37 38 73
+    TK_LI_INTEIRO <lexical_value> (274) 35 74
+    TK_LI_DECIMAL <lexical_value> (275) 36 75
+    TK_ER <lexical_value> (276)
+
+
+Nonterminals, with rules where they appear
+
+    $accept (38)
+        on left: 0
+    program <node> (39)
+        on left: 1
+        on right: 0
+    global_escope_init <node> (40)
+        on left: 2
+        on right: 1
+    global_escope_end <node> (41)
+        on left: 3
+        on right: 1
+    list <node> (42)
+        on left: 4 5
+        on right: 1 5
+    element <node> (43)
+        on left: 6 7
+        on right: 4 5
+    function_definition <node> (44)
+        on left: 9
+        on right: 6
+    $@1 (45)
+        on left: 8
+        on right: 9
+    header <symbol> (46)
+        on left: 10
+        on right: 9
+    var_type <data_type> (47)
+        on left: 11 12
+        on right: 10 18 31 32 42
+    optional_parameter_list <arg_list> (48)
+        on left: 13 14 15
+        on right: 10
+    parameter_list <arg_list> (49)
+        on left: 16 17
+        on right: 14 15 17
+    parameter <arg_list> (50)
+        on left: 18
+        on right: 16 17
+    body <node> (51)
+        on left: 19
+        on right: 9
+    command_block <node> (52)
+        on left: 20 21
+        on right: 19 30 45 46 48
+    block_scope_init <node> (53)
+        on left: 22
+        on right: 20 21
+    command_sequence <node> (54)
+        on left: 23 24
+        on right: 20 24
+    simple_command <node> (55)
+        on left: 25 26 27 28 29 30
+        on right: 23 24
+    variable_declaration <node> (56)
+        on left: 31
+        on right: 7
+    variable_declaration_with_instantiation <node> (57)
+        on left: 32
+        on right: 25
+    optional_instantiation <node> (58)
+        on left: 33 34
+        on right: 32
+    literal <node> (59)
+        on left: 35 36
+        on right: 33
+    attribution_command <node> (60)
+        on left: 37
+        on right: 27
+    function_call <node> (61)
+        on left: 38
+        on right: 26 77
+    args <node> (62)
+        on left: 39 40 41
+        on right: 38 40
+    return_command <node> (63)
+        on left: 42
+        on right: 28
+    flow_control_command <node> (64)
+        on left: 43 44
+        on right: 29
+    conditional_struct <node> (65)
+        on left: 45
+        on right: 43
+    else_block <node> (66)
+        on left: 46 47
+        on right: 45
+    iterative_struct <node> (67)
+        on left: 48
+        on right: 44
+    expression <node> (68)
+        on left: 49
+        on right: 37 39 40 42 45 48 76
+    logical_or_expression <node> (69)
+        on left: 50 51
+        on right: 49 51
+    logical_and_expression <node> (70)
+        on left: 52 53
+        on right: 50 51 53
+    equality_expression <node> (71)
+        on left: 54 55 56
+        on right: 52 53 55 56
+    relational_expression <node> (72)
+        on left: 57 58 59 60 61
+        on right: 54 55 56 58 59 60 61
+    additive_expression <node> (73)
+        on left: 62 63 64
+        on right: 57 58 59 60 61 63 64
+    multiplicative_expression <node> (74)
+        on left: 65 66 67 68
+        on right: 62 63 64 66 67 68
+    unary_expression <node> (75)
+        on left: 69 70 71 72
+        on right: 65 66 67 68 70 71 72
+    primary_expression <node> (76)
+        on left: 73 74 75 76 77
+        on right: 69
+
+
+State 0
+
+    0 $accept: • program $end
+
+    $default  reduce using rule 2 (global_escope_init)
+
+    program             go to state 1
+    global_escope_init  go to state 2
+
+
+State 1
+
+    0 $accept: program • $end
+
+    $end  shift, and go to state 3
+
+
+State 2
+
+    1 program: global_escope_init • list global_escope_end ';'
+
+    TK_VAR  shift, and go to state 4
+    TK_ID   shift, and go to state 5
+
+    list                  go to state 6
+    element               go to state 7
+    function_definition   go to state 8
+    header                go to state 9
+    variable_declaration  go to state 10
+
+
+State 3
+
+    0 $accept: program $end •
+
+    $default  accept
+
+
+State 4
+
+   31 variable_declaration: TK_VAR • TK_ID TK_ATRIB var_type
+
+    TK_ID  shift, and go to state 11
+
+
+State 5
+
+   10 header: TK_ID • TK_SETA var_type optional_parameter_list TK_ATRIB
+
+    TK_SETA  shift, and go to state 12
+
+
+State 6
+
+    1 program: global_escope_init list • global_escope_end ';'
+
+    $default  reduce using rule 3 (global_escope_end)
+
+    global_escope_end  go to state 13
+
+
+State 7
+
+    4 list: element •
+    5     | element • ',' list
+
+    ','  shift, and go to state 14
+
+    $default  reduce using rule 4 (list)
+
+
+State 8
+
+    6 element: function_definition •
+
+    $default  reduce using rule 6 (element)
+
+
+State 9
+
+    9 function_definition: header • $@1 body
+
+    $default  reduce using rule 8 ($@1)
+
+    $@1  go to state 15
+
+
+State 10
+
+    7 element: variable_declaration •
+
+    $default  reduce using rule 7 (element)
+
+
+State 11
+
+   31 variable_declaration: TK_VAR TK_ID • TK_ATRIB var_type
+
+    TK_ATRIB  shift, and go to state 16
+
+
+State 12
+
+   10 header: TK_ID TK_SETA • var_type optional_parameter_list TK_ATRIB
+
+    TK_DECIMAL  shift, and go to state 17
+    TK_INTEIRO  shift, and go to state 18
+
+    var_type  go to state 19
+
+
+State 13
+
+    1 program: global_escope_init list global_escope_end • ';'
+
+    ';'  shift, and go to state 20
+
+
+State 14
+
+    5 list: element ',' • list
+
+    TK_VAR  shift, and go to state 4
+    TK_ID   shift, and go to state 5
+
+    list                  go to state 21
+    element               go to state 7
+    function_definition   go to state 8
+    header                go to state 9
+    variable_declaration  go to state 10
+
+
+State 15
+
+    9 function_definition: header $@1 • body
+
+    '['  shift, and go to state 22
+
+    body              go to state 23
+    command_block     go to state 24
+    block_scope_init  go to state 25
+
+
+State 16
+
+   31 variable_declaration: TK_VAR TK_ID TK_ATRIB • var_type
+
+    TK_DECIMAL  shift, and go to state 17
+    TK_INTEIRO  shift, and go to state 18
+
+    var_type  go to state 26
+
+
+State 17
+
+   11 var_type: TK_DECIMAL •
+
+    $default  reduce using rule 11 (var_type)
+
+
+State 18
+
+   12 var_type: TK_INTEIRO •
+
+    $default  reduce using rule 12 (var_type)
+
+
+State 19
+
+   10 header: TK_ID TK_SETA var_type • optional_parameter_list TK_ATRIB
+
+    TK_COM  shift, and go to state 27
+    TK_ID   shift, and go to state 28
+
+    $default  reduce using rule 13 (optional_parameter_list)
+
+    optional_parameter_list  go to state 29
+    parameter_list           go to state 30
+    parameter                go to state 31
+
+
+State 20
+
+    1 program: global_escope_init list global_escope_end ';' •
+
+    $default  reduce using rule 1 (program)
+
+
+State 21
+
+    5 list: element ',' list •
+
+    $default  reduce using rule 5 (list)
+
+
+State 22
+
+   22 block_scope_init: '[' •
+
+    $default  reduce using rule 22 (block_scope_init)
+
+
+State 23
+
+    9 function_definition: header $@1 body •
+
+    $default  reduce using rule 9 (function_definition)
+
+
+State 24
+
+   19 body: command_block •
+
+    $default  reduce using rule 19 (body)
+
+
+State 25
+
+   20 command_block: block_scope_init • command_sequence ']'
+   21              | block_scope_init • ']'
+
+    TK_VAR       shift, and go to state 32
+    TK_SE        shift, and go to state 33
+    TK_RETORNA   shift, and go to state 34
+    TK_ENQUANTO  shift, and go to state 35
+    TK_ID        shift, and go to state 36
+    ']'          shift, and go to state 37
+    '['          shift, and go to state 22
+
+    command_block                            go to state 38
+    block_scope_init                         go to state 25
+    command_sequence                         go to state 39
+    simple_command                           go to state 40
+    variable_declaration_with_instantiation  go to state 41
+    attribution_command                      go to state 42
+    function_call                            go to state 43
+    return_command                           go to state 44
+    flow_control_command                     go to state 45
+    conditional_struct                       go to state 46
+    iterative_struct                         go to state 47
+
+
+State 26
+
+   31 variable_declaration: TK_VAR TK_ID TK_ATRIB var_type •
+
+    $default  reduce using rule 31 (variable_declaration)
+
+
+State 27
+
+   14 optional_parameter_list: TK_COM • parameter_list
+
+    TK_ID  shift, and go to state 28
+
+    parameter_list  go to state 48
+    parameter       go to state 31
+
+
+State 28
+
+   18 parameter: TK_ID • TK_ATRIB var_type
+
+    TK_ATRIB  shift, and go to state 49
+
+
+State 29
+
+   10 header: TK_ID TK_SETA var_type optional_parameter_list • TK_ATRIB
+
+    TK_ATRIB  shift, and go to state 50
+
+
+State 30
+
+   15 optional_parameter_list: parameter_list •
+   17 parameter_list: parameter_list • ',' parameter
+
+    ','  shift, and go to state 51
+
+    $default  reduce using rule 15 (optional_parameter_list)
+
+
+State 31
+
+   16 parameter_list: parameter •
+
+    $default  reduce using rule 16 (parameter_list)
+
+
+State 32
+
+   32 variable_declaration_with_instantiation: TK_VAR • TK_ID TK_ATRIB var_type optional_instantiation
+
+    TK_ID  shift, and go to state 52
+
+
+State 33
+
+   45 conditional_struct: TK_SE • '(' expression ')' command_block else_block
+
+    '('  shift, and go to state 53
+
+
+State 34
+
+   42 return_command: TK_RETORNA • expression TK_ATRIB var_type
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call              go to state 61
+    expression                 go to state 62
+    logical_or_expression      go to state 63
+    logical_and_expression     go to state 64
+    equality_expression        go to state 65
+    relational_expression      go to state 66
+    additive_expression        go to state 67
+    multiplicative_expression  go to state 68
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 35
+
+   48 iterative_struct: TK_ENQUANTO • '(' expression ')' command_block
+
+    '('  shift, and go to state 71
+
+
+State 36
+
+   37 attribution_command: TK_ID • TK_ATRIB expression
+   38 function_call: TK_ID • '(' args ')'
+
+    TK_ATRIB  shift, and go to state 72
+    '('       shift, and go to state 73
+
+
+State 37
+
+   21 command_block: block_scope_init ']' •
+
+    $default  reduce using rule 21 (command_block)
+
+
+State 38
+
+   30 simple_command: command_block •
+
+    $default  reduce using rule 30 (simple_command)
+
+
+State 39
+
+   20 command_block: block_scope_init command_sequence • ']'
+
+    ']'  shift, and go to state 74
+
+
+State 40
+
+   23 command_sequence: simple_command •
+   24                 | simple_command • command_sequence
+
+    TK_VAR       shift, and go to state 32
+    TK_SE        shift, and go to state 33
+    TK_RETORNA   shift, and go to state 34
+    TK_ENQUANTO  shift, and go to state 35
+    TK_ID        shift, and go to state 36
+    '['          shift, and go to state 22
+
+    $default  reduce using rule 23 (command_sequence)
+
+    command_block                            go to state 38
+    block_scope_init                         go to state 25
+    command_sequence                         go to state 75
+    simple_command                           go to state 40
+    variable_declaration_with_instantiation  go to state 41
+    attribution_command                      go to state 42
+    function_call                            go to state 43
+    return_command                           go to state 44
+    flow_control_command                     go to state 45
+    conditional_struct                       go to state 46
+    iterative_struct                         go to state 47
+
+
+State 41
+
+   25 simple_command: variable_declaration_with_instantiation •
+
+    $default  reduce using rule 25 (simple_command)
+
+
+State 42
+
+   27 simple_command: attribution_command •
+
+    $default  reduce using rule 27 (simple_command)
+
+
+State 43
+
+   26 simple_command: function_call •
+
+    $default  reduce using rule 26 (simple_command)
+
+
+State 44
+
+   28 simple_command: return_command •
+
+    $default  reduce using rule 28 (simple_command)
+
+
+State 45
+
+   29 simple_command: flow_control_command •
+
+    $default  reduce using rule 29 (simple_command)
+
+
+State 46
+
+   43 flow_control_command: conditional_struct •
+
+    $default  reduce using rule 43 (flow_control_command)
+
+
+State 47
+
+   44 flow_control_command: iterative_struct •
+
+    $default  reduce using rule 44 (flow_control_command)
+
+
+State 48
+
+   14 optional_parameter_list: TK_COM parameter_list •
+   17 parameter_list: parameter_list • ',' parameter
+
+    ','  shift, and go to state 51
+
+    $default  reduce using rule 14 (optional_parameter_list)
+
+
+State 49
+
+   18 parameter: TK_ID TK_ATRIB • var_type
+
+    TK_DECIMAL  shift, and go to state 17
+    TK_INTEIRO  shift, and go to state 18
+
+    var_type  go to state 76
+
+
+State 50
+
+   10 header: TK_ID TK_SETA var_type optional_parameter_list TK_ATRIB •
+
+    $default  reduce using rule 10 (header)
+
+
+State 51
+
+   17 parameter_list: parameter_list ',' • parameter
+
+    TK_ID  shift, and go to state 28
+
+    parameter  go to state 77
+
+
+State 52
+
+   32 variable_declaration_with_instantiation: TK_VAR TK_ID • TK_ATRIB var_type optional_instantiation
+
+    TK_ATRIB  shift, and go to state 78
+
+
+State 53
+
+   45 conditional_struct: TK_SE '(' • expression ')' command_block else_block
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call              go to state 61
+    expression                 go to state 79
+    logical_or_expression      go to state 63
+    logical_and_expression     go to state 64
+    equality_expression        go to state 65
+    relational_expression      go to state 66
+    additive_expression        go to state 67
+    multiplicative_expression  go to state 68
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 54
+
+   38 function_call: TK_ID • '(' args ')'
+   73 primary_expression: TK_ID •
+
+    '('  shift, and go to state 73
+
+    $default  reduce using rule 73 (primary_expression)
+
+
+State 55
+
+   74 primary_expression: TK_LI_INTEIRO •
+
+    $default  reduce using rule 74 (primary_expression)
+
+
+State 56
+
+   75 primary_expression: TK_LI_DECIMAL •
+
+    $default  reduce using rule 75 (primary_expression)
+
+
+State 57
+
+   76 primary_expression: '(' • expression ')'
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call              go to state 61
+    expression                 go to state 80
+    logical_or_expression      go to state 63
+    logical_and_expression     go to state 64
+    equality_expression        go to state 65
+    relational_expression      go to state 66
+    additive_expression        go to state 67
+    multiplicative_expression  go to state 68
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 58
+
+   71 unary_expression: '+' • unary_expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call       go to state 61
+    unary_expression    go to state 81
+    primary_expression  go to state 70
+
+
+State 59
+
+   72 unary_expression: '-' • unary_expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call       go to state 61
+    unary_expression    go to state 82
+    primary_expression  go to state 70
+
+
+State 60
+
+   70 unary_expression: '!' • unary_expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call       go to state 61
+    unary_expression    go to state 83
+    primary_expression  go to state 70
+
+
+State 61
+
+   77 primary_expression: function_call •
+
+    $default  reduce using rule 77 (primary_expression)
+
+
+State 62
+
+   42 return_command: TK_RETORNA expression • TK_ATRIB var_type
+
+    TK_ATRIB  shift, and go to state 84
+
+
+State 63
+
+   49 expression: logical_or_expression •
+   51 logical_or_expression: logical_or_expression • '|' logical_and_expression
+
+    '|'  shift, and go to state 85
+
+    $default  reduce using rule 49 (expression)
+
+
+State 64
+
+   50 logical_or_expression: logical_and_expression •
+   53 logical_and_expression: logical_and_expression • '&' equality_expression
+
+    '&'  shift, and go to state 86
+
+    $default  reduce using rule 50 (logical_or_expression)
+
+
+State 65
+
+   52 logical_and_expression: equality_expression •
+   55 equality_expression: equality_expression • TK_OC_EQ relational_expression
+   56                    | equality_expression • TK_OC_NE relational_expression
+
+    TK_OC_EQ  shift, and go to state 87
+    TK_OC_NE  shift, and go to state 88
+
+    $default  reduce using rule 52 (logical_and_expression)
+
+
+State 66
+
+   54 equality_expression: relational_expression •
+   58 relational_expression: relational_expression • '<' additive_expression
+   59                      | relational_expression • '>' additive_expression
+   60                      | relational_expression • TK_OC_LE additive_expression
+   61                      | relational_expression • TK_OC_GE additive_expression
+
+    TK_OC_LE  shift, and go to state 89
+    TK_OC_GE  shift, and go to state 90
+    '<'       shift, and go to state 91
+    '>'       shift, and go to state 92
+
+    $default  reduce using rule 54 (equality_expression)
+
+
+State 67
+
+   57 relational_expression: additive_expression •
+   63 additive_expression: additive_expression • '+' multiplicative_expression
+   64                    | additive_expression • '-' multiplicative_expression
+
+    '+'  shift, and go to state 93
+    '-'  shift, and go to state 94
+
+    $default  reduce using rule 57 (relational_expression)
+
+
+State 68
+
+   62 additive_expression: multiplicative_expression •
+   66 multiplicative_expression: multiplicative_expression • '*' unary_expression
+   67                          | multiplicative_expression • '/' unary_expression
+   68                          | multiplicative_expression • '%' unary_expression
+
+    '*'  shift, and go to state 95
+    '/'  shift, and go to state 96
+    '%'  shift, and go to state 97
+
+    $default  reduce using rule 62 (additive_expression)
+
+
+State 69
+
+   65 multiplicative_expression: unary_expression •
+
+    $default  reduce using rule 65 (multiplicative_expression)
+
+
+State 70
+
+   69 unary_expression: primary_expression •
+
+    $default  reduce using rule 69 (unary_expression)
+
+
+State 71
+
+   48 iterative_struct: TK_ENQUANTO '(' • expression ')' command_block
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call              go to state 61
+    expression                 go to state 98
+    logical_or_expression      go to state 63
+    logical_and_expression     go to state 64
+    equality_expression        go to state 65
+    relational_expression      go to state 66
+    additive_expression        go to state 67
+    multiplicative_expression  go to state 68
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 72
+
+   37 attribution_command: TK_ID TK_ATRIB • expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call              go to state 61
+    expression                 go to state 99
+    logical_or_expression      go to state 63
+    logical_and_expression     go to state 64
+    equality_expression        go to state 65
+    relational_expression      go to state 66
+    additive_expression        go to state 67
+    multiplicative_expression  go to state 68
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 73
+
+   38 function_call: TK_ID '(' • args ')'
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    $default  reduce using rule 41 (args)
+
+    function_call              go to state 61
+    args                       go to state 100
+    expression                 go to state 101
+    logical_or_expression      go to state 63
+    logical_and_expression     go to state 64
+    equality_expression        go to state 65
+    relational_expression      go to state 66
+    additive_expression        go to state 67
+    multiplicative_expression  go to state 68
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 74
+
+   20 command_block: block_scope_init command_sequence ']' •
+
+    $default  reduce using rule 20 (command_block)
+
+
+State 75
+
+   24 command_sequence: simple_command command_sequence •
+
+    $default  reduce using rule 24 (command_sequence)
+
+
+State 76
+
+   18 parameter: TK_ID TK_ATRIB var_type •
+
+    $default  reduce using rule 18 (parameter)
+
+
+State 77
+
+   17 parameter_list: parameter_list ',' parameter •
+
+    $default  reduce using rule 17 (parameter_list)
+
+
+State 78
+
+   32 variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB • var_type optional_instantiation
+
+    TK_DECIMAL  shift, and go to state 17
+    TK_INTEIRO  shift, and go to state 18
+
+    var_type  go to state 102
+
+
+State 79
+
+   45 conditional_struct: TK_SE '(' expression • ')' command_block else_block
+
+    ')'  shift, and go to state 103
+
+
+State 80
+
+   76 primary_expression: '(' expression • ')'
+
+    ')'  shift, and go to state 104
+
+
+State 81
+
+   71 unary_expression: '+' unary_expression •
+
+    $default  reduce using rule 71 (unary_expression)
+
+
+State 82
+
+   72 unary_expression: '-' unary_expression •
+
+    $default  reduce using rule 72 (unary_expression)
+
+
+State 83
+
+   70 unary_expression: '!' unary_expression •
+
+    $default  reduce using rule 70 (unary_expression)
+
+
+State 84
+
+   42 return_command: TK_RETORNA expression TK_ATRIB • var_type
+
+    TK_DECIMAL  shift, and go to state 17
+    TK_INTEIRO  shift, and go to state 18
+
+    var_type  go to state 105
+
+
+State 85
+
+   51 logical_or_expression: logical_or_expression '|' • logical_and_expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call              go to state 61
+    logical_and_expression     go to state 106
+    equality_expression        go to state 65
+    relational_expression      go to state 66
+    additive_expression        go to state 67
+    multiplicative_expression  go to state 68
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 86
+
+   53 logical_and_expression: logical_and_expression '&' • equality_expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call              go to state 61
+    equality_expression        go to state 107
+    relational_expression      go to state 66
+    additive_expression        go to state 67
+    multiplicative_expression  go to state 68
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 87
+
+   55 equality_expression: equality_expression TK_OC_EQ • relational_expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call              go to state 61
+    relational_expression      go to state 108
+    additive_expression        go to state 67
+    multiplicative_expression  go to state 68
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 88
+
+   56 equality_expression: equality_expression TK_OC_NE • relational_expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call              go to state 61
+    relational_expression      go to state 109
+    additive_expression        go to state 67
+    multiplicative_expression  go to state 68
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 89
+
+   60 relational_expression: relational_expression TK_OC_LE • additive_expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call              go to state 61
+    additive_expression        go to state 110
+    multiplicative_expression  go to state 68
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 90
+
+   61 relational_expression: relational_expression TK_OC_GE • additive_expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call              go to state 61
+    additive_expression        go to state 111
+    multiplicative_expression  go to state 68
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 91
+
+   58 relational_expression: relational_expression '<' • additive_expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call              go to state 61
+    additive_expression        go to state 112
+    multiplicative_expression  go to state 68
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 92
+
+   59 relational_expression: relational_expression '>' • additive_expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call              go to state 61
+    additive_expression        go to state 113
+    multiplicative_expression  go to state 68
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 93
+
+   63 additive_expression: additive_expression '+' • multiplicative_expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call              go to state 61
+    multiplicative_expression  go to state 114
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 94
+
+   64 additive_expression: additive_expression '-' • multiplicative_expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call              go to state 61
+    multiplicative_expression  go to state 115
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 95
+
+   66 multiplicative_expression: multiplicative_expression '*' • unary_expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call       go to state 61
+    unary_expression    go to state 116
+    primary_expression  go to state 70
+
+
+State 96
+
+   67 multiplicative_expression: multiplicative_expression '/' • unary_expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call       go to state 61
+    unary_expression    go to state 117
+    primary_expression  go to state 70
+
+
+State 97
+
+   68 multiplicative_expression: multiplicative_expression '%' • unary_expression
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    function_call       go to state 61
+    unary_expression    go to state 118
+    primary_expression  go to state 70
+
+
+State 98
+
+   48 iterative_struct: TK_ENQUANTO '(' expression • ')' command_block
+
+    ')'  shift, and go to state 119
+
+
+State 99
+
+   37 attribution_command: TK_ID TK_ATRIB expression •
+
+    $default  reduce using rule 37 (attribution_command)
+
+
+State 100
+
+   38 function_call: TK_ID '(' args • ')'
+
+    ')'  shift, and go to state 120
+
+
+State 101
+
+   39 args: expression •
+   40     | expression • ',' args
+
+    ','  shift, and go to state 121
+
+    $default  reduce using rule 39 (args)
+
+
+State 102
+
+   32 variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type • optional_instantiation
+
+    TK_COM  shift, and go to state 122
+
+    $default  reduce using rule 34 (optional_instantiation)
+
+    optional_instantiation  go to state 123
+
+
+State 103
+
+   45 conditional_struct: TK_SE '(' expression ')' • command_block else_block
+
+    '['  shift, and go to state 22
+
+    command_block     go to state 124
+    block_scope_init  go to state 25
+
+
+State 104
+
+   76 primary_expression: '(' expression ')' •
+
+    $default  reduce using rule 76 (primary_expression)
+
+
+State 105
+
+   42 return_command: TK_RETORNA expression TK_ATRIB var_type •
+
+    $default  reduce using rule 42 (return_command)
+
+
+State 106
+
+   51 logical_or_expression: logical_or_expression '|' logical_and_expression •
+   53 logical_and_expression: logical_and_expression • '&' equality_expression
+
+    '&'  shift, and go to state 86
+
+    $default  reduce using rule 51 (logical_or_expression)
+
+
+State 107
+
+   53 logical_and_expression: logical_and_expression '&' equality_expression •
+   55 equality_expression: equality_expression • TK_OC_EQ relational_expression
+   56                    | equality_expression • TK_OC_NE relational_expression
+
+    TK_OC_EQ  shift, and go to state 87
+    TK_OC_NE  shift, and go to state 88
+
+    $default  reduce using rule 53 (logical_and_expression)
+
+
+State 108
+
+   55 equality_expression: equality_expression TK_OC_EQ relational_expression •
+   58 relational_expression: relational_expression • '<' additive_expression
+   59                      | relational_expression • '>' additive_expression
+   60                      | relational_expression • TK_OC_LE additive_expression
+   61                      | relational_expression • TK_OC_GE additive_expression
+
+    TK_OC_LE  shift, and go to state 89
+    TK_OC_GE  shift, and go to state 90
+    '<'       shift, and go to state 91
+    '>'       shift, and go to state 92
+
+    $default  reduce using rule 55 (equality_expression)
+
+
+State 109
+
+   56 equality_expression: equality_expression TK_OC_NE relational_expression •
+   58 relational_expression: relational_expression • '<' additive_expression
+   59                      | relational_expression • '>' additive_expression
+   60                      | relational_expression • TK_OC_LE additive_expression
+   61                      | relational_expression • TK_OC_GE additive_expression
+
+    TK_OC_LE  shift, and go to state 89
+    TK_OC_GE  shift, and go to state 90
+    '<'       shift, and go to state 91
+    '>'       shift, and go to state 92
+
+    $default  reduce using rule 56 (equality_expression)
+
+
+State 110
+
+   60 relational_expression: relational_expression TK_OC_LE additive_expression •
+   63 additive_expression: additive_expression • '+' multiplicative_expression
+   64                    | additive_expression • '-' multiplicative_expression
+
+    '+'  shift, and go to state 93
+    '-'  shift, and go to state 94
+
+    $default  reduce using rule 60 (relational_expression)
+
+
+State 111
+
+   61 relational_expression: relational_expression TK_OC_GE additive_expression •
+   63 additive_expression: additive_expression • '+' multiplicative_expression
+   64                    | additive_expression • '-' multiplicative_expression
+
+    '+'  shift, and go to state 93
+    '-'  shift, and go to state 94
+
+    $default  reduce using rule 61 (relational_expression)
+
+
+State 112
+
+   58 relational_expression: relational_expression '<' additive_expression •
+   63 additive_expression: additive_expression • '+' multiplicative_expression
+   64                    | additive_expression • '-' multiplicative_expression
+
+    '+'  shift, and go to state 93
+    '-'  shift, and go to state 94
+
+    $default  reduce using rule 58 (relational_expression)
+
+
+State 113
+
+   59 relational_expression: relational_expression '>' additive_expression •
+   63 additive_expression: additive_expression • '+' multiplicative_expression
+   64                    | additive_expression • '-' multiplicative_expression
+
+    '+'  shift, and go to state 93
+    '-'  shift, and go to state 94
+
+    $default  reduce using rule 59 (relational_expression)
+
+
+State 114
+
+   63 additive_expression: additive_expression '+' multiplicative_expression •
+   66 multiplicative_expression: multiplicative_expression • '*' unary_expression
+   67                          | multiplicative_expression • '/' unary_expression
+   68                          | multiplicative_expression • '%' unary_expression
+
+    '*'  shift, and go to state 95
+    '/'  shift, and go to state 96
+    '%'  shift, and go to state 97
+
+    $default  reduce using rule 63 (additive_expression)
+
+
+State 115
+
+   64 additive_expression: additive_expression '-' multiplicative_expression •
+   66 multiplicative_expression: multiplicative_expression • '*' unary_expression
+   67                          | multiplicative_expression • '/' unary_expression
+   68                          | multiplicative_expression • '%' unary_expression
+
+    '*'  shift, and go to state 95
+    '/'  shift, and go to state 96
+    '%'  shift, and go to state 97
+
+    $default  reduce using rule 64 (additive_expression)
+
+
+State 116
+
+   66 multiplicative_expression: multiplicative_expression '*' unary_expression •
+
+    $default  reduce using rule 66 (multiplicative_expression)
+
+
+State 117
+
+   67 multiplicative_expression: multiplicative_expression '/' unary_expression •
+
+    $default  reduce using rule 67 (multiplicative_expression)
+
+
+State 118
+
+   68 multiplicative_expression: multiplicative_expression '%' unary_expression •
+
+    $default  reduce using rule 68 (multiplicative_expression)
+
+
+State 119
+
+   48 iterative_struct: TK_ENQUANTO '(' expression ')' • command_block
+
+    '['  shift, and go to state 22
+
+    command_block     go to state 125
+    block_scope_init  go to state 25
+
+
+State 120
+
+   38 function_call: TK_ID '(' args ')' •
+
+    $default  reduce using rule 38 (function_call)
+
+
+State 121
+
+   40 args: expression ',' • args
+
+    TK_ID          shift, and go to state 54
+    TK_LI_INTEIRO  shift, and go to state 55
+    TK_LI_DECIMAL  shift, and go to state 56
+    '('            shift, and go to state 57
+    '+'            shift, and go to state 58
+    '-'            shift, and go to state 59
+    '!'            shift, and go to state 60
+
+    $default  reduce using rule 41 (args)
+
+    function_call              go to state 61
+    args                       go to state 126
+    expression                 go to state 101
+    logical_or_expression      go to state 63
+    logical_and_expression     go to state 64
+    equality_expression        go to state 65
+    relational_expression      go to state 66
+    additive_expression        go to state 67
+    multiplicative_expression  go to state 68
+    unary_expression           go to state 69
+    primary_expression         go to state 70
+
+
+State 122
+
+   33 optional_instantiation: TK_COM • literal
+
+    TK_LI_INTEIRO  shift, and go to state 127
+    TK_LI_DECIMAL  shift, and go to state 128
+
+    literal  go to state 129
+
+
+State 123
+
+   32 variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional_instantiation •
+
+    $default  reduce using rule 32 (variable_declaration_with_instantiation)
+
+
+State 124
+
+   45 conditional_struct: TK_SE '(' expression ')' command_block • else_block
+
+    TK_SENAO  shift, and go to state 130
+
+    $default  reduce using rule 47 (else_block)
+
+    else_block  go to state 131
+
+
+State 125
+
+   48 iterative_struct: TK_ENQUANTO '(' expression ')' command_block •
+
+    $default  reduce using rule 48 (iterative_struct)
+
+
+State 126
+
+   40 args: expression ',' args •
+
+    $default  reduce using rule 40 (args)
+
+
+State 127
+
+   35 literal: TK_LI_INTEIRO •
+
+    $default  reduce using rule 35 (literal)
+
+
+State 128
+
+   36 literal: TK_LI_DECIMAL •
+
+    $default  reduce using rule 36 (literal)
+
+
+State 129
+
+   33 optional_instantiation: TK_COM literal •
+
+    $default  reduce using rule 33 (optional_instantiation)
+
+
+State 130
+
+   46 else_block: TK_SENAO • command_block
+
+    '['  shift, and go to state 22
+
+    command_block     go to state 132
+    block_scope_init  go to state 25
+
+
+State 131
+
+   45 conditional_struct: TK_SE '(' expression ')' command_block else_block •
+
+    $default  reduce using rule 45 (conditional_struct)
+
+
+State 132
+
+   46 else_block: TK_SENAO command_block •
+
+    $default  reduce using rule 46 (else_block)

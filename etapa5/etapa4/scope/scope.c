@@ -8,14 +8,7 @@ arg_type_node_t *args_append(arg_type_node_t *head, data_type_t type, const char
   arg_type_node_t *node = (arg_type_node_t*)calloc(1, sizeof(arg_type_node_t));
   if (!node) return head;
   node->type = type;
-
-  // Stores a copy of the name
-  if (name) {
-    node->name = strdup(name);
-  } else {
-    node->name = NULL;
-  }
-
+  node->name = name ? strdup(name) : NULL;
   if (!head) return node;
   arg_type_node_t *cur = head;
   while (cur->next) cur = cur->next;
@@ -26,7 +19,6 @@ arg_type_node_t *args_append(arg_type_node_t *head, data_type_t type, const char
 void args_free(arg_type_node_t *head) {
   while (head) {
     arg_type_node_t *nxt = head->next;
-    // Frees name copy created in args_append with strdup
     if (head->name) free(head->name);
     free(head);
     head = nxt;
@@ -36,6 +28,9 @@ void args_free(arg_type_node_t *head) {
 /* symbol table */
 symbol_table_t *symtab_create(void) {
   symbol_table_t *t = (symbol_table_t*)calloc(1, sizeof(symbol_table_t));
+  if (t) {
+    t->current_offset = 0; // Inicializa offset em 0 para este escopo
+  }
   return t;
 }
 
@@ -68,6 +63,7 @@ symbol_entry_t *symtab_insert(symbol_table_t *table,
                               const lexical_value_t *lexical_opt) {
   if (!table || !key) return NULL;
   if (symtab_lookup_local(table, key)) return NULL; /* duplicate in same scope */
+  
   symbol_entry_t *e = (symbol_entry_t*)calloc(1, sizeof(symbol_entry_t));
   if (!e) return NULL;
   e->key = strdup(key);
@@ -77,14 +73,24 @@ symbol_entry_t *symtab_insert(symbol_table_t *table,
   e->lexical.line_number = lexical_opt ? lexical_opt->line_number : 0;
   e->lexical.token_type = lexical_opt ? lexical_opt->token_type : NULL;
   e->lexical.value = lexical_opt && lexical_opt->value ? strdup(lexical_opt->value) : NULL;
+  
+  // E5: Lógica de Cálculo de Endereço (Offset)
+  // Apenas variáveis ocupam espaço endereçável na pilha/segmento de dados
+  if (nature == SYMBOL_VARIABLE) {
+      e->offset = table->current_offset;
+      table->current_offset += 4; // Incrementa 4 bytes (tamanho de int/float)
+  } else {
+      e->offset = -1; // Valor indicativo que não tem endereço de memória
+  }
+
   e->next = table->head;
   table->head = e;
   return e;
 }
 
-void symbol_entry_add_arg(symbol_entry_t *entry, data_type_t type) {
+void symbol_entry_add_arg(symbol_entry_t *entry, data_type_t type, const char *name) {
   if (!entry) return;
-  entry->args = args_append(entry->args, type, entry->key);
+  entry->args = args_append(entry->args, type, name);
 }
 
 /* scope stack */
@@ -187,20 +193,14 @@ static void symtab_print_with_header(FILE *out, scope_t *sc, const char *header)
   if (!sc || !sc->table) return;
   fprintf(out, "===== %s SCOPE [%s] =====\n", header, scope_kind_str(sc->kind));
   for (symbol_entry_t *e = sc->table->head; e; e = e->next) {
-    fprintf(out, "- %s: key='%s' type=%s", nature_str(e->nature), e->key ? e->key : "",
-            dtype_str(e->data_type));
+    fprintf(out, "- %s: key='%s' type=%s offset=%d", nature_str(e->nature), e->key ? e->key : "",
+            dtype_str(e->data_type), e->offset);
     if (e->nature == SYMBOL_FUNCTION) {
       fprintf(out, " args=");
       print_args_list(out, e->args);
     }
     if (e->lexical.value) {
       fprintf(out, " lexval='%s'", e->lexical.value);
-    }
-    if (e->lexical.token_type) {
-      fprintf(out, " token=%s", e->lexical.token_type);
-    }
-    if (e->lexical.line_number) {
-      fprintf(out, " line=%d", e->lexical.line_number);
     }
     fprintf(out, "\n");
   }
