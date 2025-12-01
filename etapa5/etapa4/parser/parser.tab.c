@@ -91,11 +91,11 @@ void semantic_error(int error_code, int line, const char *text) {
 
 static int get_reg_id(const char *temp_str) {
     if (!temp_str) {
-        fprintf(stderr, "FATAL: get_reg_id NULL\n");
+        fprintf(stderr, "FATAL ERROR: get_reg_id called with NULL pointer. Logic error in AST code gen.\n");
         exit(1);
     }
     if (temp_str[0] != 'r') {
-        fprintf(stderr, "FATAL: Invalid reg format '%s'\n", temp_str);
+        fprintf(stderr, "FATAL ERROR: Invalid register format: '%s'\n", temp_str);
         exit(1);
     }
     return atoi(temp_str + 1);
@@ -593,14 +593,14 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    75,    75,    84,    90,    98,   101,   108,   109,   115,
-     115,   137,   145,   146,   148,   149,   150,   152,   153,   161,
-     171,   173,   178,   184,   189,   192,   197,   198,   199,   200,
-     201,   202,   208,   216,   242,   248,   250,   261,   277,   304,
-     315,   318,   322,   324,   333,   333,   335,   386,   386,   388,
-     413,   415,   416,   423,   424,   431,   432,   438,   445,   446,
-     452,   458,   464,   471,   472,   479,   487,   488,   495,   502,
-     508,   509,   513,   517,   523,   542,   553,   560,   561
+       0,    69,    69,    78,    84,    92,    95,   102,   103,   105,
+     105,   127,   135,   136,   138,   139,   140,   142,   143,   151,
+     157,   159,   164,   170,   175,   178,   183,   184,   185,   186,
+     187,   188,   190,   198,   220,   224,   226,   234,   243,   258,
+     269,   272,   276,   278,   283,   283,   285,   316,   316,   318,
+     342,   344,   345,   352,   353,   360,   361,   367,   374,   375,
+     381,   387,   393,   400,   401,   408,   416,   417,   424,   431,
+     437,   438,   442,   446,   452,   468,   475,   482,   483
 };
 #endif
 
@@ -1524,7 +1524,7 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: global_escope_init list global_escope_end ';'  */
-#line 75 "parser/parser.y"
+#line 69 "parser/parser.y"
                                                        {
   arvore = (yyvsp[-2].node);
   if (arvore && arvore->code) {
@@ -1537,7 +1537,7 @@ yyreduce:
     break;
 
   case 3: /* global_escope_init: %empty  */
-#line 84 "parser/parser.y"
+#line 78 "parser/parser.y"
                            { 
   (yyval.node) = NULL;
   if (!scope_stack_pointer) scope_stack_pointer = scope_stack_create();
@@ -1547,7 +1547,7 @@ yyreduce:
     break;
 
   case 4: /* global_escope_end: %empty  */
-#line 90 "parser/parser.y"
+#line 84 "parser/parser.y"
                           {
   (yyval.node) = NULL;
   scope_log_global_end(scope_stack_pointer);
@@ -1559,7 +1559,7 @@ yyreduce:
     break;
 
   case 5: /* list: element  */
-#line 98 "parser/parser.y"
+#line 92 "parser/parser.y"
               {
   (yyval.node) = (yyvsp[0].node);
 }
@@ -1567,7 +1567,7 @@ yyreduce:
     break;
 
   case 6: /* list: element ',' list  */
-#line 101 "parser/parser.y"
+#line 95 "parser/parser.y"
                    {
   (yyval.node) = asd_select_head_and_attach_tail((yyvsp[-2].node), (yyvsp[0].node));
   if ((yyvsp[-2].node) && (yyvsp[0].node)) {
@@ -1578,19 +1578,19 @@ yyreduce:
     break;
 
   case 7: /* element: function_definition  */
-#line 108 "parser/parser.y"
+#line 102 "parser/parser.y"
                              { (yyval.node) = (yyvsp[0].node); }
 #line 1584 "parser/parser.tab.c"
     break;
 
   case 8: /* element: variable_declaration  */
-#line 109 "parser/parser.y"
+#line 103 "parser/parser.y"
                        { (yyval.node) = (yyvsp[0].node); }
 #line 1590 "parser/parser.tab.c"
     break;
 
   case 9: /* $@1: %empty  */
-#line 115 "parser/parser.y"
+#line 105 "parser/parser.y"
                             {
   scope_push(scope_stack_pointer, SCOPE_FUNCTION);
   for(arg_type_node_t *arg = (yyvsp[0].symbol)->args; arg; arg = arg->next) {
@@ -1607,7 +1607,7 @@ yyreduce:
     break;
 
   case 10: /* function_definition: header $@1 body  */
-#line 126 "parser/parser.y"
+#line 116 "parser/parser.y"
        {
   char buffer[256];
   snprintf(buffer, sizeof(buffer), "function %s", (yyvsp[-2].symbol)->key);
@@ -1622,7 +1622,7 @@ yyreduce:
     break;
 
   case 11: /* header: TK_ID TK_SETA var_type optional_parameter_list TK_ATRIB  */
-#line 137 "parser/parser.y"
+#line 127 "parser/parser.y"
                                                                 {
   symbol_entry_t *entry = scope_insert_current(scope_stack_pointer, (yyvsp[-4].lexical_value).value, SYMBOL_FUNCTION, (yyvsp[-2].data_type), &(yyvsp[-4].lexical_value));
   if(!entry) semantic_error(11, (yyvsp[-4].lexical_value).line_number, (yyvsp[-4].lexical_value).value);
@@ -1634,43 +1634,43 @@ yyreduce:
     break;
 
   case 12: /* var_type: TK_DECIMAL  */
-#line 145 "parser/parser.y"
+#line 135 "parser/parser.y"
                      { (yyval.data_type) = TYPE_FLOAT; }
 #line 1640 "parser/parser.tab.c"
     break;
 
   case 13: /* var_type: TK_INTEIRO  */
-#line 146 "parser/parser.y"
+#line 136 "parser/parser.y"
              { (yyval.data_type) = TYPE_INT; }
 #line 1646 "parser/parser.tab.c"
     break;
 
   case 14: /* optional_parameter_list: %empty  */
-#line 148 "parser/parser.y"
+#line 138 "parser/parser.y"
                                 { (yyval.arg_list) = NULL; }
 #line 1652 "parser/parser.tab.c"
     break;
 
   case 15: /* optional_parameter_list: TK_COM parameter_list  */
-#line 149 "parser/parser.y"
+#line 139 "parser/parser.y"
                         { (yyval.arg_list) = (yyvsp[0].arg_list); }
 #line 1658 "parser/parser.tab.c"
     break;
 
   case 16: /* optional_parameter_list: parameter_list  */
-#line 150 "parser/parser.y"
+#line 140 "parser/parser.y"
                  { (yyval.arg_list) = (yyvsp[0].arg_list); }
 #line 1664 "parser/parser.tab.c"
     break;
 
   case 17: /* parameter_list: parameter  */
-#line 152 "parser/parser.y"
+#line 142 "parser/parser.y"
                           { (yyval.arg_list) = (yyvsp[0].arg_list); }
 #line 1670 "parser/parser.tab.c"
     break;
 
   case 18: /* parameter_list: parameter_list ',' parameter  */
-#line 153 "parser/parser.y"
+#line 143 "parser/parser.y"
                                {
   arg_type_node_t *head = (yyvsp[-2].arg_list);
   arg_type_node_t *cur = head;
@@ -1682,7 +1682,7 @@ yyreduce:
     break;
 
   case 19: /* parameter: TK_ID TK_ATRIB var_type  */
-#line 161 "parser/parser.y"
+#line 151 "parser/parser.y"
                                    {
   (yyval.arg_list) = NULL;
   (yyval.arg_list) = args_append((yyval.arg_list), (yyvsp[0].data_type), (yyvsp[-2].lexical_value).value);
@@ -1692,13 +1692,13 @@ yyreduce:
     break;
 
   case 20: /* body: command_block  */
-#line 171 "parser/parser.y"
+#line 157 "parser/parser.y"
                     { (yyval.node) = (yyvsp[0].node); }
 #line 1698 "parser/parser.tab.c"
     break;
 
   case 21: /* command_block: block_scope_init command_sequence ']'  */
-#line 173 "parser/parser.y"
+#line 159 "parser/parser.y"
                                                      {
   (yyval.node) = (yyvsp[-1].node);
   scope_log_block_end(scope_stack_pointer);
@@ -1708,7 +1708,7 @@ yyreduce:
     break;
 
   case 22: /* command_block: block_scope_init ']'  */
-#line 178 "parser/parser.y"
+#line 164 "parser/parser.y"
                        {
   (yyval.node) = NULL;
   scope_log_block_end(scope_stack_pointer);
@@ -1718,7 +1718,7 @@ yyreduce:
     break;
 
   case 23: /* block_scope_init: '['  */
-#line 184 "parser/parser.y"
+#line 170 "parser/parser.y"
                       {
   (yyval.node) = NULL;
   scope_push(scope_stack_pointer, SCOPE_BLOCK);
@@ -1727,7 +1727,7 @@ yyreduce:
     break;
 
   case 24: /* command_sequence: simple_command  */
-#line 189 "parser/parser.y"
+#line 175 "parser/parser.y"
                                  {
   (yyval.node) = (yyvsp[0].node);
 }
@@ -1735,7 +1735,7 @@ yyreduce:
     break;
 
   case 25: /* command_sequence: simple_command command_sequence  */
-#line 192 "parser/parser.y"
+#line 178 "parser/parser.y"
                                   {
   (yyval.node) = asd_select_head_and_attach_tail((yyvsp[-1].node), (yyvsp[0].node));
   if ((yyvsp[-1].node) && (yyvsp[0].node)) (yyvsp[-1].node)->code = iloc_append((yyvsp[-1].node)->code, (yyvsp[0].node)->code);
@@ -1744,43 +1744,43 @@ yyreduce:
     break;
 
   case 26: /* simple_command: variable_declaration_with_instantiation  */
-#line 197 "parser/parser.y"
+#line 183 "parser/parser.y"
                                                         { (yyval.node) = (yyvsp[0].node); }
 #line 1750 "parser/parser.tab.c"
     break;
 
   case 27: /* simple_command: function_call  */
-#line 198 "parser/parser.y"
+#line 184 "parser/parser.y"
                 { (yyval.node) = (yyvsp[0].node); }
 #line 1756 "parser/parser.tab.c"
     break;
 
   case 28: /* simple_command: attribution_command  */
-#line 199 "parser/parser.y"
+#line 185 "parser/parser.y"
                       { (yyval.node) = (yyvsp[0].node); }
 #line 1762 "parser/parser.tab.c"
     break;
 
   case 29: /* simple_command: return_command  */
-#line 200 "parser/parser.y"
+#line 186 "parser/parser.y"
                  { (yyval.node) = (yyvsp[0].node); }
 #line 1768 "parser/parser.tab.c"
     break;
 
   case 30: /* simple_command: flow_control_command  */
-#line 201 "parser/parser.y"
+#line 187 "parser/parser.y"
                        { (yyval.node) = (yyvsp[0].node); }
 #line 1774 "parser/parser.tab.c"
     break;
 
   case 31: /* simple_command: command_block  */
-#line 202 "parser/parser.y"
+#line 188 "parser/parser.y"
                 { (yyval.node) = (yyvsp[0].node); }
 #line 1780 "parser/parser.tab.c"
     break;
 
   case 32: /* variable_declaration: TK_VAR TK_ID TK_ATRIB var_type  */
-#line 208 "parser/parser.y"
+#line 190 "parser/parser.y"
                                                      {
   if(!scope_insert_current(scope_stack_pointer, (yyvsp[-2].lexical_value).value, SYMBOL_VARIABLE, (yyvsp[0].data_type), &(yyvsp[-2].lexical_value))) {
     semantic_error(11, (yyvsp[-2].lexical_value).line_number, (yyvsp[-2].lexical_value).value);
@@ -1792,7 +1792,7 @@ yyreduce:
     break;
 
   case 33: /* variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional_instantiation  */
-#line 216 "parser/parser.y"
+#line 198 "parser/parser.y"
                                                                                                {
   symbol_entry_t *entry = scope_insert_current(scope_stack_pointer, (yyvsp[-3].lexical_value).value, SYMBOL_VARIABLE, (yyvsp[-1].data_type), &(yyvsp[-3].lexical_value));
   if (!entry) semantic_error(11, (yyvsp[-3].lexical_value).line_number, (yyvsp[-3].lexical_value).value);
@@ -1800,12 +1800,8 @@ yyreduce:
   asd_tree_t *inst_node = (yyvsp[0].node);
   if (inst_node != NULL) {
     if (inst_node->type != (yyvsp[-1].data_type)) semantic_error(30, (yyvsp[-3].lexical_value).line_number, "Instantiation type mismatch");
-    
     int base_reg = entry->is_global ? -2 : -1;
-    iloc_code_t *store = iloc_create_inst(ILOC_STOREAI,
-                                          ILOC_OP_REG, get_reg_id(inst_node->temp),
-                                          ILOC_OP_REG, base_reg,
-                                          ILOC_OP_INT, entry->offset);
+    iloc_code_t *store = iloc_create_inst(ILOC_STOREAI, ILOC_OP_REG, get_reg_id(inst_node->temp), ILOC_OP_REG, base_reg, ILOC_OP_INT, entry->offset);
     inst_node->code = iloc_append(inst_node->code, store);
   }
 
@@ -1818,60 +1814,52 @@ yyreduce:
     free((yyvsp[-3].lexical_value).value);
   }
 }
-#line 1822 "parser/parser.tab.c"
+#line 1818 "parser/parser.tab.c"
     break;
 
   case 34: /* optional_instantiation: TK_COM literal  */
-#line 242 "parser/parser.y"
+#line 220 "parser/parser.y"
                                        { 
   (yyval.node) = asd_new_unary("com", (yyvsp[0].node));
-  (yyval.node)->type = (yyvsp[0].node)->type;
-  (yyval.node)->code = (yyvsp[0].node)->code;
-  (yyval.node)->temp = (yyvsp[0].node)->temp;
+  (yyval.node)->type = (yyvsp[0].node)->type; (yyval.node)->code = (yyvsp[0].node)->code; (yyval.node)->temp = (yyvsp[0].node)->temp;
 }
-#line 1833 "parser/parser.tab.c"
+#line 1827 "parser/parser.tab.c"
     break;
 
   case 35: /* optional_instantiation: %empty  */
-#line 248 "parser/parser.y"
+#line 224 "parser/parser.y"
          { (yyval.node) = NULL; }
-#line 1839 "parser/parser.tab.c"
+#line 1833 "parser/parser.tab.c"
     break;
 
   case 36: /* literal: TK_LI_INTEIRO  */
-#line 250 "parser/parser.y"
+#line 226 "parser/parser.y"
                        {
   int val = atoi((yyvsp[0].lexical_value).value);
   (yyval.node) = asd_new_node_from_value(&(yyvsp[0].lexical_value));
   (yyval.node)->type = TYPE_INT;
   (yyval.node)->temp = iloc_new_reg();
-  // CORREÇÃO: Destino passado como 2º argumento (op2), e não 3º (op3)
-  (yyval.node)->code = iloc_create_inst(ILOC_LOADI, 
-                              ILOC_OP_INT, val,              // op1: valor
-                              ILOC_OP_REG, get_reg_id((yyval.node)->temp), // op2: destino
-                              0, 0);                         // op3: vazio
+  // op2: destino (get_reg_id)
+  (yyval.node)->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, ILOC_OP_REG, get_reg_id((yyval.node)->temp), 0,0);
 }
-#line 1855 "parser/parser.tab.c"
+#line 1846 "parser/parser.tab.c"
     break;
 
   case 37: /* literal: TK_LI_DECIMAL  */
-#line 261 "parser/parser.y"
+#line 234 "parser/parser.y"
                 {
   int val = (int)atof((yyvsp[0].lexical_value).value);
   (yyval.node) = asd_new_node_from_value(&(yyvsp[0].lexical_value));
   (yyval.node)->type = TYPE_FLOAT;
   (yyval.node)->temp = iloc_new_reg();
-  // CORREÇÃO: Destino passado como 2º argumento (op2)
-  (yyval.node)->code = iloc_create_inst(ILOC_LOADI, 
-                              ILOC_OP_INT, val,              // op1
-                              ILOC_OP_REG, get_reg_id((yyval.node)->temp), // op2
-                              0, 0);                         // op3
+  // op2: destino
+  (yyval.node)->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, ILOC_OP_REG, get_reg_id((yyval.node)->temp), 0,0);
 }
-#line 1871 "parser/parser.tab.c"
+#line 1859 "parser/parser.tab.c"
     break;
 
   case 38: /* attribution_command: TK_ID TK_ATRIB expression  */
-#line 277 "parser/parser.y"
+#line 243 "parser/parser.y"
                                                {
   symbol_entry_t *entry = scope_lookup(scope_stack_pointer, (yyvsp[-2].lexical_value).value);
   if (!entry) semantic_error(10, (yyvsp[-2].lexical_value).line_number, (yyvsp[-2].lexical_value).value);
@@ -1883,22 +1871,14 @@ yyreduce:
   (yyval.node)->type = entry->data_type;
 
   int base_reg = entry->is_global ? -2 : -1;
-  
-  // DEBUG PRINT
-  fprintf(stderr, "DEBUG: Atribuição '%s'. Expressão temp: '%s'. Offset: %d. Base: %d\n", 
-          entry->key, (yyvsp[0].node)->temp, entry->offset, base_reg);
-
-  iloc_code_t *store = iloc_create_inst(ILOC_STOREAI,
-                                        ILOC_OP_REG, get_reg_id((yyvsp[0].node)->temp),
-                                        ILOC_OP_REG, base_reg,
-                                        ILOC_OP_INT, entry->offset);
+  iloc_code_t *store = iloc_create_inst(ILOC_STOREAI, ILOC_OP_REG, get_reg_id((yyvsp[0].node)->temp), ILOC_OP_REG, base_reg, ILOC_OP_INT, entry->offset);
   (yyval.node)->code = iloc_append((yyvsp[0].node)->code, store);
 }
-#line 1898 "parser/parser.tab.c"
+#line 1878 "parser/parser.tab.c"
     break;
 
   case 39: /* function_call: TK_ID '(' args ')'  */
-#line 304 "parser/parser.y"
+#line 258 "parser/parser.y"
                                   {
     symbol_entry_t *entry = scope_lookup(scope_stack_pointer, (yyvsp[-3].lexical_value).value);
     if (!entry) semantic_error(10, (yyvsp[-3].lexical_value).line_number, (yyvsp[-3].lexical_value).value);
@@ -1909,122 +1889,102 @@ yyreduce:
     if ((yyvsp[-1].node)) (yyval.node)->code = (yyvsp[-1].node)->code;
     (yyval.node)->temp = iloc_new_reg(); 
 }
-#line 1913 "parser/parser.tab.c"
+#line 1893 "parser/parser.tab.c"
     break;
 
   case 40: /* args: expression  */
-#line 315 "parser/parser.y"
+#line 269 "parser/parser.y"
                  {
   (yyval.node) = (yyvsp[0].node);
 }
-#line 1921 "parser/parser.tab.c"
+#line 1901 "parser/parser.tab.c"
     break;
 
   case 41: /* args: expression ',' args  */
-#line 318 "parser/parser.y"
+#line 272 "parser/parser.y"
                       {
   (yyval.node) = asd_add_child_to_node((yyvsp[-2].node), (yyvsp[0].node));
   if ((yyvsp[-2].node) && (yyvsp[0].node)) (yyval.node)->code = iloc_append((yyvsp[-2].node)->code, (yyvsp[0].node)->code);
 }
-#line 1930 "parser/parser.tab.c"
+#line 1910 "parser/parser.tab.c"
     break;
 
   case 42: /* args: %empty  */
-#line 322 "parser/parser.y"
+#line 276 "parser/parser.y"
          { (yyval.node) = NULL; }
-#line 1936 "parser/parser.tab.c"
+#line 1916 "parser/parser.tab.c"
     break;
 
   case 43: /* return_command: TK_RETORNA expression TK_ATRIB var_type  */
-#line 324 "parser/parser.y"
+#line 278 "parser/parser.y"
                                                         {
   (yyval.node) = asd_new_unary("retorna", (yyvsp[-2].node));
   (yyval.node)->code = (yyvsp[-2].node)->code;
 }
-#line 1945 "parser/parser.tab.c"
+#line 1925 "parser/parser.tab.c"
     break;
 
   case 44: /* flow_control_command: conditional_struct  */
-#line 333 "parser/parser.y"
+#line 283 "parser/parser.y"
                                          { (yyval.node) = (yyvsp[0].node); }
-#line 1951 "parser/parser.tab.c"
+#line 1931 "parser/parser.tab.c"
     break;
 
   case 45: /* flow_control_command: iterative_struct  */
-#line 333 "parser/parser.y"
+#line 283 "parser/parser.y"
                                                                          { (yyval.node) = (yyvsp[0].node); }
-#line 1957 "parser/parser.tab.c"
+#line 1937 "parser/parser.tab.c"
     break;
 
   case 46: /* conditional_struct: TK_SE '(' expression ')' command_block else_block  */
-#line 335 "parser/parser.y"
+#line 285 "parser/parser.y"
                                                                       {
   (yyval.node) = asd_new_trinary("se", (yyvsp[-3].node), (yyvsp[-1].node), (yyvsp[0].node));
-  
-  char *L_true = iloc_new_label();
-  char *L_false = iloc_new_label();
-  // se tiver else, precisamos de um label extra para a saída final
-  // se não tiver, L_false já serve como saída
+  char *L_true = iloc_new_label(), *L_false = iloc_new_label();
   char *L_saida = ((yyvsp[0].node) != NULL) ? iloc_new_label() : L_false;
 
-  // 1. Gera o teste e o salto condicional
-  // cbr r_cond -> L_true, L_false
-  iloc_code_t *cbr = iloc_create_inst(ILOC_CBR,
-                                      ILOC_OP_REG, get_reg_id((yyvsp[-3].node)->temp),
-                                      ILOC_OP_LABEL, atoi(L_true + 1),
-                                      ILOC_OP_LABEL, atoi(L_false + 1));
-
-  // 2. Cria os nós de label (NOPs)
-  iloc_code_t *l_true_node = iloc_create_inst(ILOC_NOP, ILOC_OP_LABEL, atoi(L_true + 1), 0,0,0,0);
-  iloc_code_t *l_false_node = iloc_create_inst(ILOC_NOP, ILOC_OP_LABEL, atoi(L_false + 1), 0,0,0,0);
+  iloc_code_t *cbr = iloc_create_inst(ILOC_CBR, ILOC_OP_REG, get_reg_id((yyvsp[-3].node)->temp), ILOC_OP_LABEL, atoi(L_true+1), ILOC_OP_LABEL, atoi(L_false+1));
+  iloc_code_t *l_true = iloc_create_inst(ILOC_NOP, ILOC_OP_LABEL, atoi(L_true+1), 0,0,0,0);
+  iloc_code_t *l_false = iloc_create_inst(ILOC_NOP, ILOC_OP_LABEL, atoi(L_false+1), 0,0,0,0);
   
-  // 3. Montagem do Código
-  (yyval.node)->code = (yyvsp[-3].node)->code;                     // Código da expressão
-  (yyval.node)->code = iloc_append((yyval.node)->code, cbr);   // Teste
+  (yyval.node)->code = iloc_append((yyvsp[-3].node)->code, cbr);
+  (yyval.node)->code = iloc_append((yyval.node)->code, l_true);
   
-  (yyval.node)->code = iloc_append((yyval.node)->code, l_true_node); // Rótulo TRUE
-  (yyval.node)->code = iloc_append((yyval.node)->code, (yyvsp[-1].node)->code);    // Código do bloco TRUE
+  // FIX SEGV: Check if block exists
+  if ((yyvsp[-1].node)) (yyval.node)->code = iloc_append((yyval.node)->code, (yyvsp[-1].node)->code);
 
   if ((yyvsp[0].node) != NULL) {
-      // COM ELSE:
-      // Precisa pular o bloco false ao acabar o true
-      iloc_code_t *jump_out = iloc_create_inst(ILOC_JUMPI, 0,0,0,0, ILOC_OP_LABEL, atoi(L_saida + 1));
-      (yyval.node)->code = iloc_append((yyval.node)->code, jump_out);
+      iloc_code_t *jmp = iloc_create_inst(ILOC_JUMPI, 0,0,0,0, ILOC_OP_LABEL, atoi(L_saida+1));
+      (yyval.node)->code = iloc_append((yyval.node)->code, jmp);
+      (yyval.node)->code = iloc_append((yyval.node)->code, l_false);
+      (yyval.node)->code = iloc_append((yyval.node)->code, (yyvsp[0].node)->code);
       
-      (yyval.node)->code = iloc_append((yyval.node)->code, l_false_node); // Rótulo FALSE (início do else)
-      (yyval.node)->code = iloc_append((yyval.node)->code, (yyvsp[0].node)->code);     // Código do bloco FALSE
-      
-      // Rótulo de SAÍDA final
-      iloc_code_t *l_saida_node = iloc_create_inst(ILOC_NOP, ILOC_OP_LABEL, atoi(L_saida + 1), 0,0,0,0);
-      (yyval.node)->code = iloc_append((yyval.node)->code, l_saida_node);
-      free(L_saida); // Liberar apenas se foi alocado (no caso de ter else)
+      iloc_code_t *l_out = iloc_create_inst(ILOC_NOP, ILOC_OP_LABEL, atoi(L_saida+1), 0,0,0,0);
+      (yyval.node)->code = iloc_append((yyval.node)->code, l_out);
+      free(L_saida);
   } else {
-      // SEM ELSE:
-      // O fluxo cai naturalmente no L_false, que age como saída
-      (yyval.node)->code = iloc_append((yyval.node)->code, l_false_node); 
-      // L_saida é ponteiro para L_false, não precisa free separado
+      (yyval.node)->code = iloc_append((yyval.node)->code, l_false);
   }
 
-  free(L_true); 
-  free(L_false); 
+  free(L_true); free(L_false);
 }
-#line 2012 "parser/parser.tab.c"
+#line 1972 "parser/parser.tab.c"
     break;
 
   case 47: /* else_block: TK_SENAO command_block  */
-#line 386 "parser/parser.y"
+#line 316 "parser/parser.y"
                                    { (yyval.node) = (yyvsp[0].node); }
-#line 2018 "parser/parser.tab.c"
+#line 1978 "parser/parser.tab.c"
     break;
 
   case 48: /* else_block: %empty  */
-#line 386 "parser/parser.y"
+#line 316 "parser/parser.y"
                                                          { (yyval.node) = NULL; }
-#line 2024 "parser/parser.tab.c"
+#line 1984 "parser/parser.tab.c"
     break;
 
   case 49: /* iterative_struct: TK_ENQUANTO '(' expression ')' command_block  */
-#line 388 "parser/parser.y"
+#line 318 "parser/parser.y"
                                                                {
   (yyval.node) = asd_new_binary("enquanto", (yyvsp[-2].node), (yyvsp[0].node));
   char *L_ini = iloc_new_label(), *L_true = iloc_new_label(), *L_out = iloc_new_label();
@@ -2039,141 +1999,144 @@ yyreduce:
   (yyval.node)->code = iloc_append((yyval.node)->code, (yyvsp[-2].node)->code);
   (yyval.node)->code = iloc_append((yyval.node)->code, cbr);
   (yyval.node)->code = iloc_append((yyval.node)->code, l_true);
-  (yyval.node)->code = iloc_append((yyval.node)->code, (yyvsp[0].node)->code);
+  
+  // FIX SEGV: Check if block exists
+  if ((yyvsp[0].node)) (yyval.node)->code = iloc_append((yyval.node)->code, (yyvsp[0].node)->code);
+  
   (yyval.node)->code = iloc_append((yyval.node)->code, jmp);
   (yyval.node)->code = iloc_append((yyval.node)->code, l_out);
 
   free(L_ini); free(L_true); free(L_out);
 }
-#line 2049 "parser/parser.tab.c"
+#line 2012 "parser/parser.tab.c"
     break;
 
   case 50: /* expression: logical_or_expression  */
-#line 413 "parser/parser.y"
+#line 342 "parser/parser.y"
                                   { (yyval.node) = (yyvsp[0].node); }
-#line 2055 "parser/parser.tab.c"
+#line 2018 "parser/parser.tab.c"
     break;
 
   case 51: /* logical_or_expression: logical_and_expression  */
-#line 415 "parser/parser.y"
+#line 344 "parser/parser.y"
                                               { (yyval.node) = (yyvsp[0].node); }
-#line 2061 "parser/parser.tab.c"
+#line 2024 "parser/parser.tab.c"
     break;
 
   case 52: /* logical_or_expression: logical_or_expression '|' logical_and_expression  */
-#line 416 "parser/parser.y"
+#line 345 "parser/parser.y"
                                                    {
   (yyval.node) = asd_new_binary("|", (yyvsp[-2].node), (yyvsp[0].node));
   (yyval.node)->type = TYPE_INT; (yyval.node)->temp = iloc_new_reg();
   (yyval.node)->code = iloc_append((yyvsp[-2].node)->code, (yyvsp[0].node)->code);
   (yyval.node)->code = iloc_append((yyval.node)->code, iloc_create_inst(ILOC_OR, ILOC_OP_REG, get_reg_id((yyvsp[-2].node)->temp), ILOC_OP_REG, get_reg_id((yyvsp[0].node)->temp), ILOC_OP_REG, get_reg_id((yyval.node)->temp)));
 }
-#line 2072 "parser/parser.tab.c"
+#line 2035 "parser/parser.tab.c"
     break;
 
   case 53: /* logical_and_expression: equality_expression  */
-#line 423 "parser/parser.y"
+#line 352 "parser/parser.y"
                                             { (yyval.node) = (yyvsp[0].node); }
-#line 2078 "parser/parser.tab.c"
+#line 2041 "parser/parser.tab.c"
     break;
 
   case 54: /* logical_and_expression: logical_and_expression '&' equality_expression  */
-#line 424 "parser/parser.y"
+#line 353 "parser/parser.y"
                                                  {
   (yyval.node) = asd_new_binary("&", (yyvsp[-2].node), (yyvsp[0].node));
   (yyval.node)->type = TYPE_INT; (yyval.node)->temp = iloc_new_reg();
   (yyval.node)->code = iloc_append((yyvsp[-2].node)->code, (yyvsp[0].node)->code);
   (yyval.node)->code = iloc_append((yyval.node)->code, iloc_create_inst(ILOC_AND, ILOC_OP_REG, get_reg_id((yyvsp[-2].node)->temp), ILOC_OP_REG, get_reg_id((yyvsp[0].node)->temp), ILOC_OP_REG, get_reg_id((yyval.node)->temp)));
 }
-#line 2089 "parser/parser.tab.c"
+#line 2052 "parser/parser.tab.c"
     break;
 
   case 55: /* equality_expression: relational_expression  */
-#line 431 "parser/parser.y"
+#line 360 "parser/parser.y"
                                            { (yyval.node) = (yyvsp[0].node); }
-#line 2095 "parser/parser.tab.c"
+#line 2058 "parser/parser.tab.c"
     break;
 
   case 56: /* equality_expression: equality_expression TK_OC_EQ relational_expression  */
-#line 432 "parser/parser.y"
+#line 361 "parser/parser.y"
                                                      {
   (yyval.node) = asd_new_binary("==", (yyvsp[-2].node), (yyvsp[0].node));
   (yyval.node)->type = TYPE_INT; (yyval.node)->temp = iloc_new_reg();
   (yyval.node)->code = iloc_append((yyvsp[-2].node)->code, (yyvsp[0].node)->code);
   (yyval.node)->code = iloc_append((yyval.node)->code, iloc_create_inst(ILOC_CMP_EQ, ILOC_OP_REG, get_reg_id((yyvsp[-2].node)->temp), ILOC_OP_REG, get_reg_id((yyvsp[0].node)->temp), ILOC_OP_REG, get_reg_id((yyval.node)->temp)));
 }
-#line 2106 "parser/parser.tab.c"
+#line 2069 "parser/parser.tab.c"
     break;
 
   case 57: /* equality_expression: equality_expression TK_OC_NE relational_expression  */
-#line 438 "parser/parser.y"
+#line 367 "parser/parser.y"
                                                      {
   (yyval.node) = asd_new_binary("!=", (yyvsp[-2].node), (yyvsp[0].node));
   (yyval.node)->type = TYPE_INT; (yyval.node)->temp = iloc_new_reg();
   (yyval.node)->code = iloc_append((yyvsp[-2].node)->code, (yyvsp[0].node)->code);
   (yyval.node)->code = iloc_append((yyval.node)->code, iloc_create_inst(ILOC_CMP_NE, ILOC_OP_REG, get_reg_id((yyvsp[-2].node)->temp), ILOC_OP_REG, get_reg_id((yyvsp[0].node)->temp), ILOC_OP_REG, get_reg_id((yyval.node)->temp)));
 }
-#line 2117 "parser/parser.tab.c"
+#line 2080 "parser/parser.tab.c"
     break;
 
   case 58: /* relational_expression: additive_expression  */
-#line 445 "parser/parser.y"
+#line 374 "parser/parser.y"
                                            { (yyval.node) = (yyvsp[0].node); }
-#line 2123 "parser/parser.tab.c"
+#line 2086 "parser/parser.tab.c"
     break;
 
   case 59: /* relational_expression: relational_expression '<' additive_expression  */
-#line 446 "parser/parser.y"
+#line 375 "parser/parser.y"
                                                 {
   (yyval.node) = asd_new_binary("<", (yyvsp[-2].node), (yyvsp[0].node));
   (yyval.node)->type = TYPE_INT; (yyval.node)->temp = iloc_new_reg();
   (yyval.node)->code = iloc_append((yyvsp[-2].node)->code, (yyvsp[0].node)->code);
   (yyval.node)->code = iloc_append((yyval.node)->code, iloc_create_inst(ILOC_CMP_LT, ILOC_OP_REG, get_reg_id((yyvsp[-2].node)->temp), ILOC_OP_REG, get_reg_id((yyvsp[0].node)->temp), ILOC_OP_REG, get_reg_id((yyval.node)->temp)));
 }
-#line 2134 "parser/parser.tab.c"
+#line 2097 "parser/parser.tab.c"
     break;
 
   case 60: /* relational_expression: relational_expression '>' additive_expression  */
-#line 452 "parser/parser.y"
+#line 381 "parser/parser.y"
                                                 {
   (yyval.node) = asd_new_binary(">", (yyvsp[-2].node), (yyvsp[0].node));
   (yyval.node)->type = TYPE_INT; (yyval.node)->temp = iloc_new_reg();
   (yyval.node)->code = iloc_append((yyvsp[-2].node)->code, (yyvsp[0].node)->code);
   (yyval.node)->code = iloc_append((yyval.node)->code, iloc_create_inst(ILOC_CMP_GT, ILOC_OP_REG, get_reg_id((yyvsp[-2].node)->temp), ILOC_OP_REG, get_reg_id((yyvsp[0].node)->temp), ILOC_OP_REG, get_reg_id((yyval.node)->temp)));
 }
-#line 2145 "parser/parser.tab.c"
+#line 2108 "parser/parser.tab.c"
     break;
 
   case 61: /* relational_expression: relational_expression TK_OC_LE additive_expression  */
-#line 458 "parser/parser.y"
+#line 387 "parser/parser.y"
                                                      {
   (yyval.node) = asd_new_binary("<=", (yyvsp[-2].node), (yyvsp[0].node));
   (yyval.node)->type = TYPE_INT; (yyval.node)->temp = iloc_new_reg();
   (yyval.node)->code = iloc_append((yyvsp[-2].node)->code, (yyvsp[0].node)->code);
   (yyval.node)->code = iloc_append((yyval.node)->code, iloc_create_inst(ILOC_CMP_LE, ILOC_OP_REG, get_reg_id((yyvsp[-2].node)->temp), ILOC_OP_REG, get_reg_id((yyvsp[0].node)->temp), ILOC_OP_REG, get_reg_id((yyval.node)->temp)));
 }
-#line 2156 "parser/parser.tab.c"
+#line 2119 "parser/parser.tab.c"
     break;
 
   case 62: /* relational_expression: relational_expression TK_OC_GE additive_expression  */
-#line 464 "parser/parser.y"
+#line 393 "parser/parser.y"
                                                      {
   (yyval.node) = asd_new_binary(">=", (yyvsp[-2].node), (yyvsp[0].node));
   (yyval.node)->type = TYPE_INT; (yyval.node)->temp = iloc_new_reg();
   (yyval.node)->code = iloc_append((yyvsp[-2].node)->code, (yyvsp[0].node)->code);
   (yyval.node)->code = iloc_append((yyval.node)->code, iloc_create_inst(ILOC_CMP_GE, ILOC_OP_REG, get_reg_id((yyvsp[-2].node)->temp), ILOC_OP_REG, get_reg_id((yyvsp[0].node)->temp), ILOC_OP_REG, get_reg_id((yyval.node)->temp)));
 }
-#line 2167 "parser/parser.tab.c"
+#line 2130 "parser/parser.tab.c"
     break;
 
   case 63: /* additive_expression: multiplicative_expression  */
-#line 471 "parser/parser.y"
+#line 400 "parser/parser.y"
                                                { (yyval.node) = (yyvsp[0].node); }
-#line 2173 "parser/parser.tab.c"
+#line 2136 "parser/parser.tab.c"
     break;
 
   case 64: /* additive_expression: additive_expression '+' multiplicative_expression  */
-#line 472 "parser/parser.y"
+#line 401 "parser/parser.y"
                                                     {
   (yyval.node) = asd_new_binary("+", (yyvsp[-2].node), (yyvsp[0].node));
   if ((yyvsp[-2].node)->type == (yyvsp[0].node)->type) (yyval.node)->type = (yyvsp[-2].node)->type; else semantic_error(30, yylineno, "Type error");
@@ -2181,11 +2144,11 @@ yyreduce:
   (yyval.node)->code = iloc_append((yyvsp[-2].node)->code, (yyvsp[0].node)->code);
   (yyval.node)->code = iloc_append((yyval.node)->code, iloc_create_inst(ILOC_ADD, ILOC_OP_REG, get_reg_id((yyvsp[-2].node)->temp), ILOC_OP_REG, get_reg_id((yyvsp[0].node)->temp), ILOC_OP_REG, get_reg_id((yyval.node)->temp)));
 }
-#line 2185 "parser/parser.tab.c"
+#line 2148 "parser/parser.tab.c"
     break;
 
   case 65: /* additive_expression: additive_expression '-' multiplicative_expression  */
-#line 479 "parser/parser.y"
+#line 408 "parser/parser.y"
                                                     {
   (yyval.node) = asd_new_binary("-", (yyvsp[-2].node), (yyvsp[0].node));
   if ((yyvsp[-2].node)->type == (yyvsp[0].node)->type) (yyval.node)->type = (yyvsp[-2].node)->type; else semantic_error(30, yylineno, "Type error");
@@ -2193,17 +2156,17 @@ yyreduce:
   (yyval.node)->code = iloc_append((yyvsp[-2].node)->code, (yyvsp[0].node)->code);
   (yyval.node)->code = iloc_append((yyval.node)->code, iloc_create_inst(ILOC_SUB, ILOC_OP_REG, get_reg_id((yyvsp[-2].node)->temp), ILOC_OP_REG, get_reg_id((yyvsp[0].node)->temp), ILOC_OP_REG, get_reg_id((yyval.node)->temp)));
 }
-#line 2197 "parser/parser.tab.c"
+#line 2160 "parser/parser.tab.c"
     break;
 
   case 66: /* multiplicative_expression: unary_expression  */
-#line 487 "parser/parser.y"
+#line 416 "parser/parser.y"
                                             { (yyval.node) = (yyvsp[0].node); }
-#line 2203 "parser/parser.tab.c"
+#line 2166 "parser/parser.tab.c"
     break;
 
   case 67: /* multiplicative_expression: multiplicative_expression '*' unary_expression  */
-#line 488 "parser/parser.y"
+#line 417 "parser/parser.y"
                                                  {
   (yyval.node) = asd_new_binary("*", (yyvsp[-2].node), (yyvsp[0].node));
   if ((yyvsp[-2].node)->type == (yyvsp[0].node)->type) (yyval.node)->type = (yyvsp[-2].node)->type; else semantic_error(30, yylineno, "Type error");
@@ -2211,11 +2174,11 @@ yyreduce:
   (yyval.node)->code = iloc_append((yyvsp[-2].node)->code, (yyvsp[0].node)->code);
   (yyval.node)->code = iloc_append((yyval.node)->code, iloc_create_inst(ILOC_MULT, ILOC_OP_REG, get_reg_id((yyvsp[-2].node)->temp), ILOC_OP_REG, get_reg_id((yyvsp[0].node)->temp), ILOC_OP_REG, get_reg_id((yyval.node)->temp)));
 }
-#line 2215 "parser/parser.tab.c"
+#line 2178 "parser/parser.tab.c"
     break;
 
   case 68: /* multiplicative_expression: multiplicative_expression '/' unary_expression  */
-#line 495 "parser/parser.y"
+#line 424 "parser/parser.y"
                                                  {
   (yyval.node) = asd_new_binary("/", (yyvsp[-2].node), (yyvsp[0].node));
   if ((yyvsp[-2].node)->type == (yyvsp[0].node)->type) (yyval.node)->type = (yyvsp[-2].node)->type; else semantic_error(30, yylineno, "Type error");
@@ -2223,58 +2186,59 @@ yyreduce:
   (yyval.node)->code = iloc_append((yyvsp[-2].node)->code, (yyvsp[0].node)->code);
   (yyval.node)->code = iloc_append((yyval.node)->code, iloc_create_inst(ILOC_DIV, ILOC_OP_REG, get_reg_id((yyvsp[-2].node)->temp), ILOC_OP_REG, get_reg_id((yyvsp[0].node)->temp), ILOC_OP_REG, get_reg_id((yyval.node)->temp)));
 }
-#line 2227 "parser/parser.tab.c"
+#line 2190 "parser/parser.tab.c"
     break;
 
   case 69: /* multiplicative_expression: multiplicative_expression '%' unary_expression  */
-#line 502 "parser/parser.y"
+#line 431 "parser/parser.y"
                                                  {
   (yyval.node) = asd_new_binary("%", (yyvsp[-2].node), (yyvsp[0].node));
   (yyval.node)->type = TYPE_INT; (yyval.node)->temp = iloc_new_reg();
   (yyval.node)->code = iloc_append((yyvsp[-2].node)->code, (yyvsp[0].node)->code);
 }
-#line 2237 "parser/parser.tab.c"
+#line 2200 "parser/parser.tab.c"
     break;
 
   case 70: /* unary_expression: primary_expression  */
-#line 508 "parser/parser.y"
+#line 437 "parser/parser.y"
                                      { (yyval.node) = (yyvsp[0].node); }
-#line 2243 "parser/parser.tab.c"
+#line 2206 "parser/parser.tab.c"
     break;
 
   case 71: /* unary_expression: '!' unary_expression  */
-#line 509 "parser/parser.y"
+#line 438 "parser/parser.y"
                        { 
   (yyval.node) = asd_new_unary("!", (yyvsp[0].node)); 
   (yyval.node)->type = TYPE_INT; (yyval.node)->code = (yyvsp[0].node)->code;
 }
-#line 2252 "parser/parser.tab.c"
+#line 2215 "parser/parser.tab.c"
     break;
 
   case 72: /* unary_expression: '+' unary_expression  */
-#line 513 "parser/parser.y"
+#line 442 "parser/parser.y"
                        { 
   (yyval.node) = asd_new_unary("+", (yyvsp[0].node)); 
   (yyval.node)->type = (yyvsp[0].node)->type; (yyval.node)->code = (yyvsp[0].node)->code; (yyval.node)->temp = (yyvsp[0].node)->temp;
 }
-#line 2261 "parser/parser.tab.c"
+#line 2224 "parser/parser.tab.c"
     break;
 
   case 73: /* unary_expression: '-' unary_expression  */
-#line 517 "parser/parser.y"
+#line 446 "parser/parser.y"
                        {
   (yyval.node) = asd_new_unary("-", (yyvsp[0].node));
   (yyval.node)->type = (yyvsp[0].node)->type; (yyval.node)->temp = iloc_new_reg();
   (yyval.node)->code = iloc_append((yyvsp[0].node)->code, iloc_create_inst(ILOC_RSUBI, ILOC_OP_REG, get_reg_id((yyvsp[0].node)->temp), ILOC_OP_INT, 0, ILOC_OP_REG, get_reg_id((yyval.node)->temp)));
 }
-#line 2271 "parser/parser.tab.c"
+#line 2234 "parser/parser.tab.c"
     break;
 
   case 74: /* primary_expression: TK_ID  */
-#line 523 "parser/parser.y"
+#line 452 "parser/parser.y"
                           {
   symbol_entry_t *entry = scope_lookup(scope_stack_pointer, (yyvsp[0].lexical_value).value);
   if (!entry) semantic_error(10, (yyvsp[0].lexical_value).line_number, (yyvsp[0].lexical_value).value);
+  if (entry->nature != SYMBOL_VARIABLE) semantic_error(20, (yyvsp[0].lexical_value).line_number, (yyvsp[0].lexical_value).value);
   
   data_type_t type = entry->data_type;
   int offset = entry->offset;
@@ -2285,57 +2249,49 @@ yyreduce:
   (yyval.node)->temp = iloc_new_reg();
   int base_reg = is_global ? -2 : -1;
   
-  // DEBUG PRINT
-  fprintf(stderr, "DEBUG: ID '%s' carregado em %s. Offset: %d. Global: %d\n", 
-          entry->key, (yyval.node)->temp, offset, is_global);
-
   (yyval.node)->code = iloc_create_inst(ILOC_LOADAI, ILOC_OP_REG, base_reg, ILOC_OP_INT, offset, ILOC_OP_REG, get_reg_id((yyval.node)->temp));
 }
-#line 2295 "parser/parser.tab.c"
+#line 2255 "parser/parser.tab.c"
     break;
 
   case 75: /* primary_expression: TK_LI_INTEIRO  */
-#line 542 "parser/parser.y"
+#line 468 "parser/parser.y"
                 {
   int val = atoi((yyvsp[0].lexical_value).value);
   (yyval.node) = asd_new_node_from_value(&(yyvsp[0].lexical_value));
   (yyval.node)->type = TYPE_INT;
   (yyval.node)->temp = iloc_new_reg();
-  
-  // DEBUG PRINT
-  fprintf(stderr, "DEBUG: Literal %d carregado em %s\n", val, (yyval.node)->temp);
-
-  (yyval.node)->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, 0,0, ILOC_OP_REG, get_reg_id((yyval.node)->temp));
+  (yyval.node)->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, ILOC_OP_REG, get_reg_id((yyval.node)->temp), 0,0);
 }
-#line 2311 "parser/parser.tab.c"
+#line 2267 "parser/parser.tab.c"
     break;
 
   case 76: /* primary_expression: TK_LI_DECIMAL  */
-#line 553 "parser/parser.y"
+#line 475 "parser/parser.y"
                 {
   int val = (int)atof((yyvsp[0].lexical_value).value);
   (yyval.node) = asd_new_node_from_value(&(yyvsp[0].lexical_value));
   (yyval.node)->type = TYPE_FLOAT;
   (yyval.node)->temp = iloc_new_reg();
-  (yyval.node)->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, 0,0, ILOC_OP_REG, get_reg_id((yyval.node)->temp));
+  (yyval.node)->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, ILOC_OP_REG, get_reg_id((yyval.node)->temp), 0,0);
 }
-#line 2323 "parser/parser.tab.c"
+#line 2279 "parser/parser.tab.c"
     break;
 
   case 77: /* primary_expression: '(' expression ')'  */
-#line 560 "parser/parser.y"
+#line 482 "parser/parser.y"
                      { (yyval.node) = (yyvsp[-1].node); }
-#line 2329 "parser/parser.tab.c"
+#line 2285 "parser/parser.tab.c"
     break;
 
   case 78: /* primary_expression: function_call  */
-#line 561 "parser/parser.y"
+#line 483 "parser/parser.y"
                 { (yyval.node) = (yyvsp[0].node); }
-#line 2335 "parser/parser.tab.c"
+#line 2291 "parser/parser.tab.c"
     break;
 
 
-#line 2339 "parser/parser.tab.c"
+#line 2295 "parser/parser.tab.c"
 
       default: break;
     }
@@ -2559,7 +2515,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 563 "parser/parser.y"
+#line 485 "parser/parser.y"
 
 
 void yyerror (char const *mensagem) {

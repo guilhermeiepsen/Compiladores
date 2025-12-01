@@ -21,11 +21,11 @@ void semantic_error(int error_code, int line, const char *text) {
 
 static int get_reg_id(const char *temp_str) {
     if (!temp_str) {
-        fprintf(stderr, "FATAL: get_reg_id NULL\n");
+        fprintf(stderr, "FATAL ERROR: get_reg_id called with NULL pointer. Logic error in AST code gen.\n");
         exit(1);
     }
     if (temp_str[0] != 'r') {
-        fprintf(stderr, "FATAL: Invalid reg format '%s'\n", temp_str);
+        fprintf(stderr, "FATAL ERROR: Invalid register format: '%s'\n", temp_str);
         exit(1);
     }
     return atoi(temp_str + 1);
@@ -48,7 +48,6 @@ static int get_reg_id(const char *temp_str) {
  symbol_entry_t *symbol;
 }
 
-/* Tipos das regras */
 %type <node> program list element function_definition body command_block command_sequence simple_command
 %type <node> variable_declaration variable_declaration_with_instantiation optional_instantiation literal
 %type <node> attribution_command function_call args return_command flow_control_command
@@ -61,16 +60,11 @@ static int get_reg_id(const char *temp_str) {
 %type <arg_list> optional_parameter_list parameter_list parameter
 %type <symbol> header
 
-/* Tokens */
 %token TK_TIPO TK_VAR TK_SENAO TK_DECIMAL TK_SE TK_INTEIRO TK_ATRIB TK_RETORNA TK_SETA TK_ENQUANTO TK_COM
 %token TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE
 %token <lexical_value>TK_ID TK_LI_INTEIRO TK_LI_DECIMAL TK_ER
 
 %%
-
-/* ========================================================================== */
-/* PROGRAMA                                                                   */
-/* ========================================================================== */
 
 program: global_escope_init list global_escope_end ';' {
   arvore = $2;
@@ -107,10 +101,6 @@ list: element {
 
 element: function_definition { $$ = $1; }
 | variable_declaration { $$ = $1; };
-
-/* ========================================================================== */
-/* FUNÇÕES                                                                    */
-/* ========================================================================== */
 
 function_definition: header {
   scope_push(scope_stack_pointer, SCOPE_FUNCTION);
@@ -164,10 +154,6 @@ parameter: TK_ID TK_ATRIB var_type {
   free($1.value);
 };
 
-/* ========================================================================== */
-/* BLOCOS                                                                     */
-/* ========================================================================== */
-
 body: command_block { $$ = $1; };
 
 command_block: block_scope_init command_sequence ']' {
@@ -201,10 +187,6 @@ simple_command: variable_declaration_with_instantiation { $$ = $1; }
 | flow_control_command { $$ = $1; }
 | command_block { $$ = $1; };
 
-/* ========================================================================== */
-/* DECLARAÇÃO DE VARIÁVEIS                                                    */
-/* ========================================================================== */
-
 variable_declaration: TK_VAR TK_ID TK_ATRIB var_type {
   if(!scope_insert_current(scope_stack_pointer, $2.value, SYMBOL_VARIABLE, $4, &$2)) {
     semantic_error(11, $2.line_number, $2.value);
@@ -220,12 +202,8 @@ variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional
   asd_tree_t *inst_node = $5;
   if (inst_node != NULL) {
     if (inst_node->type != $4) semantic_error(30, $2.line_number, "Instantiation type mismatch");
-    
     int base_reg = entry->is_global ? -2 : -1;
-    iloc_code_t *store = iloc_create_inst(ILOC_STOREAI,
-                                          ILOC_OP_REG, get_reg_id(inst_node->temp),
-                                          ILOC_OP_REG, base_reg,
-                                          ILOC_OP_INT, entry->offset);
+    iloc_code_t *store = iloc_create_inst(ILOC_STOREAI, ILOC_OP_REG, get_reg_id(inst_node->temp), ILOC_OP_REG, base_reg, ILOC_OP_INT, entry->offset);
     inst_node->code = iloc_append(inst_node->code, store);
   }
 
@@ -241,9 +219,7 @@ variable_declaration_with_instantiation: TK_VAR TK_ID TK_ATRIB var_type optional
 
 optional_instantiation: TK_COM literal { 
   $$ = asd_new_unary("com", $2);
-  $$->type = $2->type;
-  $$->code = $2->code;
-  $$->temp = $2->temp;
+  $$->type = $2->type; $$->code = $2->code; $$->temp = $2->temp;
 }
 | %empty { $$ = NULL; };
 
@@ -252,27 +228,17 @@ literal: TK_LI_INTEIRO {
   $$ = asd_new_node_from_value(&$1);
   $$->type = TYPE_INT;
   $$->temp = iloc_new_reg();
-  // CORREÇÃO: Destino passado como 2º argumento (op2), e não 3º (op3)
-  $$->code = iloc_create_inst(ILOC_LOADI, 
-                              ILOC_OP_INT, val,              // op1: valor
-                              ILOC_OP_REG, get_reg_id($$->temp), // op2: destino
-                              0, 0);                         // op3: vazio
+  // op2: destino (get_reg_id)
+  $$->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, ILOC_OP_REG, get_reg_id($$->temp), 0,0);
 }
 | TK_LI_DECIMAL {
   int val = (int)atof($1.value);
   $$ = asd_new_node_from_value(&$1);
   $$->type = TYPE_FLOAT;
   $$->temp = iloc_new_reg();
-  // CORREÇÃO: Destino passado como 2º argumento (op2)
-  $$->code = iloc_create_inst(ILOC_LOADI, 
-                              ILOC_OP_INT, val,              // op1
-                              ILOC_OP_REG, get_reg_id($$->temp), // op2
-                              0, 0);                         // op3
+  // op2: destino
+  $$->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, ILOC_OP_REG, get_reg_id($$->temp), 0,0);
 };
-
-/* ========================================================================== */
-/* ATRIBUIÇÃO                                                                 */
-/* ========================================================================== */
 
 attribution_command: TK_ID TK_ATRIB expression {
   symbol_entry_t *entry = scope_lookup(scope_stack_pointer, $1.value);
@@ -285,21 +251,9 @@ attribution_command: TK_ID TK_ATRIB expression {
   $$->type = entry->data_type;
 
   int base_reg = entry->is_global ? -2 : -1;
-  
-  // DEBUG PRINT
-  fprintf(stderr, "DEBUG: Atribuição '%s'. Expressão temp: '%s'. Offset: %d. Base: %d\n", 
-          entry->key, $3->temp, entry->offset, base_reg);
-
-  iloc_code_t *store = iloc_create_inst(ILOC_STOREAI,
-                                        ILOC_OP_REG, get_reg_id($3->temp),
-                                        ILOC_OP_REG, base_reg,
-                                        ILOC_OP_INT, entry->offset);
+  iloc_code_t *store = iloc_create_inst(ILOC_STOREAI, ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_REG, base_reg, ILOC_OP_INT, entry->offset);
   $$->code = iloc_append($3->code, store);
 };
-
-/* ========================================================================== */
-/* CHAMADA DE FUNÇÃO, ARGUMENTOS, RETORNO                                     */
-/* ========================================================================== */
 
 function_call: TK_ID '(' args ')' {
     symbol_entry_t *entry = scope_lookup(scope_stack_pointer, $1.value);
@@ -326,61 +280,37 @@ return_command: TK_RETORNA expression TK_ATRIB var_type {
   $$->code = $2->code;
 };
 
-/* ========================================================================== */
-/* CONTROLE DE FLUXO                                                          */
-/* ========================================================================== */
-
 flow_control_command: conditional_struct { $$ = $1; } | iterative_struct { $$ = $1; };
 
 conditional_struct: TK_SE '(' expression ')' command_block else_block {
   $$ = asd_new_trinary("se", $3, $5, $6);
-  
-  char *L_true = iloc_new_label();
-  char *L_false = iloc_new_label();
-  // se tiver else, precisamos de um label extra para a saída final
-  // se não tiver, L_false já serve como saída
+  char *L_true = iloc_new_label(), *L_false = iloc_new_label();
   char *L_saida = ($6 != NULL) ? iloc_new_label() : L_false;
 
-  // 1. Gera o teste e o salto condicional
-  // cbr r_cond -> L_true, L_false
-  iloc_code_t *cbr = iloc_create_inst(ILOC_CBR,
-                                      ILOC_OP_REG, get_reg_id($3->temp),
-                                      ILOC_OP_LABEL, atoi(L_true + 1),
-                                      ILOC_OP_LABEL, atoi(L_false + 1));
-
-  // 2. Cria os nós de label (NOPs)
-  iloc_code_t *l_true_node = iloc_create_inst(ILOC_NOP, ILOC_OP_LABEL, atoi(L_true + 1), 0,0,0,0);
-  iloc_code_t *l_false_node = iloc_create_inst(ILOC_NOP, ILOC_OP_LABEL, atoi(L_false + 1), 0,0,0,0);
+  iloc_code_t *cbr = iloc_create_inst(ILOC_CBR, ILOC_OP_REG, get_reg_id($3->temp), ILOC_OP_LABEL, atoi(L_true+1), ILOC_OP_LABEL, atoi(L_false+1));
+  iloc_code_t *l_true = iloc_create_inst(ILOC_NOP, ILOC_OP_LABEL, atoi(L_true+1), 0,0,0,0);
+  iloc_code_t *l_false = iloc_create_inst(ILOC_NOP, ILOC_OP_LABEL, atoi(L_false+1), 0,0,0,0);
   
-  // 3. Montagem do Código
-  $$->code = $3->code;                     // Código da expressão
-  $$->code = iloc_append($$->code, cbr);   // Teste
+  $$->code = iloc_append($3->code, cbr);
+  $$->code = iloc_append($$->code, l_true);
   
-  $$->code = iloc_append($$->code, l_true_node); // Rótulo TRUE
-  $$->code = iloc_append($$->code, $5->code);    // Código do bloco TRUE
+  // FIX SEGV: Check if block exists
+  if ($5) $$->code = iloc_append($$->code, $5->code);
 
   if ($6 != NULL) {
-      // COM ELSE:
-      // Precisa pular o bloco false ao acabar o true
-      iloc_code_t *jump_out = iloc_create_inst(ILOC_JUMPI, 0,0,0,0, ILOC_OP_LABEL, atoi(L_saida + 1));
-      $$->code = iloc_append($$->code, jump_out);
+      iloc_code_t *jmp = iloc_create_inst(ILOC_JUMPI, 0,0,0,0, ILOC_OP_LABEL, atoi(L_saida+1));
+      $$->code = iloc_append($$->code, jmp);
+      $$->code = iloc_append($$->code, l_false);
+      $$->code = iloc_append($$->code, $6->code);
       
-      $$->code = iloc_append($$->code, l_false_node); // Rótulo FALSE (início do else)
-      $$->code = iloc_append($$->code, $6->code);     // Código do bloco FALSE
-      
-      // Rótulo de SAÍDA final
-      iloc_code_t *l_saida_node = iloc_create_inst(ILOC_NOP, ILOC_OP_LABEL, atoi(L_saida + 1), 0,0,0,0);
-      $$->code = iloc_append($$->code, l_saida_node);
-      free(L_saida); // Liberar apenas se foi alocado (no caso de ter else)
+      iloc_code_t *l_out = iloc_create_inst(ILOC_NOP, ILOC_OP_LABEL, atoi(L_saida+1), 0,0,0,0);
+      $$->code = iloc_append($$->code, l_out);
+      free(L_saida);
   } else {
-      // SEM ELSE:
-      // O fluxo cai naturalmente no L_false, que age como saída
-      $$->code = iloc_append($$->code, l_false_node); 
-      // L_saida é ponteiro para L_false, não precisa free separado
+      $$->code = iloc_append($$->code, l_false);
   }
 
-  free(L_true); 
-  free(L_false); 
+  free(L_true); free(L_false);
 };
 
 else_block: TK_SENAO command_block { $$ = $2; } | %empty { $$ = NULL; };
@@ -399,16 +329,15 @@ iterative_struct: TK_ENQUANTO '(' expression ')' command_block {
   $$->code = iloc_append($$->code, $3->code);
   $$->code = iloc_append($$->code, cbr);
   $$->code = iloc_append($$->code, l_true);
-  $$->code = iloc_append($$->code, $5->code);
+  
+  // FIX SEGV: Check if block exists
+  if ($5) $$->code = iloc_append($$->code, $5->code);
+  
   $$->code = iloc_append($$->code, jmp);
   $$->code = iloc_append($$->code, l_out);
 
   free(L_ini); free(L_true); free(L_out);
 };
-
-/* ========================================================================== */
-/* EXPRESSÕES                                                                 */
-/* ========================================================================== */
 
 expression: logical_or_expression { $$ = $1; };
 
@@ -523,6 +452,7 @@ unary_expression: primary_expression { $$ = $1; }
 primary_expression: TK_ID {
   symbol_entry_t *entry = scope_lookup(scope_stack_pointer, $1.value);
   if (!entry) semantic_error(10, $1.line_number, $1.value);
+  if (entry->nature != SYMBOL_VARIABLE) semantic_error(20, $1.line_number, $1.value);
   
   data_type_t type = entry->data_type;
   int offset = entry->offset;
@@ -533,10 +463,6 @@ primary_expression: TK_ID {
   $$->temp = iloc_new_reg();
   int base_reg = is_global ? -2 : -1;
   
-  // DEBUG PRINT
-  fprintf(stderr, "DEBUG: ID '%s' carregado em %s. Offset: %d. Global: %d\n", 
-          entry->key, $$->temp, offset, is_global);
-
   $$->code = iloc_create_inst(ILOC_LOADAI, ILOC_OP_REG, base_reg, ILOC_OP_INT, offset, ILOC_OP_REG, get_reg_id($$->temp));
 }
 | TK_LI_INTEIRO {
@@ -544,18 +470,14 @@ primary_expression: TK_ID {
   $$ = asd_new_node_from_value(&$1);
   $$->type = TYPE_INT;
   $$->temp = iloc_new_reg();
-  
-  // DEBUG PRINT
-  fprintf(stderr, "DEBUG: Literal %d carregado em %s\n", val, $$->temp);
-
-  $$->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, 0,0, ILOC_OP_REG, get_reg_id($$->temp));
+  $$->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, ILOC_OP_REG, get_reg_id($$->temp), 0,0);
 }
 | TK_LI_DECIMAL {
   int val = (int)atof($1.value);
   $$ = asd_new_node_from_value(&$1);
   $$->type = TYPE_FLOAT;
   $$->temp = iloc_new_reg();
-  $$->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, 0,0, ILOC_OP_REG, get_reg_id($$->temp));
+  $$->code = iloc_create_inst(ILOC_LOADI, ILOC_OP_INT, val, ILOC_OP_REG, get_reg_id($$->temp), 0,0);
 }
 | '(' expression ')' { $$ = $2; }
 | function_call { $$ = $1; };
