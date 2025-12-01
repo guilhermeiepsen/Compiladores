@@ -1,5 +1,4 @@
-var b := inteiro,   // Declaração Global (separada por vírgula)
-
-main -> inteiro := [
-  b := 2            // Uso Global
+var b := inteiro,
+f -> inteiro := [
+  b := 2
 ];
