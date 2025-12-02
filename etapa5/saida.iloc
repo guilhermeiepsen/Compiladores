@@ -1,0 +1,2 @@
+loadI 2 => r1
+storeAI r1 => rbss, 0
